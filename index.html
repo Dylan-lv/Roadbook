@@ -1,3 +1,4 @@
+<!-- ... existing code ... -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -93,7 +94,7 @@
     </header>
 
     <!-- ===================================================================== -->
-    <!-- VUE 1 : ACTUALITÉ                                                     -->
+    <!-- VUE 1 : ACTUALITÉ (SANS GROSSE BANNIÈRE INUTILE)                      -->
     <!-- ===================================================================== -->
     <main id="view-feed" class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
         <div class="flex items-center justify-between gap-4">
@@ -107,7 +108,7 @@
     </main>
 
     <!-- ===================================================================== -->
-    <!-- VUE 2 : EXPLORER                                                      -->
+    <!-- VUE 2 : EXPLORER (SANS GROSSE BANNIÈRE + 5 FILTRES & MODE BOUCLE)     -->
     <!-- ===================================================================== -->
     <main id="view-explorer" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
         <div class="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-4">
@@ -177,7 +178,7 @@
     </main>
 
     <!-- ===================================================================== -->
-    <!-- VUE 3 : CARTE GPS (STYLE WAZE ÉPURÉ ET TRACÉS RÉELS)                  -->
+    <!-- VUE 3 : CARTE GPS (LEAFLET CORRIGÉE)                                  -->
     <!-- ===================================================================== -->
     <main id="view-map" class="hidden flex-1 flex flex-col relative pb-16">
         <div class="absolute top-4 inset-x-4 z-30 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
@@ -234,7 +235,7 @@
     </main>
 
     <!-- ===================================================================== -->
-    <!-- VUE 4 : MON GARAGE & PROFIL                                           -->
+    <!-- VUE 4 : MON GARAGE & PROFIL (FICHE TECHNIQUE & ARCHIVAGE)             -->
     <!-- ===================================================================== -->
     <main id="view-garage" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -322,7 +323,7 @@
         </div>
     </footer>
 
-    <!-- MODALE VÉHICULE -->
+    <!-- MODALE VÉHICULE (Fiche technique complète) -->
     <div id="vehicle-modal" class="fixed inset-0 bg-asphalt/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <h3 id="veh-modal-title" class="font-serif text-xl font-bold text-asphalt">Fiche Véhicule</h3>
@@ -505,7 +506,7 @@
                     rating: 4.9,
                     bannerPhoto: 'https://placehold.co/800x400/8B1E24/FFFFFF?text=Route+Napoleon',
                     mechanicAdvice: 'Montée prolongée sur 40 km : surveiller température d’eau. Plein SP98 et E85 disponible à Grasse.',
-                    gpsCoords: [[43.6585, 6.9237], [43.7120, 6.8450], [43.7900, 6.7120], [43.8450, 6.5130]],
+                    gpsCoords: [[43.6585, 6.9237], [43.7120, 6.8450], [43.8450, 6.5130]],
                     reviews: []
                 },
                 {
@@ -524,14 +525,14 @@
                     rating: 4.8,
                     bannerPhoto: 'https://placehold.co/800x400/3F3F46/FFFFFF?text=Chartreuse',
                     mechanicAdvice: 'Routes étroites, freinage très sollicité dans la descente.',
-                    gpsCoords: [[45.2410, 5.8520], [45.2890, 5.8920], [45.3520, 5.9810], [45.4210, 6.0420], [45.2410, 5.8520]],
+                    gpsCoords: [[45.2410, 5.8520], [45.2890, 5.8920], [45.4210, 6.0420], [45.2410, 5.8520]],
                     reviews: []
                 },
                 {
-                    id: 'r-esterel',
+                    id: 'r-corbiere',
                     title: 'Route des Crêtes & Corniche de l’Esterel',
                     region: 'Var & Alpes-Maritimes',
-                    proximityKm: 310,
+                    proximityKm: 410,
                     distanceKm: 45,
                     durationMins: 60,
                     durationLabel: '1h 00',
@@ -543,7 +544,7 @@
                     rating: 4.9,
                     bannerPhoto: 'https://placehold.co/800x400/0284C7/FFFFFF?text=Esterel+Littoral',
                     mechanicAdvice: 'Superbes points de vue rocheux. Attention aux cyclistes en saison.',
-                    gpsCoords: [[43.4190, 6.8450], [43.4350, 6.8620], [43.4500, 6.8800], [43.4190, 6.8450]],
+                    gpsCoords: [[43.4190, 6.8450], [43.4500, 6.8800], [43.4190, 6.8450]],
                     reviews: []
                 },
                 {
@@ -562,14 +563,14 @@
                     rating: 4.7,
                     bannerPhoto: 'https://placehold.co/800x400/15803D/FFFFFF?text=Vosges+Cretes',
                     mechanicAdvice: 'Passages en crête exposés au vent. Vérifier la carburation en altitude.',
-                    gpsCoords: [[48.0750, 7.0350], [48.1200, 7.1000], [48.1800, 7.1200], [48.2500, 7.1500]],
+                    gpsCoords: [[48.0750, 7.0350], [48.1200, 7.1000], [48.2500, 7.1500]],
                     reviews: []
                 },
                 {
                     id: 'r-normandie',
                     title: 'Boucle des Falaises de Côte d’Albâtre',
                     region: 'Normandie',
-                    proximityKm: 420,
+                    proximityKm: 520,
                     distanceKm: 74,
                     durationMins: 90,
                     durationLabel: '1h 30',
@@ -581,7 +582,7 @@
                     rating: 4.6,
                     bannerPhoto: 'https://placehold.co/800x400/CA8A04/FFFFFF?text=Normandie+Campagne',
                     mechanicAdvice: 'Routes sinueuses entre champs et estuaires. Embruns salins sur la carrosserie.',
-                    gpsCoords: [[49.8500, 0.3800], [49.8800, 0.4500], [49.9200, 0.5300], [49.8500, 0.3800]],
+                    gpsCoords: [[49.8500, 0.3800], [49.9200, 0.5300], [49.8500, 0.3800]],
                     reviews: []
                 }
             ],
@@ -595,11 +596,8 @@
             }
         };
 
-        // --- MÉMOIRE & PERSISTANCE (localStorage) ---
-        let appState = JSON.parse(localStorage.getItem('roadbook_app_v14')) || DEFAULT_STATE;
-        function saveState() { 
-            localStorage.setItem('roadbook_app_v14', JSON.stringify(appState)); 
-        }
+        let appState = JSON.parse(localStorage.getItem('roadbook_app_v8')) || DEFAULT_STATE;
+        function saveState() { localStorage.setItem('roadbook_app_v8', JSON.stringify(appState)); }
 
         let selectedRouteId = appState.routes[0].id;
         let leafletMap = null;
@@ -624,7 +622,7 @@
             });
 
             if (tabId === 'map') {
-                setTimeout(() => { initLeafletMap(); }, 200);
+                setTimeout(() => { initLeafletMap(); }, 150);
             }
         }
 
@@ -647,21 +645,19 @@
             showToast('Véhicule actif mis à jour !', 'fa-car');
         }
 
-        // --- CARTE LEAFLET (STYLE WAZE ÉPURÉ SANS CLÉ API) ---
+        /* COMMENT INTÉGRER UNE MAP LEAFLET CORRECTEMENT :
+           1. Inclure le CSS et le JS de Leaflet dans le <head> (ce qui a été fait ci-dessus).
+           2. Disposer d'un conteneur DOM avec une hauteur explicite (ex: min-height: 75vh).
+           3. Initialiser la map avec L.map('id_du_div') une seule fois, et l'appeler après que l'onglet soit visible pour éviter les bugs de rendu gris (via invalidateSize).
+           4. Ajouter les tuiles géographiques (TileLayer) avec L.tileLayer(...).addTo(map).
+           5. Gérer le redimensionnement et le centrage avec fitBounds sur les tracés GPS. */
         function initLeafletMap() {
-            const container = document.getElementById('leaflet-map');
-            if (!container) return;
-
             if (!leafletMap) {
                 leafletMap = L.map('leaflet-map', { zoomControl: false }).setView([45.7640, 4.8357], 11);
                 L.control.zoom({ position: 'topright' }).addTo(leafletMap);
-                
-                // Tuiles sombres & épurées style Waze
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-                    maxZoom: 19,
-                    attribution: '© CARTO'
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                    maxZoom: 19, subdomains: 'abcd', attribution: '© CARTO'
                 }).addTo(leafletMap);
-
                 poisLayersGroup = L.layerGroup().addTo(leafletMap);
                 renderLeafletMapData();
                 locateUserOnMap();
@@ -679,17 +675,16 @@
                         leafletMap.setView([lat, lng], 13);
                         if (userLocationMarker) leafletMap.removeLayer(userLocationMarker);
                         userLocationMarker = L.marker([lat, lng], {
-                            icon: L.divIcon({ className: 'user-loc', html: `<div class="w-8 h-8 rounded-full bg-crimson border-2 border-white text-white flex items-center justify-center shadow-lg animate-pulse"><i class="fa-solid fa-location-crosshairs text-xs"></i></div>`, iconSize: [32, 32], iconAnchor: [16, 16] })
+                            icon: L.divIcon({ className: 'user-loc', html: `<div class="w-8 h-8 rounded-full bg-blue-600 border-2 border-white text-white flex items-center justify-center shadow-lg animate-pulse"><i class="fa-solid fa-location-crosshairs text-xs"></i></div>`, iconSize: [32, 32], iconAnchor: [16, 16] })
                         }).addTo(leafletMap).bindPopup('<b>Vous êtes ici</b>').openPopup();
                     }
                     showToast('Position GPS actualisée !', 'fa-crosshairs');
                 }, () => {
-                    showToast('Géolocalisation non disponible.', 'fa-triangle-exclamation');
+                    showToast('Impossible d’accéder à votre géolocalisation.', 'fa-triangle-exclamation');
                 });
             }
         }
 
-        // --- TRACÉS RÉELS GÉOGRAPHIQUES DES ITINÉRAIRES ---
         function renderLeafletMapData() {
             if (!leafletMap) return;
             poisLayersGroup.clearLayers();
@@ -700,17 +695,16 @@
                 appState.mapPOIs.stations.forEach(st => {
                     const p = st.prices[fuel] || 'N/D';
                     const marker = L.marker([st.lat, st.lng], {
-                        icon: L.divIcon({ className: 'poi', html: `<div class="w-8 h-8 rounded-full bg-zinc-900 border-2 border-crimson text-white flex items-center justify-center text-xs"><i class="fa-solid fa-gas-pump"></i></div>`, iconSize: [32, 32], iconAnchor: [16, 16] })
+                        icon: L.divIcon({ className: 'poi', html: `<div class="w-8 h-8 rounded-full bg-asphalt border-2 border-crimson text-white flex items-center justify-center text-xs"><i class="fa-solid fa-gas-pump"></i></div>`, iconSize: [32, 32], iconAnchor: [16, 16] })
                     }).bindPopup(`<div class="text-xs"><b>${st.name}</b><br>Tarif ${fuel}: ${p} €/L</div>`);
                     poisLayersGroup.addLayer(marker);
                 });
             }
 
-            // Tracé géographique réel sous forme de Polyline rouge vif (style Waze)
             const route = appState.routes.find(r => r.id === selectedRouteId);
             if (route && route.gpsCoords) {
                 if (routePolylineLayer) leafletMap.removeLayer(routePolylineLayer);
-                routePolylineLayer = L.polyline(route.gpsCoords, { color: '#EF4444', weight: 6, opacity: 0.9 }).addTo(leafletMap);
+                routePolylineLayer = L.polyline(route.gpsCoords, { color: '#8B1E24', weight: 5 }).addTo(leafletMap);
                 leafletMap.fitBounds(routePolylineLayer.getBounds(), { padding: [50, 50] });
             }
         }
@@ -736,6 +730,15 @@
                 if (isLoopOnly && !r.isLoop) return false;
                 if (windingFilter !== 'all' && r.windingType !== windingFilter) return false;
                 if (typeFilter !== 'all' && r.roadType !== typeFilter) return false;
+
+                if (durFilter === 'short' && r.distanceKm > 60) return false;
+                if (durFilter === 'medium' && (r.distanceKm <= 60 || r.distanceKm > 150)) return false;
+                if (durFilter === 'long' && r.distanceKm <= 150) return false;
+
+                if (elevFilter === 'low' && r.elevationGain > 500) return false;
+                if (elevFilter === 'mid' && (r.elevationGain <= 500 || r.elevationGain > 1500)) return false;
+                if (elevFilter === 'high' && r.elevationGain <= 1500) return false;
+
                 return true;
             });
 
@@ -766,8 +769,7 @@
         function launchRouteOnMap(routeId) {
             selectedRouteId = routeId;
             switchTab('map');
-            renderLeafletMapData();
-            showToast('Itinéraire et tracé chargés sur le GPS !', 'fa-location-arrow');
+            showToast('Itinéraire chargé sur le GPS !', 'fa-location-arrow');
         }
 
         function openRouteDetail(routeId) {
@@ -1046,7 +1048,7 @@
             if (!address) return;
             const item = { id: 'loc-' + Date.now(), name, address };
             if (type === 'garage') appState.profile.garages.push(item);
-            else appState.profile.favoritesDest.push(item);
+            else appstate.profile.favoritesDest.push(item);
             saveState();
             renderGarageAndProfile();
             showToast('Lieu privé enregistré !', 'fa-check');
