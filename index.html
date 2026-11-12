@@ -449,7 +449,6 @@
 
     <!-- SCRIPTS JAVASCRIPT -->
     <script>
-        // État global avec Persistance localStorage
         let defaultState = {
             activeTab: 'feed',
             activeVehicleId: 'veh_1',
@@ -482,7 +481,6 @@
             ]
         };
 
-        // Charger depuis localStorage si dispo
         let appState = JSON.parse(localStorage.getItem('roadbook_state')) || defaultState;
 
         function saveStateToStorage() {
@@ -567,6 +565,7 @@
             document.getElementById('prof-age').value = p.age;
             document.getElementById('prof-category').value = p.category;
             document.getElementById('prof-bio').value = p.bio;
+            document.getElementById('prof-avatar').value = '';
             document.getElementById('profile-modal').classList.remove('hidden');
             document.getElementById('profile-modal').classList.add('flex');
         }
@@ -581,19 +580,28 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     document.getElementById('prof-avatar').value = e.target.result;
-                }
+                };
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
         function saveProfileModal() {
-            appState.userProfile.pseudo = document.getElementById('prof-pseudo').value;
+            const pseudo = document.getElementById('prof-pseudo').value.trim();
+            if (!pseudo) {
+                showToast("Le pseudo est obligatoire", "error");
+                return;
+            }
+
+            appState.userProfile.pseudo = pseudo;
             appState.userProfile.city = document.getElementById('prof-city').value;
             appState.userProfile.age = parseInt(document.getElementById('prof-age').value) || 30;
             appState.userProfile.category = document.getElementById('prof-category').value;
             appState.userProfile.bio = document.getElementById('prof-bio').value;
+            
             const customAvatar = document.getElementById('prof-avatar').value;
-            if (customAvatar) appState.userProfile.avatar = customAvatar;
+            if (customAvatar) {
+                appState.userProfile.avatar = customAvatar;
+            }
 
             saveStateToStorage();
             renderUserProfile();
@@ -788,6 +796,9 @@
         function openVehicleModal(id) {
             document.getElementById('veh-id').value = id || '';
             document.getElementById('veh-modal-title').textContent = id ? 'Modifier le véhicule' : 'Ajouter un véhicule';
+            document.getElementById('veh-photo').value = '';
+            document.getElementById('veh-file').value = '';
+            
             if (id) {
                 const v = appState.vehicles.find(x => x.id === id);
                 document.getElementById('veh-brand').value = v.brand;
@@ -799,9 +810,8 @@
                 document.getElementById('veh-torque').value = v.torque;
                 document.getElementById('veh-weight').value = v.weight;
                 document.getElementById('veh-special').value = v.special;
-                document.getElementById('veh-photo').value = v.photo;
             } else {
-                ['veh-brand', 'veh-model', 'veh-year', 'veh-cc', 'veh-hp', 'veh-torque', 'veh-weight', 'veh-special', 'veh-photo'].forEach(el => document.getElementById(el).value = '');
+                ['veh-brand', 'veh-model', 'veh-year', 'veh-cc', 'veh-hp', 'veh-torque', 'veh-weight', 'veh-special'].forEach(el => document.getElementById(el).value = '');
             }
             document.getElementById('vehicle-modal').classList.remove('hidden');
             document.getElementById('vehicle-modal').classList.add('flex');
@@ -817,21 +827,32 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     document.getElementById('veh-photo').value = e.target.result;
-                }
+                };
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
         function saveVehicleModal() {
             const id = document.getElementById('veh-id').value;
-            const brand = document.getElementById('veh-brand').value;
-            const model = document.getElementById('veh-model').value;
+            const brand = document.getElementById('veh-brand').value.trim();
+            const model = document.getElementById('veh-model').value.trim();
             const year = parseInt(document.getElementById('veh-year').value);
 
             if (!brand || !model || !year) {
                 showToast("Marque, modèle et année obligatoires", "error");
                 return;
             }
+
+            let existingPhoto = 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400';
+            if (id) {
+                const oldVeh = appState.vehicles.find(x => x.id === id);
+                if (oldVeh && oldVeh.photo) {
+                    existingPhoto = oldVeh.photo;
+                }
+            }
+
+            const customPhoto = document.getElementById('veh-photo').value;
+            const finalPhoto = customPhoto ? customPhoto : existingPhoto;
 
             const vehicleData = {
                 id: id || `veh_${Date.now()}`,
@@ -842,7 +863,7 @@
                 torque: document.getElementById('veh-torque').value,
                 weight: document.getElementById('veh-weight').value,
                 special: document.getElementById('veh-special').value,
-                photo: document.getElementById('veh-photo').value || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400',
+                photo: finalPhoto,
                 archived: false
             };
 
