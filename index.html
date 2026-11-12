@@ -60,21 +60,21 @@
             </div>
 
             <nav class="hidden md:flex items-center gap-1 bg-zinc-900/90 p-1.5 rounded-2xl border border-zinc-800">
-                <button onclick="switchTab('map')" id="nav-map" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
-                    <i class="fa-solid fa-location-arrow"></i>
-                    <span>GPS & Carte</span>
+                <button onclick="switchTab('feed')" id="nav-feed" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
+                    <i class="fa-solid fa-rss"></i>
+                    <span>Actualités</span>
                 </button>
                 <button onclick="switchTab('explorer')" id="nav-explorer" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
                     <i class="fa-solid fa-compass"></i>
                     <span>Explorer</span>
                 </button>
-                <button onclick="switchTab('feed')" id="nav-feed" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
-                    <i class="fa-solid fa-rss"></i>
-                    <span>Actualités</span>
+                <button onclick="switchTab('map')" id="nav-map" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
+                    <i class="fa-solid fa-location-arrow"></i>
+                    <span>Prendre la route</span>
                 </button>
                 <button onclick="switchTab('garage')" id="nav-garage" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
                     <i class="fa-solid fa-car"></i>
-                    <span>Mon Garage & Profil</span>
+                    <span>Mon Garage</span>
                 </button>
             </nav>
 
@@ -93,9 +93,99 @@
     </header>
 
     <!-- ===================================================================== -->
-    <!-- VUE 1 : CARTE GPS & NAVIGATION (ÉCRAN PRINCIPAL)                      -->
+    <!-- VUE 1 : ACTUALITÉS (FIL ABONNEMENTS)                                  -->
     <!-- ===================================================================== -->
-    <main id="view-map" class="flex-1 flex flex-col relative pb-16">
+    <main id="view-feed" class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
+        <div class="bg-white rounded-2xl border border-zinc-200 p-5 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+            <div>
+                <h2 class="font-serif text-2xl font-bold text-asphalt">Actualités des Abonnements</h2>
+                <p class="text-xs text-zinc-500">Dernières sorties des pilotes suivis. (Sans photo, la preview du tracé s'affiche automatiquement).</p>
+            </div>
+            <div class="flex items-center gap-2 bg-cream p-1 rounded-xl border border-zinc-200 text-xs font-bold">
+                <button onclick="setFeedFilter('following')" id="btn-feed-following" class="px-3 py-1.5 rounded-lg bg-crimson text-white transition">Abonnements</button>
+                <button onclick="setFeedFilter('all')" id="btn-feed-all" class="px-3 py-1.5 rounded-lg text-zinc-600 hover:text-asphalt transition">Communauté</button>
+            </div>
+        </div>
+        <div id="feed-activities-container" class="space-y-5"></div>
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- VUE 2 : EXPLORER LES ITINÉRAIRES (TOUTE LA FRANCE + 5 FILTRES)         -->
+    <!-- ===================================================================== -->
+    <main id="view-explorer" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
+        <div class="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h2 class="font-serif text-2xl font-bold text-asphalt">Explorer les Itinéraires de France</h2>
+                    <p class="text-xs text-zinc-500">Filtrés selon vos critères de pilotage et votre rythme (${appState.profile.category}).</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="flex items-center gap-2 bg-cream px-3.5 py-2 rounded-xl border border-zinc-300 cursor-pointer text-xs font-bold text-asphalt hover:border-crimson transition">
+                        <input type="checkbox" id="filter-loop-chk" onchange="filterRoutes()" class="accent-crimson">
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-arrows-spin text-crimson"></i> Mode Boucle</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 5 Critères de filtres demandés -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2 border-t border-zinc-100 text-xs">
+                <div>
+                    <label class="block font-bold text-zinc-500 uppercase mb-1">1. Proximité</label>
+                    <select id="filter-prox" onchange="filterRoutes()" class="w-full rounded-xl bg-cream border border-zinc-300 px-3 py-2 font-semibold">
+                        <option value="1000">Toute la France</option>
+                        <option value="50">Moins de 50 km</option>
+                        <option value="150">Moins de 150 km</option>
+                        <option value="300">Moins de 300 km</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-zinc-500 uppercase mb-1">2. Durée / Distance</label>
+                    <select id="filter-dur" onchange="filterRoutes()" class="w-full rounded-xl bg-cream border border-zinc-300 px-3 py-2 font-semibold">
+                        <option value="all">Tous formats</option>
+                        <option value="short">Courte (< 1h / < 60 km)</option>
+                        <option value="medium">Moyenne (1h - 3h / 60-150 km)</option>
+                        <option value="long">Journée (> 3h / > 150 km)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-zinc-500 uppercase mb-1">3. Tracé & Accès</label>
+                    <select id="filter-winding" onchange="filterRoutes()" class="w-full rounded-xl bg-cream border border-zinc-300 px-3 py-2 font-semibold">
+                        <option value="all">Tous profils</option>
+                        <option value="LIAISON">Liaison rapide (Sortie mégapole)</option>
+                        <option value="SINUEUX">Sinueux & Épingles</option>
+                        <option value="MIXTE">Mixte & Fluide</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-zinc-500 uppercase mb-1">4. Dénivelé D+</label>
+                    <select id="filter-elev" onchange="filterRoutes()" class="w-full rounded-xl bg-cream border border-zinc-300 px-3 py-2 font-semibold">
+                        <option value="all">Tous dénivelés</option>
+                        <option value="low">Plat / Doux (< 500m)</option>
+                        <option value="mid">Modéré (500m - 1500m)</option>
+                        <option value="high">Alpin / Fort (> 1500m)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-zinc-500 uppercase mb-1">5. Typologie route</label>
+                    <select id="filter-type" onchange="filterRoutes()" class="w-full rounded-xl bg-cream border border-zinc-300 px-3 py-2 font-semibold">
+                        <option value="all">Toutes typologies</option>
+                        <option value="Col de montagne">Col de montagne</option>
+                        <option value="Littoral">Littoral</option>
+                        <option value="Rural">Rural</option>
+                        <option value="Forêt">Forêt</option>
+                        <option value="Ville">Ville</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="routes-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- VUE 3 : CARTE GPS & NAVIGATION                                        -->
+    <!-- ===================================================================== -->
+    <main id="view-map" class="hidden flex-1 flex flex-col relative pb-16">
         <div class="absolute top-4 inset-x-4 z-30 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
             <div class="bg-asphalt/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-xl border border-zinc-800 flex items-center gap-4 pointer-events-auto">
                 <div class="flex items-center gap-3">
@@ -113,7 +203,7 @@
                 </div>
                 <div class="hidden sm:flex items-center gap-2 pl-3 border-l border-zinc-800">
                     <button onclick="locateUserOnMap()" class="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold shadow transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-crosshairs text-crimson"></i> Ma Position
+                        <i class="fa-solid fa-crosshairs text-crimson"></i> Ma Position GPS
                     </button>
                     <button onclick="toggleAutoDrive()" id="btn-autodrive" class="px-3 py-1.5 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs font-bold shadow transition flex items-center gap-1.5">
                         <i class="fa-solid fa-play"></i> Rouler
@@ -132,9 +222,6 @@
                         <button onclick="addCommunityReport('Police', 'fa-shield-halved', '#3B82F6')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-800 flex items-center gap-2"><i class="fa-solid fa-shield-halved text-blue-400"></i> Police / Contrôle</button>
                         <button onclick="addCommunityReport('Trous sur la route', 'fa-circle-dot', '#EF4444')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-800 flex items-center gap-2"><i class="fa-solid fa-circle-dot text-red-400"></i> Trous sur la route</button>
                         <button onclick="addCommunityReport('Dos-d’âne trop haut', 'fa-road-barrier', '#F59E0B')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-800 flex items-center gap-2"><i class="fa-solid fa-road-barrier text-amber-400"></i> Dos-d’âne trop haut</button>
-                        <button onclick="addCommunityReport('Objet sur la route', 'fa-box', '#A855F7')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-800 flex items-center gap-2"><i class="fa-solid fa-box text-purple-400"></i> Objet sur la route</button>
-                        <button onclick="addCommunityReport('Verglas', 'fa-snowflake', '#06B6D4')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-800 flex items-center gap-2"><i class="fa-solid fa-snowflake text-cyan-400"></i> Verglas</button>
-                        <button onclick="addCommunityReport('Brume', 'fa-smog', '#94A3B8')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-800 flex items-center gap-2"><i class="fa-solid fa-smog text-zinc-400"></i> Brume / Brouillard</button>
                     </div>
                 </div>
             </div>
@@ -145,73 +232,12 @@
         <div class="absolute bottom-4 inset-x-4 z-30 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
             <div class="bg-asphalt/95 backdrop-blur-md text-white px-4 py-2.5 rounded-2xl shadow-xl border border-zinc-800 flex flex-wrap items-center gap-3 pointer-events-auto text-xs font-bold">
                 <span class="text-zinc-400 uppercase text-[10px]">Calques :</span>
-                <label class="flex items-center gap-1.5 cursor-pointer hover:text-crimson"><input type="checkbox" checked onchange="toggleMapLayer('stations', this.checked)" class="accent-crimson"> Carburants (E85/SP98)</label>
+                <label class="flex items-center gap-1.5 cursor-pointer hover:text-crimson"><input type="checkbox" checked onchange="toggleMapLayer('stations', this.checked)" class="accent-crimson"> Carburants</label>
                 <label class="flex items-center gap-1.5 cursor-pointer hover:text-crimson"><input type="checkbox" checked onchange="toggleMapLayer('radars', this.checked)" class="accent-crimson"> Radars</label>
                 <label class="flex items-center gap-1.5 cursor-pointer hover:text-crimson"><input type="checkbox" checked onchange="toggleMapLayer('spots', this.checked)" class="accent-crimson"> Spots Photo</label>
                 <label class="flex items-center gap-1.5 cursor-pointer hover:text-crimson"><input type="checkbox" checked onchange="toggleMapLayer('parkings', this.checked)" class="accent-crimson"> Parkings</label>
-                <label class="flex items-center gap-1.5 cursor-pointer hover:text-crimson"><input type="checkbox" checked onchange="toggleMapLayer('meets', this.checked)" class="accent-crimson"> Rassemblements</label>
-                <label class="flex items-center gap-1.5 cursor-pointer hover:text-crimson"><input type="checkbox" checked onchange="toggleMapLayer('museums', this.checked)" class="accent-crimson"> Musées</label>
             </div>
         </div>
-    </main>
-
-    <!-- ===================================================================== -->
-    <!-- VUE 2 : EXPLORER LES ITINÉRAIRES                                      -->
-    <!-- ===================================================================== -->
-    <main id="view-explorer" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
-        <div class="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-4">
-            <div class="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                    <h2 class="font-serif text-2xl font-bold text-asphalt">Explorer les Itinéraires</h2>
-                    <p class="text-xs text-zinc-500">Filtrés automatiquement selon votre rythme conducteur (${appState.profile.category}).</p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <label class="flex items-center gap-2 bg-cream px-3.5 py-2 rounded-xl border border-zinc-300 cursor-pointer text-xs font-bold text-asphalt hover:border-crimson transition">
-                        <input type="checkbox" id="filter-loop-chk" onchange="filterRoutes()" class="accent-crimson">
-                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-arrows-spin text-crimson"></i> Mode Boucle</span>
-                    </label>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-zinc-100">
-                <div>
-                    <label class="block text-[11px] font-bold text-zinc-500 uppercase mb-1">Proximité max</label>
-                    <select id="filter-prox" onchange="filterRoutes()" class="w-full rounded-xl bg-cream border border-zinc-300 px-3 py-2 text-xs font-semibold text-asphalt">
-                        <option value="500">Toutes les distances</option>
-                        <option value="50">Moins de 50 km</option>
-                        <option value="150">Moins de 150 km</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-[11px] font-bold text-zinc-500 uppercase mb-1">Rythme conducteur</label>
-                    <select id="filter-cat" onchange="filterRoutes()" class="w-full rounded-xl bg-cream border border-zinc-300 px-3 py-2 text-xs font-semibold text-crimson">
-                        <option value="all">Tous rythmes</option>
-                        <option value="Balade" ${appState.profile.category === 'Balade' ? 'selected' : ''}>Balade</option>
-                        <option value="Rapide" ${appState.profile.category === 'Rapide' ? 'selected' : ''}>Rapide</option>
-                        <option value="Sport" ${appState.profile.category === 'Sport' ? 'selected' : ''}>Sport</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <div id="routes-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-    </main>
-
-    <!-- ===================================================================== -->
-    <!-- VUE 3 : ACTUALITÉS (FIL ABONNEMENTS)                                  -->
-    <!-- ===================================================================== -->
-    <main id="view-feed" class="hidden flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
-        <div class="bg-white rounded-2xl border border-zinc-200 p-5 flex flex-wrap items-center justify-between gap-4 shadow-sm">
-            <div>
-                <h2 class="font-serif text-2xl font-bold text-asphalt">Actualités des Abonnements</h2>
-                <p class="text-xs text-zinc-500">Dernières sorties des pilotes suivis.</p>
-            </div>
-            <div class="flex items-center gap-2 bg-cream p-1 rounded-xl border border-zinc-200 text-xs font-bold">
-                <button onclick="setFeedFilter('following')" id="btn-feed-following" class="px-3 py-1.5 rounded-lg bg-crimson text-white transition">Abonnements</button>
-                <button onclick="setFeedFilter('all')" id="btn-feed-all" class="px-3 py-1.5 rounded-lg text-zinc-600 hover:text-asphalt transition">Communauté</button>
-            </div>
-        </div>
-        <div id="feed-activities-container" class="space-y-5"></div>
     </main>
 
     <!-- ===================================================================== -->
@@ -233,7 +259,6 @@
                                 <p id="profile-city-display" class="text-xs text-zinc-500"></p>
                                 <div class="flex items-center gap-2 mt-1.5">
                                     <span id="profile-cat-display" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-crimson text-white"></span>
-                                    <span id="profile-social-stats" class="text-xs font-semibold text-zinc-600"></span>
                                 </div>
                             </div>
                         </div>
@@ -268,65 +293,82 @@
                 <div class="bg-white rounded-2xl border border-zinc-200 p-5 flex flex-wrap items-center justify-between gap-3 shadow-sm">
                     <div>
                         <h2 class="font-serif text-2xl font-bold text-asphalt">Mon Garage</h2>
-                        <p class="text-xs text-zinc-500">Gérez vos sportives classiques.</p>
+                        <p class="text-xs text-zinc-500">Modifiez vos fiches techniques, archivez ou ajoutez vos véhicules.</p>
                     </div>
                     <button onclick="openVehicleModal(null)" class="px-4 py-2.5 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs sm:text-sm font-bold shadow flex items-center gap-2">
                         <i class="fa-solid fa-plus"></i> Ajouter un véhicule
                     </button>
                 </div>
                 <div id="garage-vehicles-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+                <!-- Véhicules Archivés -->
+                <div class="bg-white rounded-2xl border border-zinc-200 p-5 space-y-3 shadow-sm">
+                    <h3 class="text-xs font-extrabold uppercase tracking-wider text-zinc-400">Véhicules Archivés</h3>
+                    <div id="archived-vehicles-list" class="space-y-2"></div>
+                </div>
             </div>
         </div>
     </main>
 
     <!-- ===================================================================== -->
-    <!-- BARRE DE NAVIGATION INFÉRIEURE STYLE GPS                              -->
+    <!-- BARRE DE NAVIGATION INFÉRIEURE                                        -->
     <!-- ===================================================================== -->
     <footer class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-zinc-200 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] no-print">
         <div class="max-w-3xl mx-auto px-2 sm:px-6 h-16 flex items-center justify-between">
-            <button onclick="switchTab('map')" id="bnav-map" class="bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-bold text-crimson transition">
-                <i class="fa-solid fa-location-arrow text-base"></i>
-                <span>GPS & Carte</span>
+            <button onclick="switchTab('feed')" id="bnav-feed" class="bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-bold text-crimson transition">
+                <i class="fa-solid fa-rss text-base"></i>
+                <span>Actualités</span>
             </button>
             <button onclick="switchTab('explorer')" id="bnav-explorer" class="bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-crimson transition">
                 <i class="fa-solid fa-compass text-base"></i>
                 <span>Explorer</span>
             </button>
-            <button onclick="switchTab('feed')" id="bnav-feed" class="bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-crimson transition">
-                <i class="fa-solid fa-rss text-base"></i>
-                <span>Actualités</span>
+            <button onclick="switchTab('map')" id="bnav-map" class="bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-crimson transition">
+                <i class="fa-solid fa-location-arrow text-base"></i>
+                <span>Prendre la route</span>
             </button>
             <button onclick="switchTab('garage')" id="bnav-garage" class="bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-crimson transition">
-                <i class="fa-solid fa-user text-base"></i>
-                <span>Profil</span>
+                <i class="fa-solid fa-car text-base"></i>
+                <span>Mon Garage</span>
             </button>
         </div>
     </footer>
 
     <!-- ===================================================================== -->
-    <!-- MODALES INTERACTIVES                                                  -->
+    <!-- MODALES                                                               -->
     <!-- ===================================================================== -->
     
-    <!-- Modal Véhicule (Critères dissociés + Photo appareil) -->
+    <!-- Modal Fiche Véhicule (Marque, Modèle, Année obligatoires + Technique + Appareil) -->
     <div id="vehicle-modal" class="fixed inset-0 bg-asphalt/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-            <h3 id="veh-modal-title" class="font-serif text-xl font-bold text-asphalt">Ajouter un véhicule</h3>
+        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <h3 id="veh-modal-title" class="font-serif text-xl font-bold text-asphalt">Fiche Véhicule</h3>
             <input type="hidden" id="veh-id">
             <div class="space-y-3 text-xs">
-                <div><label class="block font-bold text-zinc-600 mb-1">Marque</label><input type="text" id="veh-brand" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: Alpine"></div>
-                <div><label class="block font-bold text-zinc-600 mb-1">Modèle</label><input type="text" id="veh-model" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: A110 1600S"></div>
-                <div><label class="block font-bold text-zinc-600 mb-1">Année</label><input type="number" id="veh-year" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="1972"></div>
-                <div><label class="block font-bold text-zinc-600 mb-1">Motorisation</label><input type="text" id="veh-engine" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: 4-cyl. double carbu Weber"></div>
-                <div>
-                    <label class="block font-bold text-zinc-600 mb-1">Carburant</label>
-                    <select id="veh-fuel" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold">
-                        <option value="SP98">SP98</option>
-                        <option value="SP95">SP95 / E10</option>
-                        <option value="E85">E85 Superéthanol</option>
-                        <option value="Diesel">Diesel</option>
-                    </select>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block font-bold text-zinc-600 mb-1">Marque *</label><input type="text" id="veh-brand" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: Alpine"></div>
+                    <div><label class="block font-bold text-zinc-600 mb-1">Modèle *</label><input type="text" id="veh-model" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: A110 1600S"></div>
                 </div>
-                <div><label class="block font-bold text-zinc-600 mb-1">Spécificité</label><input type="text" id="veh-special" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: Boîte courte 5 rapports"></div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block font-bold text-zinc-600 mb-1">Année *</label><input type="number" id="veh-year" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="1972"></div>
+                    <div>
+                        <label class="block font-bold text-zinc-600 mb-1">Carburant</label>
+                        <select id="veh-fuel" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold">
+                            <option value="SP98">SP98</option>
+                            <option value="SP95">SP95 / E10</option>
+                            <option value="E85">E85 Superéthanol</option>
+                            <option value="Diesel">Diesel</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block font-bold text-zinc-600 mb-1">Cylindrée</label><input type="text" id="veh-cc" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: 1596 cm³"></div>
+                    <div><label class="block font-bold text-zinc-600 mb-1">Puissance (chevaux)</label><input type="text" id="veh-hp" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: 138 ch"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block font-bold text-zinc-600 mb-1">Couple (N.m)</label><input type="text" id="veh-torque" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: 148 N.m"></div>
+                    <div><label class="block font-bold text-zinc-600 mb-1">Poids</label><input type="text" id="veh-weight" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: 805 kg"></div>
+                </div>
+                <div><label class="block font-bold text-zinc-600 mb-1">Version spéciale</label><input type="text" id="veh-special" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: Châssis pont de biche, carbu Weber"></div>
                 <div>
                     <label class="block font-bold text-zinc-600 mb-1">Photo (depuis votre appareil)</label>
                     <input type="file" id="veh-file" accept="image/*" onchange="handleVehicleFile(this)" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-1.5 text-xs">
@@ -351,7 +393,7 @@
                     <div><label class="block font-bold text-zinc-600 mb-1">Âge</label><input type="number" id="prof-age" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold"></div>
                 </div>
                 <div>
-                    <label class="block font-bold text-zinc-600 mb-1">Rythme conducteur (déterminant pour l'algorithme)</label>
+                    <label class="block font-bold text-zinc-600 mb-1">Catégorie du conducteur (déterminant pour l'algorithme)</label>
                     <select id="prof-category" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold text-crimson">
                         <option value="Balade">Balade</option>
                         <option value="Rapide">Rapide</option>
@@ -431,8 +473,6 @@
                 avatar: 'https://placehold.co/150x150/8B1E24/FFFFFF?text=EV',
                 bio: 'Amoureux des doubles arbres à cames italiens et des cols alpins.',
                 category: 'Rapide',
-                followersCount: 14,
-                followingPseudos: ['Julien_Alpine', 'Sophie_Spider'],
                 garages: [
                     { id: 'g1', name: 'Garage Principal — Lyon', address: '14 Quai des Célestins, 69002 Lyon' }
                 ],
@@ -446,8 +486,11 @@
                     brand: 'Alfa Romeo',
                     model: 'Giulia Sprint GT 1600',
                     year: 1966,
-                    engine: '4-cyl. Double Arbre 1570 cm³',
                     fuel: 'SP98',
+                    cc: '1570 cm³',
+                    hp: '109 ch',
+                    torque: '142 N.m',
+                    weight: '950 kg',
                     special: 'Coupé Bertone • Carburateurs Weber 40 DCOE',
                     kmDriven: 1420,
                     archived: false,
@@ -455,10 +498,6 @@
                 }
             ],
             activeVehicleId: 'veh-alfa',
-            communityPilots: [
-                { pseudo: 'Julien_Alpine', city: 'Grenoble', category: 'Sport', car: 'Alpine A110 1600S', avatar: 'https://placehold.co/100x100/18181B/FFFFFF?text=JA' },
-                { pseudo: 'Sophie_Spider', city: 'Annecy', category: 'Balade', car: 'Alfa Spider Duetto', avatar: 'https://placehold.co/100x100/8B1E24/FFFFFF?text=SS' }
-            ],
             feedActivities: [
                 {
                     id: 'act-1',
@@ -470,7 +509,7 @@
                     title: 'A parcouru la Boucle du Massif de la Chartreuse',
                     meta: '112 km • +2 180 m D+ • Rythme Sport',
                     routeId: 'r-chartreuse',
-                    photo: null // Sans photo, sera masquée ou remplacée par la preview du tracé
+                    photo: null // Sans photo, la preview de la carte s'affiche automatiquement
                 }
             ],
             routes: [
@@ -484,16 +523,14 @@
                     durationLabel: '1h 15',
                     elevationGain: 1320,
                     windingType: 'MIXTE',
-                    roadTypes: ['Col de montagne', 'Rural'],
+                    roadType: 'Col de montagne',
                     isLoop: false,
                     recommendedCategory: 'Rapide',
                     rating: 4.9,
                     bannerPhoto: 'https://placehold.co/800x400/8B1E24/FFFFFF?text=Route+Napoleon',
                     mechanicAdvice: 'Montée prolongée sur 40 km : surveiller température d’eau. Plein SP98 et E85 disponible à Grasse.',
                     gpsCoords: [[43.6585, 6.9237], [43.7120, 6.8450], [43.8450, 6.5130]],
-                    reviews: [
-                        { author: 'Julien_Alpine', car: 'Alpine A110 1600S', rating: 5, comment: 'Bitume impeccable et superbes panoramas !', photos: [] }
-                    ]
+                    reviews: []
                 },
                 {
                     id: 'r-chartreuse',
@@ -505,47 +542,102 @@
                     durationLabel: '2h 15',
                     elevationGain: 2180,
                     windingType: 'SINUEUX',
-                    roadTypes: ['Col de montagne', 'Forêt'],
+                    roadType: 'Col de montagne',
                     isLoop: true,
                     recommendedCategory: 'Sport',
                     rating: 4.8,
                     bannerPhoto: 'https://placehold.co/800x400/3F3F46/FFFFFF?text=Chartreuse',
                     mechanicAdvice: 'Routes étroites, freinage très sollicité dans la descente.',
-                    gpsCoords: [[45.2410, 5.8520], [45.2890, 5.8920], [45.4210, 6.0420]],
+                    gpsCoords: [[45.2410, 5.8520], [45.2890, 5.8920], [45.4210, 6.0420], [45.2410, 5.8520]],
+                    reviews: []
+                },
+                {
+                    id: 'r-corbiere',
+                    title: 'Route des Crêtes & Corniche de l’Esterel',
+                    region: 'Var & Alpes-Maritimes',
+                    proximityKm: 410,
+                    distanceKm: 45,
+                    durationMins: 60,
+                    durationLabel: '1h 00',
+                    elevationGain: 480,
+                    windingType: 'SINUEUX',
+                    roadType: 'Littoral',
+                    isLoop: true,
+                    recommendedCategory: 'Balade',
+                    rating: 4.9,
+                    bannerPhoto: 'https://placehold.co/800x400/0284C7/FFFFFF?text=Esterel+Littoral',
+                    mechanicAdvice: 'Superbes points de vue rocheux. Attention aux cyclistes en saison.',
+                    gpsCoords: [[43.4190, 6.8450], [43.4500, 6.8800], [43.4190, 6.8450]],
+                    reviews: []
+                },
+                {
+                    id: 'r-vosges',
+                    title: 'La Route des Crêtes des Vosges',
+                    region: 'Grand Est / Alsace',
+                    proximityKm: 390,
+                    distanceKm: 88,
+                    durationMins: 110,
+                    durationLabel: '1h 50',
+                    elevationGain: 1650,
+                    windingType: 'MIXTE',
+                    roadType: 'Forêt',
+                    isLoop: false,
+                    recommendedCategory: 'Rapide',
+                    rating: 4.7,
+                    bannerPhoto: 'https://placehold.co/800x400/15803D/FFFFFF?text=Vosges+Cretes',
+                    mechanicAdvice: 'Passages en crête exposés au vent. Vérifier la carburation en altitude.',
+                    gpsCoords: [[48.0750, 7.0350], [48.1200, 7.1000], [48.2500, 7.1500]],
+                    reviews: []
+                },
+                {
+                    id: 'r-normandie',
+                    title: 'Boucle des Falaises de Côte d’Albâtre',
+                    region: 'Normandie',
+                    proximityKm: 520,
+                    distanceKm: 74,
+                    durationMins: 90,
+                    durationLabel: '1h 30',
+                    elevationGain: 350,
+                    windingType: 'LIAISON',
+                    roadType: 'Rural',
+                    isLoop: true,
+                    recommendedCategory: 'Balade',
+                    rating: 4.6,
+                    bannerPhoto: 'https://placehold.co/800x400/CA8A04/FFFFFF?text=Normandie+Campagne',
+                    mechanicAdvice: 'Routes sinueuses entre champs et estuaires. Embruns salins sur la carrosserie.',
+                    gpsCoords: [[49.8500, 0.3800], [49.9200, 0.5300], [49.8500, 0.3800]],
                     reviews: []
                 }
             ],
             mapPOIs: {
                 stations: [
-                    { id: 'st1', lat: 45.7720, lng: 4.8157, name: 'TotalEnergies Relais des Alpes', prices: { 'SP98': 1.89, 'SP95': 1.79, 'E85': 0.84, 'Diesel': 1.72 }, note: 'Pompe E85 et SP98 disponibles.' }
+                    { id: 'st1', lat: 45.7720, lng: 4.8157, name: 'TotalEnergies Relais des Alpes', prices: { 'SP98': 1.89, 'SP95': 1.79, 'E85': 0.84, 'Diesel': 1.72 }, note: 'Pompe E85 et SP98.' }
                 ],
                 radars: [{ id: 'rad1', lat: 45.8120, lng: 4.7920, name: 'Radar Fixe', limit: 80 }],
-                spots: [{ id: 'sp1', lat: 48.8631, lng: 2.2875, name: 'Spot Photo Panoramique' }],
-                parkings: [{ id: 'pk1', lat: 45.7920, lng: 4.7820, name: 'Parking Sécurisé' }],
-                meets: [{ id: 'mt1', lat: 45.7520, lng: 4.8520, name: 'Rassemblement Classiques' }],
-                museums: [{ id: 'ms1', lat: 45.7320, lng: 4.8920, name: 'Musée Automobiles' }]
+                spots: [{ id: 'sp1', lat: 45.8320, lng: 4.7420, name: 'Spot Photo Panoramique' }],
+                parkings: [{ id: 'pk1', lat: 45.7920, lng: 4.7820, name: 'Parking Sécurisé' }]
             }
         };
 
-        let appState = JSON.parse(localStorage.getItem('roadbook_app_v6')) || DEFAULT_STATE;
-        function saveState() { localStorage.setItem('roadbook_app_v6', JSON.stringify(appState)); }
+        let appState = JSON.parse(localStorage.getItem('roadbook_app_v7')) || DEFAULT_STATE;
+        function saveState() { localStorage.setItem('roadbook_app_v7', JSON.stringify(appState)); }
 
         let selectedRouteId = appState.routes[0].id;
         let leafletMap = null;
         let routePolylineLayer = null;
         let poisLayersGroup = null;
         let userLocationMarker = null;
-        let mapLayersVisible = { stations: true, radars: true, spots: true, parkings: true, meets: true, museums: true };
+        let mapLayersVisible = { stations: true, radars: true, spots: true, parkings: true };
 
         function switchTab(tabId) {
-            ['map', 'explorer', 'feed', 'garage'].forEach(id => {
+            ['feed', 'explorer', 'map', 'garage'].forEach(id => {
                 const el = document.getElementById(`view-${id}`);
                 if (el) {
                     if (id === tabId) el.classList.remove('hidden');
                     else el.classList.add('hidden');
                 }
             });
-            ['map', 'explorer', 'feed', 'garage'].forEach(id => {
+            ['feed', 'explorer', 'map', 'garage'].forEach(id => {
                 const btn = document.getElementById(`nav-${id}`);
                 const bbtn = document.getElementById(`bnav-${id}`);
                 if (btn) btn.className = id === tabId ? 'px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-crimson text-white shadow' : 'px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 text-zinc-300 hover:text-white hover:bg-zinc-800';
@@ -557,7 +649,7 @@
             }
         }
 
-        function getActiveVehicle() { return appState.vehicles.find(v => v.id === appState.activeVehicleId) || appState.vehicles[0]; }
+        function getActiveVehicle() { return appState.vehicles.find(v => v.id === appState.activeVehicleId && !v.archived) || appState.vehicles.find(v => !v.archived) || appState.vehicles[0]; }
 
         function refreshHeaderUI() {
             const selectEl = document.getElementById('header-vehicle-select');
@@ -603,7 +695,7 @@
                             icon: L.divIcon({ className: 'user-loc', html: `<div class="w-8 h-8 rounded-full bg-blue-600 border-2 border-white text-white flex items-center justify-center shadow-lg animate-pulse"><i class="fa-solid fa-location-crosshairs text-xs"></i></div>`, iconSize: [32, 32], iconAnchor: [16, 16] })
                         }).addTo(leafletMap).bindPopup('<b>Vous êtes ici</b>').openPopup();
                     }
-                    showToast('Position GPS actualisée !', 'fa-crosshairs');
+                    showToast('Position GPS actualisée autour de vous !', 'fa-crosshairs');
                 }, () => {
                     showToast('Impossible d’accéder à votre géolocalisation.', 'fa-triangle-exclamation');
                 });
@@ -642,18 +734,40 @@
         function filterRoutes() {
             const grid = document.getElementById('routes-grid');
             if (!grid) return;
-            const cat = document.getElementById('filter-cat').value;
-            let filtered = appState.routes.filter(r => cat === 'all' || r.recommendedCategory === cat);
+
+            const proxMax = parseInt(document.getElementById('filter-prox').value, 10);
+            const durFilter = document.getElementById('filter-dur').value;
+            const windingFilter = document.getElementById('filter-winding').value;
+            const elevFilter = document.getElementById('filter-elev').value;
+            const typeFilter = document.getElementById('filter-type').value;
+            const isLoopOnly = document.getElementById('filter-loop-chk').checked;
+
+            let filtered = appState.routes.filter(r => {
+                if (r.proximityKm > proxMax) return false;
+                if (isLoopOnly && !r.isLoop) return false;
+                if (windingFilter !== 'all' && r.windingType !== windingFilter) return false;
+                if (typeFilter !== 'all' && r.roadType !== typeFilter) return false;
+
+                if (durFilter === 'short' && r.distanceKm > 60) return false;
+                if (durFilter === 'medium' && (r.distanceKm <= 60 || r.distanceKm > 150)) return false;
+                if (durFilter === 'long' && r.distanceKm <= 150) return false;
+
+                if (elevFilter === 'low' && r.elevationGain > 500) return false;
+                if (elevFilter === 'mid' && (r.elevationGain <= 500 || r.elevationGain > 1500)) return false;
+                if (elevFilter === 'high' && r.elevationGain <= 1500) return false;
+
+                return true;
+            });
 
             grid.innerHTML = filtered.map(r => `
                 <div class="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm flex flex-col justify-between">
                     <div class="cursor-pointer" onclick="openRouteDetail('${r.id}')">
-                        <div class="h-48 overflow-hidden relative">
+                        <div class="h-44 overflow-hidden relative">
                             <img src="${r.bannerPhoto}" class="w-full h-full object-cover hover:scale-105 transition duration-500">
                             <span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-asphalt/90 text-white uppercase">${r.region}</span>
                         </div>
                         <div class="p-5 space-y-2">
-                            <h3 class="font-serif font-bold text-lg text-asphalt">${r.title}</h3>
+                            <h3 class="font-serif font-bold text-base text-asphalt">${r.title}</h3>
                             <div class="grid grid-cols-3 gap-2 py-2 border-y border-zinc-100 font-mono text-center text-xs">
                                 <div><span class="block text-[9px] text-zinc-400">Distance</span><strong>${r.distanceKm} km</strong></div>
                                 <div><span class="block text-[9px] text-zinc-400">Durée</span><strong>${r.durationLabel}</strong></div>
@@ -662,11 +776,17 @@
                         </div>
                     </div>
                     <div class="bg-cream px-5 py-3 border-t border-zinc-200 flex justify-between items-center">
-                        <button onclick="openRouteDetail('${r.id}')" class="text-xs font-bold text-crimson hover:underline"><i class="fa-solid fa-eye mr-1"></i> Voir Fiche & Avis</button>
+                        <button onclick="openRouteDetail('${r.id}')" class="text-xs font-bold text-crimson hover:underline"><i class="fa-solid fa-eye mr-1"></i> Fiche & Avis</button>
                         <button onclick="launchRouteOnMap('${r.id}')" class="px-3.5 py-2 rounded-xl bg-crimson text-white text-xs font-bold shadow"><i class="fa-solid fa-location-arrow mr-1"></i> GPS</button>
                     </div>
                 </div>
             `).join('');
+        }
+
+        function launchRouteOnMap(routeId) {
+            selectedRouteId = routeId;
+            switchTab('map');
+            showToast('Itinéraire chargé sur le GPS !', 'fa-location-arrow');
         }
 
         function openRouteDetail(routeId) {
@@ -736,20 +856,42 @@
             }
         }
 
+        function setFeedFilter(filter) {
+            const btnFollowing = document.getElementById('btn-feed-following');
+            const btnAll = document.getElementById('btn-feed-all');
+            if (filter === 'following') {
+                btnFollowing.className = 'px-3 py-1.5 rounded-lg bg-crimson text-white transition';
+                btnAll.className = 'px-3 py-1.5 rounded-lg text-zinc-600 hover:text-asphalt transition';
+            } else {
+                btnAll.className = 'px-3 py-1.5 rounded-lg bg-crimson text-white transition';
+                btnFollowing.className = 'px-3 py-1.5 rounded-lg text-zinc-600 hover:text-asphalt transition';
+            }
+            renderFeedView();
+        }
+
         function renderFeedView() {
             const container = document.getElementById('feed-activities-container');
             if (!container) return;
-            container.innerHTML = appState.feedActivities.map(act => `
-                <div class="bg-white rounded-2xl border border-zinc-200 p-5 space-y-3 shadow-sm">
-                    <div class="flex items-center gap-3">
-                        <img src="${act.avatar}" class="w-10 h-10 rounded-xl object-cover">
-                        <div><h4 class="font-bold text-xs text-asphalt">${act.author} • ${act.car}</h4><span class="text-[10px] text-zinc-400 font-mono">${act.time}</span></div>
+            container.innerHTML = appState.feedActivities.map(act => {
+                const route = appState.routes.find(r => r.id === act.routeId);
+                const previewImg = (route && route.bannerPhoto) ? route.bannerPhoto : 'https://placehold.co/700x320/8B1E24/FFFFFF?text=Tracé+GPS';
+                const displayPhoto = act.photo ? act.photo : previewImg;
+
+                return `
+                    <div class="bg-white rounded-2xl border border-zinc-200 p-5 space-y-3 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <img src="${act.avatar}" class="w-10 h-10 rounded-xl object-cover">
+                            <div><h4 class="font-bold text-xs text-asphalt">${act.author} • ${act.car}</h4><span class="text-[10px] text-zinc-400 font-mono">${act.time}</span></div>
+                        </div>
+                        <p class="text-xs sm:text-sm font-bold text-asphalt">${act.title}</p>
+                        <p class="text-xs text-zinc-500">${act.meta}</p>
+                        <div class="h-48 overflow-hidden rounded-xl border border-zinc-200"><img src="${displayPhoto}" class="w-full h-full object-cover"></div>
+                        <div class="flex justify-end pt-1">
+                            <button onclick="launchRouteOnMap('${act.routeId}')" class="px-3 py-1.5 rounded-xl bg-crimson text-white text-xs font-bold shadow">Voir l'itinéraire</button>
+                        </div>
                     </div>
-                    <p class="text-xs sm:text-sm font-bold text-asphalt">${act.title}</p>
-                    <p class="text-xs text-zinc-500">${act.meta}</p>
-                    ${act.photo ? `<div class="h-48 overflow-hidden rounded-xl"><img src="${act.photo}" class="w-full h-full object-cover"></div>` : ''}
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function renderGarageAndProfile() {
@@ -760,37 +902,73 @@
             document.getElementById('profile-cat-display').innerText = p.category;
             document.getElementById('profile-bio-display').innerText = p.bio;
             document.getElementById('profile-avatar-display').src = p.avatar;
-            document.getElementById('profile-social-stats').innerText = `${p.followingPseudos.length} abonnés`;
 
             document.getElementById('user-garages-list').innerHTML = p.garages.map(g => `<div class="bg-cream p-2.5 rounded-xl border text-xs"><strong>${g.name}</strong><br><span class="text-zinc-500">${g.address}</span></div>`).join('');
             document.getElementById('user-destinations-list').innerHTML = p.favoritesDest.map(d => `<div class="bg-cream p-2.5 rounded-xl border text-xs"><strong>${d.name}</strong><br><span class="text-zinc-500">${d.address}</span></div>`).join('');
 
-            document.getElementById('garage-vehicles-grid').innerHTML = appState.vehicles.map(v => `
+            // Véhicules actifs
+            document.getElementById('garage-vehicles-grid').innerHTML = appState.vehicles.filter(v => !v.archived).map(v => `
                 <div class="bg-white rounded-2xl border ${v.id === appState.activeVehicleId ? 'border-crimson ring-2 ring-crimson/20' : 'border-zinc-200'} overflow-hidden shadow-sm flex flex-col justify-between">
                     <div>
                         <div class="h-36 overflow-hidden relative"><img src="${v.photo}" class="w-full h-full object-cover"><span class="absolute top-2 left-2 px-2 py-0.5 rounded bg-asphalt text-white text-[10px] font-bold">${v.year} • ${v.fuel}</span></div>
-                        <div class="p-4 space-y-1">
+                        <div class="p-4 space-y-1 text-xs">
                             <h3 class="font-bold text-sm text-asphalt">${v.brand} ${v.model}</h3>
-                            <p class="text-xs text-crimson font-mono font-bold">${v.engine}</p>
-                            <p class="text-xs text-zinc-500">${v.special}</p>
+                            <div class="grid grid-cols-2 gap-1 pt-1 text-zinc-600 font-mono text-[11px]">
+                                <div>Cylindrée : <b>${v.cc || 'N/D'}</b></div>
+                                <div>Puissance : <b>${v.hp || 'N/D'}</b></div>
+                                <div>Couple : <b>${v.torque || 'N/D'}</b></div>
+                                <div>Poids : <b>${v.weight || 'N/D'}</b></div>
+                            </div>
+                            <p class="text-crimson font-semibold pt-1">${v.special || ''}</p>
                         </div>
                     </div>
                     <div class="bg-cream px-4 py-3 border-t flex justify-between items-center text-xs">
                         <span class="font-mono font-bold">${v.kmDriven} km</span>
-                        ${v.id !== appState.activeVehicleId ? `<button onclick="switchActiveVehicle('${v.id}')" class="px-3 py-1 rounded bg-crimson text-white font-bold">Activer</button>` : '<span class="text-crimson font-bold">Actif</span>'}
+                        <div class="flex items-center gap-2">
+                            <button onclick="openVehicleModal('${v.id}')" class="px-2.5 py-1 rounded bg-zinc-200 font-bold text-zinc-700">Modifier</button>
+                            <button onclick="archiveVehicle('${v.id}')" class="px-2.5 py-1 rounded bg-zinc-700 font-bold text-white">Archiver</button>
+                        </div>
                     </div>
                 </div>
             `).join('');
+
+            // Véhicules archivés
+            document.getElementById('archived-vehicles-list').innerHTML = appState.vehicles.filter(v => v.archived).map(v => `
+                <div class="bg-cream p-3 rounded-xl border flex items-center justify-between text-xs">
+                    <div><strong>${v.brand} ${v.model} (${v.year})</strong></div>
+                    <button onclick="restoreVehicle('${v.id}')" class="px-3 py-1 rounded bg-crimson text-white font-bold">Restaurer</button>
+                </div>
+            `).join('') || '<p class="text-xs text-zinc-400 italic">Aucun véhicule archivé.</p>';
         }
 
-        function openVehicleModal() {
-            document.getElementById('veh-id').value = '';
-            document.getElementById('veh-brand').value = '';
-            document.getElementById('veh-model').value = '';
-            document.getElementById('veh-year').value = '';
-            document.getElementById('veh-engine').value = '';
-            document.getElementById('veh-special').value = '';
-            document.getElementById('veh-photo').value = '';
+        function openVehicleModal(id) {
+            document.getElementById('veh-id').value = id || '';
+            if (id) {
+                const v = appState.vehicles.find(item => item.id === id);
+                if (v) {
+                    document.getElementById('veh-brand').value = v.brand;
+                    document.getElementById('veh-model').value = v.model;
+                    document.getElementById('veh-year').value = v.year;
+                    document.getElementById('veh-fuel').value = v.fuel;
+                    document.getElementById('veh-cc').value = v.cc || '';
+                    document.getElementById('veh-hp').value = v.hp || '';
+                    document.getElementById('veh-torque').value = v.torque || '';
+                    document.getElementById('veh-weight').value = v.weight || '';
+                    document.getElementById('veh-special').value = v.special || '';
+                    document.getElementById('veh-photo').value = v.photo;
+                }
+            } else {
+                document.getElementById('veh-brand').value = '';
+                document.getElementById('veh-model').value = '';
+                document.getElementById('veh-year').value = '';
+                document.getElementById('veh-fuel').value = 'SP98';
+                document.getElementById('veh-cc').value = '';
+                document.getElementById('veh-hp').value = '';
+                document.getElementById('veh-torque').value = '';
+                document.getElementById('veh-weight').value = '';
+                document.getElementById('veh-special').value = '';
+                document.getElementById('veh-photo').value = '';
+            }
             document.getElementById('vehicle-modal').classList.remove('hidden');
             document.getElementById('vehicle-modal').classList.add('flex');
         }
@@ -809,21 +987,62 @@
         }
 
         function saveVehicleModal() {
+            const id = document.getElementById('veh-id').value;
             const brand = document.getElementById('veh-brand').value.trim();
             const model = document.getElementById('veh-model').value.trim();
-            const year = parseInt(document.getElementById('veh-year').value, 10) || 1975;
-            const engine = document.getElementById('veh-engine').value.trim();
+            const year = parseInt(document.getElementById('veh-year').value, 10);
             const fuel = document.getElementById('veh-fuel').value;
+            const cc = document.getElementById('veh-cc').value.trim();
+            const hp = document.getElementById('veh-hp').value.trim();
+            const torque = document.getElementById('veh-torque').value.trim();
+            const weight = document.getElementById('veh-weight').value.trim();
             const special = document.getElementById('veh-special').value.trim();
             const photo = document.getElementById('veh-photo').value || `https://placehold.co/400x250/8B1E24/FFFFFF?text=${encodeURIComponent(brand + ' ' + model)}`;
 
-            if (!brand || !model) return;
-            appState.vehicles.push({ id: 'veh-' + Date.now(), brand, model, year, engine, fuel, special, kmDriven: 0, archived: false, photo });
+            if (!brand || !model || !year) {
+                showToast('Veuillez remplir la Marque, le Modèle et l’Année.', 'fa-triangle-exclamation');
+                return;
+            }
+
+            if (id) {
+                const v = appState.vehicles.find(item => item.id === id);
+                if (v) {
+                    v.brand = brand; v.model = model; v.year = year; v.fuel = fuel;
+                    v.cc = cc; v.hp = hp; v.torque = torque; v.weight = weight; v.special = special; v.photo = photo;
+                }
+            } else {
+                appState.vehicles.push({
+                    id: 'veh-' + Date.now(), brand, model, year, fuel, cc, hp, torque, weight, special, kmDriven: 0, archived: false, photo
+                });
+            }
+
             saveState();
             refreshHeaderUI();
             renderGarageAndProfile();
             closeVehicleModal();
-            showToast('Véhicule ajouté !', 'fa-car');
+            showToast('Fiche véhicule enregistrée !', 'fa-check');
+        }
+
+        function archiveVehicle(id) {
+            const v = appState.vehicles.find(item => item.id === id);
+            if (v) {
+                v.archived = true;
+                saveState();
+                refreshHeaderUI();
+                renderGarageAndProfile();
+                showToast('Véhicule archivé.', 'fa-box-archive');
+            }
+        }
+
+        function restoreVehicle(id) {
+            const v = appState.vehicles.find(item => item.id === id);
+            if (v) {
+                v.archived = false;
+                saveState();
+                refreshHeaderUI();
+                renderGarageAndProfile();
+                showToast('Véhicule restauré !', 'fa-car');
+            }
         }
 
         function openEditProfileModal() {
@@ -900,7 +1119,7 @@
             filterRoutes();
             renderFeedView();
             renderGarageAndProfile();
-            switchTab('map');
+            switchTab('feed');
         });
     </script>
 </body>
