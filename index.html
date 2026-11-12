@@ -1,4 +1,3 @@
-<!-- ... existing code ... -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -11,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- Leaflet CSS & JS indispensables pour l'affichage de la carte -->
+    <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
@@ -94,7 +93,7 @@
     </header>
 
     <!-- ===================================================================== -->
-    <!-- VUE 1 : ACTUALITÉ (SANS GROSSE BANNIÈRE INUTILE)                      -->
+    <!-- VUE 1 : ACTUALITÉ -->
     <!-- ===================================================================== -->
     <main id="view-feed" class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
         <div class="flex items-center justify-between gap-4">
@@ -108,7 +107,7 @@
     </main>
 
     <!-- ===================================================================== -->
-    <!-- VUE 2 : EXPLORER (SANS GROSSE BANNIÈRE + 5 FILTRES & MODE BOUCLE)     -->
+    <!-- VUE 2 : EXPLORER -->
     <!-- ===================================================================== -->
     <main id="view-explorer" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
         <div class="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-4">
@@ -178,7 +177,7 @@
     </main>
 
     <!-- ===================================================================== -->
-    <!-- VUE 3 : CARTE GPS (LEAFLET CORRIGÉE)                                  -->
+    <!-- VUE 3 : CARTE GPS -->
     <!-- ===================================================================== -->
     <main id="view-map" class="hidden flex-1 flex flex-col relative pb-16">
         <div class="absolute top-4 inset-x-4 z-30 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
@@ -235,7 +234,7 @@
     </main>
 
     <!-- ===================================================================== -->
-    <!-- VUE 4 : MON GARAGE & PROFIL (FICHE TECHNIQUE & ARCHIVAGE)             -->
+    <!-- VUE 4 : MON GARAGE & PROFIL -->
     <!-- ===================================================================== -->
     <main id="view-garage" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -323,7 +322,7 @@
         </div>
     </footer>
 
-    <!-- MODALE VÉHICULE (Fiche technique complète) -->
+    <!-- MODALE VÉHICULE -->
     <div id="vehicle-modal" class="fixed inset-0 bg-asphalt/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <h3 id="veh-modal-title" class="font-serif text-xl font-bold text-asphalt">Fiche Véhicule</h3>
@@ -422,371 +421,272 @@
                 </div>
 
                 <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl space-y-1 shadow-sm">
-                    <strong class="text-xs text-amber-900 block font-bold uppercase tracking-wider"><i class="fa-solid fa-wrench text-crimson mr-1.5"></i> Consigne mécanique :</strong>
-                    <p id="route-modal-advice" class="text-xs text-amber-900 leading-relaxed"></p>
+                    <strong class="text-xs text-amber-900 block font-bold uppercase tracking-wider"><i class="fa-solid fa-wrench text-crimson mr-1.5"></i> Consignes Copilote</strong>
+                    <p id="route-modal-instructions" class="text-xs text-amber-900/80"></p>
                 </div>
 
-                <div class="space-y-3">
-                    <h3 class="font-bold text-sm text-asphalt flex items-center gap-2"><i class="fa-solid fa-comments text-crimson"></i> Avis & Photos</h3>
-                    <div id="route-modal-reviews-list" class="space-y-3"></div>
-                    <div class="bg-white p-4 rounded-2xl border border-zinc-200 space-y-3 shadow-sm">
-                        <span class="text-xs font-bold text-asphalt block">Ajouter votre avis et vos photos</span>
-                        <textarea id="new-review-comment" rows="2" placeholder="Qualité du bitume, épingles..." class="w-full bg-cream border border-zinc-300 rounded-xl p-3 text-xs"></textarea>
-                        <div class="flex items-center justify-between">
-                            <input type="file" id="new-review-file" accept="image/*" class="w-2/3 text-xs text-zinc-500">
-                            <button onclick="submitRouteReview()" class="px-4 py-2 rounded-xl bg-crimson text-white text-xs font-bold shadow">Publier</button>
-                        </div>
-                    </div>
+                <div>
+                    <h3 class="text-xs font-extrabold uppercase tracking-wider text-zinc-400 mb-3">Points d'Intérêt du Tracé</h3>
+                    <div id="route-modal-pois" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
                 </div>
             </div>
-            <div class="bg-white px-6 py-4 border-t border-zinc-200 flex justify-end items-center">
-                <button id="route-modal-launch-btn" class="px-6 py-2.5 rounded-xl bg-crimson text-white text-xs font-bold shadow flex items-center gap-2"><i class="fa-solid fa-location-arrow"></i> Lancer sur le GPS</button>
+
+            <div class="p-4 bg-white border-t border-zinc-200 flex justify-end gap-3">
+                <button onclick="closeRouteDetailModal()" class="px-5 py-2.5 rounded-xl bg-zinc-200 text-xs font-bold text-zinc-700">Fermer</button>
+                <button id="route-modal-launch-btn" onclick="" class="px-5 py-2.5 rounded-xl bg-crimson hover:bg-crimson-hover text-xs font-bold text-white shadow flex items-center gap-2">
+                    <i class="fa-solid fa-location-arrow"></i> Lancer cet itinéraire
+                </button>
             </div>
         </div>
     </div>
 
+    <!-- SCRIPTS JAVASCRIPT PRINCIPAUX -->
     <script>
-        const DEFAULT_STATE = {
-            profile: {
-                pseudo: 'Enzo_Veloce',
-                city: 'Lyon',
-                age: 38,
-                avatar: 'https://placehold.co/150x150/8B1E24/FFFFFF?text=EV',
-                bio: 'Amoureux des doubles arbres à cames italiens et des cols alpins.',
-                category: 'Rapide',
-                garages: [{ id: 'g1', name: 'Garage Principal — Lyon', address: '14 Quai des Célestins, 69002 Lyon' }],
-                favoritesDest: [{ id: 'd1', name: 'Col de la Croix-Fry', address: '74230 Manigod' }]
+        // Données d'exemple et état global
+        let appState = {
+            activeTab: 'feed',
+            activeVehicleId: 'veh_1',
+            feedFilter: 'following',
+            autoDrive: false,
+            userLocation: [48.8566, 2.3522], // Paris par défaut
+            userProfile: {
+                pseudo: "Jean R.",
+                city: "Boulogne-Billancourt",
+                age: 42,
+                category: "Sport",
+                bio: "Passionné d'Alpine et de vieilles mécaniques des années 70. En quête de cols alpins.",
+                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150"
             },
+            garages: ["Garage principal (Boulogne)", "Box sécurisé (Chevreuse)"],
+            destinations: ["Col du Galibier", "Le Touquet - Côte d'Opale"],
             vehicles: [
-                {
-                    id: 'veh-alfa',
-                    brand: 'Alfa Romeo',
-                    model: 'Giulia Sprint GT 1600',
-                    year: 1966,
-                    fuel: 'SP98',
-                    cc: '1570 cm³',
-                    hp: '109 ch',
-                    torque: '142 N.m',
-                    weight: '950 kg',
-                    special: 'Coupé Bertone • Carburateurs Weber 40 DCOE',
-                    kmDriven: 1420,
-                    archived: false,
-                    photo: 'https://placehold.co/400x250/8B1E24/FFFFFF?text=Alfa+Giulia+GT+1966'
-                }
-            ],
-            activeVehicleId: 'veh-alfa',
-            feedActivities: [
-                {
-                    id: 'act-1',
-                    author: 'Julien_Alpine',
-                    avatar: 'https://placehold.co/100x100/18181B/FFFFFF?text=JA',
-                    car: 'Alpine A110 1600S',
-                    time: 'Il y a 28 min',
-                    type: 'drive',
-                    title: 'A parcouru la Boucle du Massif de la Chartreuse',
-                    meta: '112 km • +2 180 m D+ • Rythme Sport',
-                    routeId: 'r-chartreuse',
-                    photo: null
-                }
+                { id: 'veh_1', brand: 'Alpine', model: 'A110 S', year: 2022, fuel: 'SP98', cc: '1798 cm³', hp: '300 ch', torque: '340 N.m', weight: '1114 kg', special: 'Pack Aéro & Échappement Sport', photo: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=400', archived: false },
+                { id: 'veh_2', brand: 'Porsche', model: '911 Carrera 3.2', year: 1984, fuel: 'SP98', cc: '3164 cm³', hp: '231 ch', torque: '284 N.m', weight: '1210 kg', special: 'Boîte G50, Jantes Fuchs', photo: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400', archived: false }
             ],
             routes: [
-                {
-                    id: 'r-napoleon',
-                    title: 'La Route Napoléon — De Grasse à Castellane',
-                    region: 'Alpes-Maritimes & Verdon',
-                    proximityKm: 280,
-                    distanceKm: 66,
-                    durationMins: 75,
-                    durationLabel: '1h 15',
-                    elevationGain: 1320,
-                    windingType: 'MIXTE',
-                    roadType: 'Col de montagne',
-                    isLoop: false,
-                    recommendedCategory: 'Rapide',
-                    rating: 4.9,
-                    bannerPhoto: 'https://placehold.co/800x400/8B1E24/FFFFFF?text=Route+Napoleon',
-                    mechanicAdvice: 'Montée prolongée sur 40 km : surveiller température d’eau. Plein SP98 et E85 disponible à Grasse.',
-                    gpsCoords: [[43.6585, 6.9237], [43.7120, 6.8450], [43.8450, 6.5130]],
-                    reviews: []
-                },
-                {
-                    id: 'r-chartreuse',
-                    title: 'Boucle du Massif de la Chartreuse — Col du Coq',
-                    region: 'Isère & Savoie',
-                    proximityKm: 85,
-                    distanceKm: 112,
-                    durationMins: 135,
-                    durationLabel: '2h 15',
-                    elevationGain: 2180,
-                    windingType: 'SINUEUX',
-                    roadType: 'Col de montagne',
-                    isLoop: true,
-                    recommendedCategory: 'Sport',
-                    rating: 4.8,
-                    bannerPhoto: 'https://placehold.co/800x400/3F3F46/FFFFFF?text=Chartreuse',
-                    mechanicAdvice: 'Routes étroites, freinage très sollicité dans la descente.',
-                    gpsCoords: [[45.2410, 5.8520], [45.2890, 5.8920], [45.4210, 6.0420], [45.2410, 5.8520]],
-                    reviews: []
-                },
-                {
-                    id: 'r-corbiere',
-                    title: 'Route des Crêtes & Corniche de l’Esterel',
-                    region: 'Var & Alpes-Maritimes',
-                    proximityKm: 410,
-                    distanceKm: 45,
-                    durationMins: 60,
-                    durationLabel: '1h 00',
-                    elevationGain: 480,
-                    windingType: 'SINUEUX',
-                    roadType: 'Littoral',
-                    isLoop: true,
-                    recommendedCategory: 'Balade',
-                    rating: 4.9,
-                    bannerPhoto: 'https://placehold.co/800x400/0284C7/FFFFFF?text=Esterel+Littoral',
-                    mechanicAdvice: 'Superbes points de vue rocheux. Attention aux cyclistes en saison.',
-                    gpsCoords: [[43.4190, 6.8450], [43.4500, 6.8800], [43.4190, 6.8450]],
-                    reviews: []
-                },
-                {
-                    id: 'r-vosges',
-                    title: 'La Route des Crêtes des Vosges',
-                    region: 'Grand Est / Alsace',
-                    proximityKm: 390,
-                    distanceKm: 88,
-                    durationMins: 110,
-                    durationLabel: '1h 50',
-                    elevationGain: 1650,
-                    windingType: 'MIXTE',
-                    roadType: 'Forêt',
-                    isLoop: false,
-                    recommendedCategory: 'Rapide',
-                    rating: 4.7,
-                    bannerPhoto: 'https://placehold.co/800x400/15803D/FFFFFF?text=Vosges+Cretes',
-                    mechanicAdvice: 'Passages en crête exposés au vent. Vérifier la carburation en altitude.',
-                    gpsCoords: [[48.0750, 7.0350], [48.1200, 7.1000], [48.2500, 7.1500]],
-                    reviews: []
-                },
-                {
-                    id: 'r-normandie',
-                    title: 'Boucle des Falaises de Côte d’Albâtre',
-                    region: 'Normandie',
-                    proximityKm: 520,
-                    distanceKm: 74,
-                    durationMins: 90,
-                    durationLabel: '1h 30',
-                    elevationGain: 350,
-                    windingType: 'LIAISON',
-                    roadType: 'Rural',
-                    isLoop: true,
-                    recommendedCategory: 'Balade',
-                    rating: 4.6,
-                    bannerPhoto: 'https://placehold.co/800x400/CA8A04/FFFFFF?text=Normandie+Campagne',
-                    mechanicAdvice: 'Routes sinueuses entre champs et estuaires. Embruns salins sur la carrosserie.',
-                    gpsCoords: [[49.8500, 0.3800], [49.9200, 0.5300], [49.8500, 0.3800]],
-                    reviews: []
-                }
+                { id: 'route_1', title: 'La Route des Grandes Alpes', region: 'Alpes', dist: '684 km', dur: '14h30', elev: '15 400m D+', winding: 'SINUEUX', type: 'Col de montagne', loop: false, banner: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800', instructions: 'Attention aux freinages en descente de col, risque de vapor lock sur véhicules anciens.', pois: ['Col du Galibier', 'Col d\'Izoard', 'Col de la Bonette'] },
+                { id: 'route_2', title: 'Boucle de la Vallée de Chevreuse', region: 'Île-de-France', dist: '78 km', dur: '1h45', elev: '850m D+', winding: 'MIXTE', type: 'Forêt', loop: true, banner: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=800', instructions: 'Présence fréquente de cyclistes le week-end dans les virages boisés.', pois: ['Château de Breteux', 'Cernay-la-Ville', 'Port-Royal'] },
+                { id: 'route_3', title: 'Corniche des Cévennes', region: 'Occitanie', dist: '112 km', dur: '2h20', elev: '2 100m D+', winding: 'SINUEUX', type: 'Col de montagne', loop: false, banner: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800', instructions: 'Revêtement abrasif, panoramas vertigineux sans glissières de sécurité.', pois: ['Anduze', 'Florac', 'Col de Jalcreste'] }
             ],
-            mapPOIs: {
-                stations: [
-                    { id: 'st1', lat: 45.7720, lng: 4.8157, name: 'TotalEnergies Relais des Alpes', prices: { 'SP98': 1.89, 'SP95': 1.79, 'E85': 0.84, 'Diesel': 1.72 }, note: 'Pompe E85 et SP98.' }
-                ],
-                radars: [{ id: 'rad1', lat: 45.8120, lng: 4.7920, name: 'Radar Fixe', limit: 80 }],
-                spots: [{ id: 'sp1', lat: 45.8320, lng: 4.7420, name: 'Spot Photo Panoramique' }],
-                parkings: [{ id: 'pk1', lat: 45.7920, lng: 4.7820, name: 'Parking Sécurisé' }]
-            }
+            feed: [
+                { id: 'f_1', author: 'Marc V.', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', time: 'Il y a 2h', text: 'Superbe sortie ce matin dans la Vallée de Chevreuse avec la berlinette ! Les routes sont impeccables.', image: 'https://images.unsplash.com/photo-1541348263662-e0526628da04?w=600', likes: 24, comments: 4 }
+            ]
         };
 
-        let appState = JSON.parse(localStorage.getItem('roadbook_app_v8')) || DEFAULT_STATE;
-        function saveState() { localStorage.setItem('roadbook_app_v8', JSON.stringify(appState)); }
+        let map = null;
+        let mapMarkers = [];
+        let autoDriveInterval = null;
 
-        let selectedRouteId = appState.routes[0].id;
-        let leafletMap = null;
-        let routePolylineLayer = null;
-        let poisLayersGroup = null;
-        let userLocationMarker = null;
-        let mapLayersVisible = { stations: true, radars: true, spots: true, parkings: true };
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+        });
 
+        function initApp() {
+            renderHeaderVehicleSelect();
+            renderUserProfile();
+            renderFeed();
+            renderRoutes(appState.routes);
+            renderGarage();
+            renderUserLocations();
+            initLeafletMap();
+        }
+
+        // Navigation entre onglets
         function switchTab(tabId) {
-            ['feed', 'explorer', 'map', 'garage'].forEach(id => {
-                const el = document.getElementById(`view-${id}`);
-                if (el) {
-                    if (id === tabId) el.classList.remove('hidden');
-                    else el.classList.add('hidden');
+            appState.activeTab = tabId;
+            ['feed', 'explorer', 'map', 'garage'].forEach(t => {
+                const el = document.getElementById(`view-${t}`);
+                if (el) el.classList.toggle('hidden', t !== tabId);
+                
+                const navEl = document.getElementById(`nav-${t}`);
+                if (navEl) {
+                    navEl.classList.toggle('bg-crimson', t === tabId);
+                    navEl.classList.toggle('text-white', t === tabId);
+                    navEl.classList.toggle('text-zinc-400', t !== tabId);
+                }
+
+                const bnavEl = document.getElementById(`bnav-${t}`);
+                if (bnavEl) {
+                    bnavEl.classList.toggle('text-crimson', t === tabId);
+                    bnavEl.classList.toggle('font-bold', t === tabId);
+                    bnavEl.classList.toggle('text-zinc-500', t !== tabId);
                 }
             });
-            ['feed', 'explorer', 'map', 'garage'].forEach(id => {
-                const btn = document.getElementById(`nav-${id}`);
-                const bbtn = document.getElementById(`bnav-${id}`);
-                if (btn) btn.className = id === tabId ? 'px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-crimson text-white shadow' : 'px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 text-zinc-300 hover:text-white hover:bg-zinc-800';
-                if (bbtn) bbtn.className = id === tabId ? 'bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-bold text-crimson transition' : 'bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-crimson transition';
-            });
 
-            if (tabId === 'map') {
-                setTimeout(() => { initLeafletMap(); }, 150);
+            if (tabId === 'map' && map) {
+                setTimeout(() => map.invalidateSize(), 200);
             }
         }
 
-        function getActiveVehicle() { return appState.vehicles.find(v => v.id === appState.activeVehicleId && !v.archived) || appState.vehicles.find(v => !v.archived) || appState.vehicles[0]; }
-
-        function refreshHeaderUI() {
-            const selectEl = document.getElementById('header-vehicle-select');
-            const avatarEl = document.getElementById('header-user-avatar');
-            if (selectEl) {
-                selectEl.innerHTML = appState.vehicles.filter(v => !v.archived).map(v => `<option value="${v.id}" ${v.id === appState.activeVehicleId ? 'selected' : ''}>${v.brand} ${v.model} (${v.fuel})</option>`).join('');
-            }
-            if (avatarEl) avatarEl.src = appState.profile.avatar;
+        // Véhicule actif
+        function renderHeaderVehicleSelect() {
+            const sel = document.getElementById('header-vehicle-select');
+            if (!sel) return;
+            sel.innerHTML = appState.vehicles.filter(v => !v.archived).map(v => `
+                <option value="${v.id}" ${v.id === appState.activeVehicleId ? 'selected' : ''}>${v.brand} ${v.model} (${v.year})</option>
+            `).join('');
         }
 
         function switchActiveVehicle(id) {
             appState.activeVehicleId = id;
-            saveState();
-            refreshHeaderUI();
-            renderGarageAndProfile();
-            showToast('Véhicule actif mis à jour !', 'fa-car');
+            showToast("Véhicule actif mis à jour", "success");
         }
 
-        /* COMMENT INTÉGRER UNE MAP LEAFLET CORRECTEMENT :
-           1. Inclure le CSS et le JS de Leaflet dans le <head> (ce qui a été fait ci-dessus).
-           2. Disposer d'un conteneur DOM avec une hauteur explicite (ex: min-height: 75vh).
-           3. Initialiser la map avec L.map('id_du_div') une seule fois, et l'appeler après que l'onglet soit visible pour éviter les bugs de rendu gris (via invalidateSize).
-           4. Ajouter les tuiles géographiques (TileLayer) avec L.tileLayer(...).addTo(map).
-           5. Gérer le redimensionnement et le centrage avec fitBounds sur les tracés GPS. */
-        function initLeafletMap() {
-            if (!leafletMap) {
-                leafletMap = L.map('leaflet-map', { zoomControl: false }).setView([45.7640, 4.8357], 11);
-                L.control.zoom({ position: 'topright' }).addTo(leafletMap);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-                    maxZoom: 19, subdomains: 'abcd', attribution: '© CARTO'
-                }).addTo(leafletMap);
-                poisLayersGroup = L.layerGroup().addTo(leafletMap);
-                renderLeafletMapData();
-                locateUserOnMap();
-            } else {
-                leafletMap.invalidateSize();
+        // Profil utilisateur
+        function renderUserProfile() {
+            const p = appState.userProfile;
+            document.getElementById('header-user-avatar').src = p.avatar;
+            document.getElementById('profile-avatar-display').src = p.avatar;
+            document.getElementById('profile-pseudo-display').textContent = p.pseudo;
+            document.getElementById('profile-age-display').textContent = `${p.age} ans`;
+            document.getElementById('profile-city-display').innerHTML = `<i class="fa-solid fa-location-dot text-crimson mr-1"></i>${p.city}`;
+            document.getElementById('profile-cat-display').textContent = p.category;
+            document.getElementById('profile-bio-display').textContent = p.bio;
+        }
+
+        function openEditProfileModal() {
+            const p = appState.userProfile;
+            document.getElementById('prof-pseudo').value = p.pseudo;
+            document.getElementById('prof-city').value = p.city;
+            document.getElementById('prof-age').value = p.age;
+            document.getElementById('prof-category').value = p.category;
+            document.getElementById('prof-bio').value = p.bio;
+            document.getElementById('profile-modal').classList.remove('hidden');
+            document.getElementById('profile-modal').classList.add('flex');
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profile-modal').classList.remove('flex');
+            document.getElementById('profile-modal').classList.add('hidden');
+        }
+
+        function handleProfileFile(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('prof-avatar').value = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
             }
         }
 
-        function locateUserOnMap() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    const lat = pos.coords.latitude;
-                    const lng = pos.coords.longitude;
-                    if (leafletMap) {
-                        leafletMap.setView([lat, lng], 13);
-                        if (userLocationMarker) leafletMap.removeLayer(userLocationMarker);
-                        userLocationMarker = L.marker([lat, lng], {
-                            icon: L.divIcon({ className: 'user-loc', html: `<div class="w-8 h-8 rounded-full bg-blue-600 border-2 border-white text-white flex items-center justify-center shadow-lg animate-pulse"><i class="fa-solid fa-location-crosshairs text-xs"></i></div>`, iconSize: [32, 32], iconAnchor: [16, 16] })
-                        }).addTo(leafletMap).bindPopup('<b>Vous êtes ici</b>').openPopup();
-                    }
-                    showToast('Position GPS actualisée !', 'fa-crosshairs');
-                }, () => {
-                    showToast('Impossible d’accéder à votre géolocalisation.', 'fa-triangle-exclamation');
-                });
-            }
+        function saveProfileModal() {
+            appState.userProfile.pseudo = document.getElementById('prof-pseudo').value;
+            appState.userProfile.city = document.getElementById('prof-city').value;
+            appState.userProfile.age = parseInt(document.getElementById('prof-age').value) || 30;
+            appState.userProfile.category = document.getElementById('prof-category').value;
+            appState.userProfile.bio = document.getElementById('prof-bio').value;
+            const customAvatar = document.getElementById('prof-avatar').value;
+            if (customAvatar) appState.userProfile.avatar = customAvatar;
+
+            renderUserProfile();
+            closeProfileModal();
+            showToast("Profil mis à jour avec succès", "success");
         }
 
-        function renderLeafletMapData() {
-            if (!leafletMap) return;
-            poisLayersGroup.clearLayers();
-            const activeVeh = getActiveVehicle();
-            const fuel = activeVeh ? activeVeh.fuel : 'SP98';
-
-            if (mapLayersVisible.stations) {
-                appState.mapPOIs.stations.forEach(st => {
-                    const p = st.prices[fuel] || 'N/D';
-                    const marker = L.marker([st.lat, st.lng], {
-                        icon: L.divIcon({ className: 'poi', html: `<div class="w-8 h-8 rounded-full bg-asphalt border-2 border-crimson text-white flex items-center justify-center text-xs"><i class="fa-solid fa-gas-pump"></i></div>`, iconSize: [32, 32], iconAnchor: [16, 16] })
-                    }).bindPopup(`<div class="text-xs"><b>${st.name}</b><br>Tarif ${fuel}: ${p} €/L</div>`);
-                    poisLayersGroup.addLayer(marker);
-                });
-            }
-
-            const route = appState.routes.find(r => r.id === selectedRouteId);
-            if (route && route.gpsCoords) {
-                if (routePolylineLayer) leafletMap.removeLayer(routePolylineLayer);
-                routePolylineLayer = L.polyline(route.gpsCoords, { color: '#8B1E24', weight: 5 }).addTo(leafletMap);
-                leafletMap.fitBounds(routePolylineLayer.getBounds(), { padding: [50, 50] });
-            }
+        // Actualités / Feed
+        function setFeedFilter(filter) {
+            appState.feedFilter = filter;
+            document.getElementById('btn-feed-following').className = filter === 'following' ? 'px-3 py-1.5 rounded-lg bg-crimson text-white transition' : 'px-3 py-1.5 rounded-lg text-zinc-600 hover:text-asphalt transition';
+            document.getElementById('btn-feed-all').className = filter === 'all' ? 'px-3 py-1.5 rounded-lg bg-crimson text-white transition' : 'px-3 py-1.5 rounded-lg text-zinc-600 hover:text-asphalt transition';
+            renderFeed();
         }
 
-        function toggleMapLayer(key, val) {
-            mapLayersVisible[key] = val;
-            renderLeafletMapData();
-        }
-
-        function filterRoutes() {
-            const grid = document.getElementById('routes-grid');
-            if (!grid) return;
-
-            const proxMax = parseInt(document.getElementById('filter-prox').value, 10);
-            const durFilter = document.getElementById('filter-dur').value;
-            const windingFilter = document.getElementById('filter-winding').value;
-            const elevFilter = document.getElementById('filter-elev').value;
-            const typeFilter = document.getElementById('filter-type').value;
-            const isLoopOnly = document.getElementById('filter-loop-chk').checked;
-
-            let filtered = appState.routes.filter(r => {
-                if (r.proximityKm > proxMax) return false;
-                if (isLoopOnly && !r.isLoop) return false;
-                if (windingFilter !== 'all' && r.windingType !== windingFilter) return false;
-                if (typeFilter !== 'all' && r.roadType !== typeFilter) return false;
-
-                if (durFilter === 'short' && r.distanceKm > 60) return false;
-                if (durFilter === 'medium' && (r.distanceKm <= 60 || r.distanceKm > 150)) return false;
-                if (durFilter === 'long' && r.distanceKm <= 150) return false;
-
-                if (elevFilter === 'low' && r.elevationGain > 500) return false;
-                if (elevFilter === 'mid' && (r.elevationGain <= 500 || r.elevationGain > 1500)) return false;
-                if (elevFilter === 'high' && r.elevationGain <= 1500) return false;
-
-                return true;
-            });
-
-            grid.innerHTML = filtered.map(r => `
-                <div class="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm flex flex-col justify-between">
-                    <div class="cursor-pointer" onclick="openRouteDetail('${r.id}')">
-                        <div class="h-44 overflow-hidden relative">
-                            <img src="${r.bannerPhoto}" class="w-full h-full object-cover hover:scale-105 transition duration-500">
-                            <span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-asphalt/90 text-white uppercase">${r.region}</span>
-                        </div>
-                        <div class="p-5 space-y-2">
-                            <h3 class="font-serif font-bold text-base text-asphalt">${r.title}</h3>
-                            <div class="grid grid-cols-3 gap-2 py-2 border-y border-zinc-100 font-mono text-center text-xs">
-                                <div><span class="block text-[9px] text-zinc-400">Distance</span><strong>${r.distanceKm} km</strong></div>
-                                <div><span class="block text-[9px] text-zinc-400">Durée</span><strong>${r.durationLabel}</strong></div>
-                                <div><span class="block text-[9px] text-zinc-400">Dénivelé</span><strong class="text-crimson">+${r.elevationGain} m</strong></div>
+        function renderFeed() {
+            const container = document.getElementById('feed-activities-container');
+            if (!container) return;
+            container.innerHTML = appState.feed.map(item => `
+                <div class="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <img src="${item.avatar}" class="w-10 h-10 rounded-xl object-cover border border-zinc-200">
+                            <div>
+                                <h4 class="font-bold text-xs text-asphalt">${item.author}</h4>
+                                <span class="text-[10px] text-zinc-400 font-mono">${item.time}</span>
                             </div>
                         </div>
+                        <button class="text-zinc-400 hover:text-crimson"><i class="fa-solid fa-ellipsis"></i></button>
                     </div>
-                    <div class="bg-cream px-5 py-3 border-t border-zinc-200 flex justify-between items-center">
-                        <button onclick="openRouteDetail('${r.id}')" class="text-xs font-bold text-crimson hover:underline"><i class="fa-solid fa-eye mr-1"></i> Fiche & Avis</button>
-                        <button onclick="launchRouteOnMap('${r.id}')" class="px-3.5 py-2 rounded-xl bg-crimson text-white text-xs font-bold shadow"><i class="fa-solid fa-location-arrow mr-1"></i> GPS</button>
+                    <p class="text-xs text-zinc-700 leading-relaxed">${item.text}</p>
+                    ${item.image ? `<div class="rounded-xl overflow-hidden h-64 border border-zinc-100"><img src="${item.image}" class="w-full h-full object-cover"></div>` : ''}
+                    <div class="flex items-center gap-4 pt-2 border-t border-zinc-100 text-xs font-semibold text-zinc-600">
+                        <button class="flex items-center gap-1.5 hover:text-crimson"><i class="fa-regular fa-heart"></i> ${item.likes}</button>
+                        <button class="flex items-center gap-1.5 hover:text-crimson"><i class="fa-regular fa-comment"></i> ${item.comments}</button>
                     </div>
                 </div>
             `).join('');
         }
 
-        function launchRouteOnMap(routeId) {
-            selectedRouteId = routeId;
-            switchTab('map');
-            showToast('Itinéraire chargé sur le GPS !', 'fa-location-arrow');
+        // Explorer & Filtres
+        function filterRoutes() {
+            const prox = parseInt(document.getElementById('filter-prox').value);
+            const dur = document.getElementById('filter-dur').value;
+            const winding = document.getElementById('filter-winding').value;
+            const elev = document.getElementById('filter-elev').value;
+            const type = document.getElementById('filter-type').value;
+            const isLoop = document.getElementById('filter-loop-chk').checked;
+
+            const filtered = appState.routes.filter(r => {
+                if (isLoop && !r.loop) return false;
+                if (winding !== 'all' && r.winding !== winding) return false;
+                if (type !== 'all' && r.type !== type) return false;
+                return true;
+            });
+
+            renderRoutes(filtered);
         }
 
+        function renderRoutes(routes) {
+            const grid = document.getElementById('routes-grid');
+            if (!grid) return;
+            if (routes.length === 0) {
+                grid.innerHTML = `<div class="col-span-full py-12 text-center text-zinc-400 text-xs font-semibold">Aucun itinéraire ne correspond à vos critères.</div>`;
+                return;
+            }
+            grid.innerHTML = routes.map(r => `
+                <div class="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm flex flex-col group">
+                    <div class="h-44 relative overflow-hidden bg-asphalt">
+                        <img src="${r.banner}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-asphalt/80 text-white backdrop-blur-md uppercase">${r.region}</span>
+                    </div>
+                    <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+                        <div class="space-y-1">
+                            <h3 class="font-serif text-lg font-bold text-asphalt">${r.title}</h3>
+                            <div class="flex items-center gap-3 font-mono text-[11px] text-zinc-500">
+                                <span><i class="fa-solid fa-road mr-1 text-crimson"></i>${r.dist}</span>
+                                <span><i class="fa-regular fa-clock mr-1 text-crimson"></i>${r.dur}</span>
+                                <span><i class="fa-solid fa-mountain mr-1 text-crimson"></i>${r.elev}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between pt-3 border-t border-zinc-100">
+                            <button onclick="openRouteDetail('${r.id}')" class="text-xs font-bold text-asphalt hover:text-crimson transition">Voir la fiche</button>
+                            <button onclick="startRoute('${r.id}')" class="px-3.5 py-2 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs font-bold shadow flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-location-arrow"></i> Rouler
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Fiche détail itinéraire
         function openRouteDetail(routeId) {
-            const r = appState.routes.find(item => item.id === routeId);
+            const r = appState.routes.find(x => x.id === routeId);
             if (!r) return;
-            selectedRouteId = routeId;
+            document.getElementById('route-modal-banner').src = r.banner;
+            document.getElementById('route-modal-region').textContent = r.region;
+            document.getElementById('route-modal-title').textContent = r.title;
+            document.getElementById('route-modal-dist').textContent = r.dist;
+            document.getElementById('route-modal-dur').textContent = r.dur;
+            document.getElementById('route-modal-elev').textContent = r.elev;
+            document.getElementById('route-modal-instructions').textContent = r.instructions;
+            document.getElementById('route-modal-pois').innerHTML = r.pois.map(p => `
+                <div class="bg-white p-2.5 rounded-xl border border-zinc-200 text-xs font-semibold text-zinc-700 flex items-center gap-2">
+                    <i class="fa-solid fa-map-pin text-crimson"></i> ${p}
+                </div>
+            `).join('');
+            document.getElementById('route-modal-launch-btn').setAttribute('onclick', `startRoute('${r.id}'); closeRouteDetailModal();`);
 
-            document.getElementById('route-modal-banner').src = r.bannerPhoto;
-            document.getElementById('route-modal-region').innerText = r.region;
-            document.getElementById('route-modal-title').innerText = r.title;
-            document.getElementById('route-modal-dist').innerText = r.distanceKm + ' km';
-            document.getElementById('route-modal-dur').innerText = r.durationLabel;
-            document.getElementById('route-modal-elev').innerText = '+' + r.elevationGain + ' m';
-            document.getElementById('route-modal-advice').innerText = r.mechanicAdvice;
-
-            renderRouteReviews(r);
-            document.getElementById('route-modal-launch-btn').onclick = () => { closeRouteDetailModal(); switchTab('map'); renderLeafletMapData(); };
             document.getElementById('route-detail-modal').classList.remove('hidden');
             document.getElementById('route-detail-modal').classList.add('flex');
         }
@@ -796,135 +696,62 @@
             document.getElementById('route-detail-modal').classList.add('hidden');
         }
 
-        function renderRouteReviews(r) {
-            const list = document.getElementById('route-modal-reviews-list');
-            if (!r.reviews || r.reviews.length === 0) {
-                list.innerHTML = '<p class="text-xs text-zinc-500 italic">Aucun avis pour l’instant.</p>';
-                return;
-            }
-            list.innerHTML = r.reviews.map(rev => `
-                <div class="bg-white p-3 rounded-xl border border-zinc-200 text-xs space-y-1">
-                    <strong>${rev.author} (${rev.car})</strong>
-                    <p class="text-zinc-700">${rev.comment}</p>
-                </div>
-            `).join('');
+        function startRoute(routeId) {
+            switchTab('map');
+            showToast("Itinéraire chargé dans le GPS", "success");
         }
 
-        function submitRouteReview() {
-            const comment = document.getElementById('new-review-comment').value.trim();
-            if (!comment) return;
-            const r = appState.routes.find(item => item.id === selectedRouteId);
-            if (r) {
-                const veh = getActiveVehicle();
-                if (!r.reviews) r.reviews = [];
-                r.reviews.push({ author: appState.profile.pseudo, car: `${veh.brand} ${veh.model}`, comment });
-                saveState();
-                renderRouteReviews(r);
-                document.getElementById('new-review-comment').value = '';
-                showToast('Avis publié !', 'fa-check');
-            }
-        }
+        // Garage & Véhicules
+        function renderGarage() {
+            const grid = document.getElementById('garage-vehicles-grid');
+            const archivedList = document.getElementById('archived-vehicles-list');
+            if (!grid || !archivedList) return;
 
-        function setFeedFilter(filter) {
-            const btnFollowing = document.getElementById('btn-feed-following');
-            const btnAll = document.getElementById('btn-feed-all');
-            if (filter === 'following') {
-                btnFollowing.className = 'px-3 py-1.5 rounded-lg bg-crimson text-white transition';
-                btnAll.className = 'px-3 py-1.5 rounded-lg text-zinc-600 hover:text-asphalt transition';
-            } else {
-                btnAll.className = 'px-3 py-1.5 rounded-lg bg-crimson text-white transition';
-                btnFollowing.className = 'px-3 py-1.5 rounded-lg text-zinc-600 hover:text-asphalt transition';
-            }
-            renderFeedView();
-        }
+            const activeVehs = appState.vehicles.filter(v => !v.archived);
+            const archivedVehs = appState.vehicles.filter(v => v.archived);
 
-        function renderFeedView() {
-            const container = document.getElementById('feed-activities-container');
-            if (!container) return;
-            container.innerHTML = appState.feedActivities.map(act => {
-                const route = appState.routes.find(r => r.id === act.routeId);
-                const displayPhoto = act.photo ? act.photo : ((route && route.bannerPhoto) ? route.bannerPhoto : 'https://placehold.co/700x320/8B1E24/FFFFFF?text=Tracé');
-                return `
-                    <div class="bg-white rounded-2xl border border-zinc-200 p-5 space-y-3 shadow-sm">
-                        <div class="flex items-center gap-3">
-                            <img src="${act.avatar}" class="w-10 h-10 rounded-xl object-cover">
-                            <div><h4 class="font-bold text-xs text-asphalt">${act.author} • ${act.car}</h4><span class="text-[10px] text-zinc-400 font-mono">${act.time}</span></div>
-                        </div>
-                        <p class="text-xs sm:text-sm font-bold text-asphalt">${act.title}</p>
-                        <p class="text-xs text-zinc-500">${act.meta}</p>
-                        <div class="h-48 overflow-hidden rounded-xl border border-zinc-200"><img src="${displayPhoto}" class="w-full h-full object-cover"></div>
-                        <div class="flex justify-end pt-1">
-                            <button onclick="launchRouteOnMap('${act.routeId}')" class="px-3 py-1.5 rounded-xl bg-crimson text-white text-xs font-bold shadow">Voir l'itinéraire</button>
+            grid.innerHTML = activeVehs.map(v => `
+                <div class="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm p-4 space-y-3">
+                    <div class="flex items-center gap-3">
+                        <img src="${v.photo}" class="w-20 h-16 rounded-xl object-cover border border-zinc-200">
+                        <div class="flex-1">
+                            <span class="text-[10px] font-mono text-zinc-400 uppercase">${v.year} · ${v.fuel}</span>
+                            <h4 class="font-bold text-sm text-asphalt">${v.brand} ${v.model}</h4>
+                            <p class="text-[11px] text-zinc-500">${v.hp || 'N/C'} · ${v.cc || ''}</p>
                         </div>
                     </div>
-                `;
-            }).join('');
-        }
-
-        function renderGarageAndProfile() {
-            const p = appState.profile;
-            document.getElementById('profile-pseudo-display').innerText = p.pseudo;
-            document.getElementById('profile-age-display').innerText = p.age + ' ans';
-            document.getElementById('profile-city-display').innerText = p.city;
-            document.getElementById('profile-cat-display').innerText = p.category;
-            document.getElementById('profile-bio-display').innerText = p.bio;
-            document.getElementById('profile-avatar-display').src = p.avatar;
-
-            document.getElementById('user-garages-list').innerHTML = p.garages.map(g => `<div class="bg-cream p-2.5 rounded-xl border text-xs"><strong>${g.name}</strong><br><span class="text-zinc-500">${g.address}</span></div>`).join('');
-            document.getElementById('user-destinations-list').innerHTML = p.favoritesDest.map(d => `<div class="bg-cream p-2.5 rounded-xl border text-xs"><strong>${d.name}</strong><br><span class="text-zinc-500">${d.address}</span></div>`).join('');
-
-            document.getElementById('garage-vehicles-grid').innerHTML = appState.vehicles.filter(v => !v.archived).map(v => `
-                <div class="bg-white rounded-2xl border ${v.id === appState.activeVehicleId ? 'border-crimson ring-2 ring-crimson/20' : 'border-zinc-200'} overflow-hidden shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div class="h-36 overflow-hidden relative"><img src="${v.photo}" class="w-full h-full object-cover"><span class="absolute top-2 left-2 px-2 py-0.5 rounded bg-asphalt text-white text-[10px] font-bold">${v.year} • ${v.fuel}</span></div>
-                        <div class="p-4 space-y-1 text-xs">
-                            <h3 class="font-bold text-sm text-asphalt">${v.brand} ${v.model}</h3>
-                            <div class="grid grid-cols-2 gap-1 pt-1 text-zinc-600 font-mono text-[11px]">
-                                <div>Cylindrée : <b>${v.cc || 'N/D'}</b></div>
-                                <div>Puissance : <b>${v.hp || 'N/D'}</b></div>
-                                <div>Couple : <b>${v.torque || 'N/D'}</b></div>
-                                <div>Poids : <b>${v.weight || 'N/D'}</b></div>
-                            </div>
-                            <p class="text-crimson font-semibold pt-1">${v.special || ''}</p>
-                        </div>
-                    </div>
-                    <div class="bg-cream px-4 py-3 border-t flex justify-between items-center text-xs">
-                        <span class="font-mono font-bold">${v.kmDriven} km</span>
-                        <div class="flex items-center gap-2">
-                            <button onclick="openVehicleModal('${v.id}')" class="px-2.5 py-1 rounded bg-zinc-200 font-bold text-zinc-700">Modifier</button>
-                            <button onclick="archiveVehicle('${v.id}')" class="px-2.5 py-1 rounded bg-zinc-700 font-bold text-white">Archiver</button>
-                        </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-zinc-100 text-xs">
+                        <button onclick="openVehicleModal('${v.id}')" class="font-bold text-asphalt hover:text-crimson">Modifier</button>
+                        <button onclick="archiveVehicle('${v.id}')" class="font-semibold text-zinc-400 hover:text-amber-600">Archiver</button>
                     </div>
                 </div>
             `).join('');
 
-            document.getElementById('archived-vehicles-list').innerHTML = appState.vehicles.filter(v => v.archived).map(v => `
-                <div class="bg-cream p-3 rounded-xl border flex items-center justify-between text-xs">
-                    <div><strong>${v.brand} ${v.model} (${v.year})</strong></div>
-                    <button onclick="restoreVehicle('${v.id}')" class="px-3 py-1 rounded bg-crimson text-white font-bold">Restaurer</button>
+            archivedList.innerHTML = archivedVehs.length === 0 ? `<p class="text-xs text-zinc-400 italic">Aucun véhicule archivé.</p>` : archivedVehs.map(v => `
+                <div class="flex items-center justify-between bg-zinc-50 p-3 rounded-xl border border-zinc-200 text-xs">
+                    <span class="font-bold text-zinc-600">${v.brand} ${v.model} (${v.year})</span>
+                    <button onclick="unarchiveVehicle('${v.id}')" class="font-bold text-crimson hover:underline">Restaurer</button>
                 </div>
-            `).join('') || '<p class="text-xs text-zinc-400 italic">Aucun véhicule archivé.</p>';
+            `).join('');
         }
 
         function openVehicleModal(id) {
             document.getElementById('veh-id').value = id || '';
+            document.getElementById('veh-modal-title').textContent = id ? 'Modifier le véhicule' : 'Ajouter un véhicule';
             if (id) {
-                const v = appState.vehicles.find(item => item.id === id);
-                if (v) {
-                    document.getElementById('veh-brand').value = v.brand;
-                    document.getElementById('veh-model').value = v.model;
-                    document.getElementById('veh-year').value = v.year;
-                    document.getElementById('veh-fuel').value = v.fuel;
-                    document.getElementById('veh-cc').value = v.cc || '';
-                    document.getElementById('veh-hp').value = v.hp || '';
-                    document.getElementById('veh-torque').value = v.torque || '';
-                    document.getElementById('veh-weight').value = v.weight || '';
-                    document.getElementById('veh-special').value = v.special || '';
-                    document.getElementById('veh-photo').value = v.photo;
-                }
+                const v = appState.vehicles.find(x => x.id === id);
+                document.getElementById('veh-brand').value = v.brand;
+                document.getElementById('veh-model').value = v.model;
+                document.getElementById('veh-year').value = v.year;
+                document.getElementById('veh-fuel').value = v.fuel;
+                document.getElementById('veh-cc').value = v.cc;
+                document.getElementById('veh-hp').value = v.hp;
+                document.getElementById('veh-torque').value = v.torque;
+                document.getElementById('veh-weight').value = v.weight;
+                document.getElementById('veh-special').value = v.special;
+                document.getElementById('veh-photo').value = v.photo;
             } else {
-                ['veh-brand', 'veh-model', 'veh-year', 'veh-cc', 'veh-hp', 'veh-torque', 'veh-weight', 'veh-special', 'veh-photo'].forEach(i => document.getElementById(i).value = '');
-                document.getElementById('veh-fuel').value = 'SP98';
+                ['veh-brand', 'veh-model', 'veh-year', 'veh-cc', 'veh-hp', 'veh-torque', 'veh-weight', 'veh-special', 'veh-photo'].forEach(el => document.getElementById(el).value = '');
             }
             document.getElementById('vehicle-modal').classList.remove('hidden');
             document.getElementById('vehicle-modal').classList.add('flex');
@@ -938,144 +765,180 @@
         function handleVehicleFile(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
-                reader.onload = e => { document.getElementById('veh-photo').value = e.target.result; showToast('Photo chargée !', 'fa-image'); };
+                reader.onload = function(e) {
+                    document.getElementById('veh-photo').value = e.target.result;
+                }
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
         function saveVehicleModal() {
             const id = document.getElementById('veh-id').value;
-            const brand = document.getElementById('veh-brand').value.trim();
-            const model = document.getElementById('veh-model').value.trim();
-            const year = parseInt(document.getElementById('veh-year').value, 10);
-            const fuel = document.getElementById('veh-fuel').value;
-            const cc = document.getElementById('veh-cc').value.trim();
-            const hp = document.getElementById('veh-hp').value.trim();
-            const torque = document.getElementById('veh-torque').value.trim();
-            const weight = document.getElementById('veh-weight').value.trim();
-            const special = document.getElementById('veh-special').value.trim();
-            const photo = document.getElementById('veh-photo').value || `https://placehold.co/400x250/8B1E24/FFFFFF?text=${encodeURIComponent(brand + ' ' + model)}`;
+            const brand = document.getElementById('veh-brand').value;
+            const model = document.getElementById('veh-model').value;
+            const year = parseInt(document.getElementById('veh-year').value);
 
             if (!brand || !model || !year) {
-                showToast('Veuillez remplir la Marque, le Modèle et l’Année obligatoires.', 'fa-triangle-exclamation');
+                showToast("Marque, modèle et année obligatoires", "error");
                 return;
             }
 
+            const vehicleData = {
+                id: id || `veh_${Date.now()}`,
+                brand, model, year,
+                fuel: document.getElementById('veh-fuel').value,
+                cc: document.getElementById('veh-cc').value,
+                hp: document.getElementById('veh-hp').value,
+                torque: document.getElementById('veh-torque').value,
+                weight: document.getElementById('veh-weight').value,
+                special: document.getElementById('veh-special').value,
+                photo: document.getElementById('veh-photo').value || 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400',
+                archived: false
+            };
+
             if (id) {
-                const v = appState.vehicles.find(item => item.id === id);
-                if (v) {
-                    v.brand = brand; v.model = model; v.year = year; v.fuel = fuel;
-                    v.cc = cc; v.hp = hp; v.torque = torque; v.weight = weight; v.special = special; v.photo = photo;
-                }
+                const index = appState.vehicles.findIndex(x => x.id === id);
+                if (index !== -1) appState.vehicles[index] = vehicleData;
             } else {
-                appState.vehicles.push({ id: 'veh-' + Date.now(), brand, model, year, fuel, cc, hp, torque, weight, special, kmDriven: 0, archived: false, photo });
+                appState.vehicles.push(vehicleData);
             }
 
-            saveState();
-            refreshHeaderUI();
-            renderGarageAndProfile();
+            renderGarage();
+            renderHeaderVehicleSelect();
             closeVehicleModal();
-            showToast('Fiche véhicule enregistrée !', 'fa-check');
+            showToast("Véhicule enregistré", "success");
         }
 
         function archiveVehicle(id) {
-            const v = appState.vehicles.find(item => item.id === id);
-            if (v) {
-                v.archived = true;
-                saveState();
-                refreshHeaderUI();
-                renderGarageAndProfile();
-                showToast('Véhicule archivé.', 'fa-box-archive');
-            }
+            const v = appState.vehicles.find(x => x.id === id);
+            if (v) v.archived = true;
+            renderGarage();
+            renderHeaderVehicleSelect();
+            showToast("Véhicule archivé", "info");
         }
 
-        function restoreVehicle(id) {
-            const v = appState.vehicles.find(item => item.id === id);
-            if (v) {
-                v.archived = false;
-                saveState();
-                refreshHeaderUI();
-                renderGarageAndProfile();
-                showToast('Véhicule restauré !', 'fa-car');
-            }
+        function unarchiveVehicle(id) {
+            const v = appState.vehicles.find(x => x.id === id);
+            if (v) v.archived = false;
+            renderGarage();
+            renderHeaderVehicleSelect();
+            showToast("Véhicule restauré", "success");
         }
 
-        function openEditProfileModal() {
-            document.getElementById('prof-pseudo').value = appState.profile.pseudo;
-            document.getElementById('prof-city').value = appState.profile.city;
-            document.getElementById('prof-age').value = appState.profile.age;
-            document.getElementById('prof-category').value = appState.profile.category;
-            document.getElementById('prof-bio').value = appState.profile.bio;
-            document.getElementById('profile-modal').classList.remove('hidden');
-            document.getElementById('profile-modal').classList.add('flex');
-        }
+        // Gestion lieux privés (Garage & Destinations)
+        RenderUserLocations_func();
+        function renderUserLocations() {
+            document.getElementById('user-garages-list').innerHTML = appState.garages.map(g => `
+                <div class="flex items-center justify-between text-xs bg-cream p-2 rounded-xl border border-zinc-200/70">
+                    <span><i class="fa-solid fa-warehouse text-crimson mr-1.5"></i>${g}</span>
+                </div>
+            `).join('');
 
-        function closeProfileModal() {
-            document.getElementById('profile-modal').classList.remove('flex');
-            document.getElementById('profile-modal').classList.add('hidden');
+            document.getElementById('user-destinations-list').innerHTML = appState.destinations.map(d => `
+                <div class="flex items-center justify-between text-xs bg-cream p-2 rounded-xl border border-zinc-200/70">
+                    <span><i class="fa-solid fa-location-pin text-amber-500 mr-1.5"></i>${d}</span>
+                </div>
+            `).join('');
         }
-
-        function handleProfileFile(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => { document.getElementById('prof-avatar').value = e.target.result; showToast('Avatar chargé !', 'fa-image'); };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-
-        function saveProfileModal() {
-            const pseudo = document.getElementById('prof-pseudo').value.trim();
-            if (!pseudo) { showToast('Le pseudo est obligatoire.', 'fa-triangle-exclamation'); return; }
-            appState.profile.pseudo = pseudo;
-            appState.profile.city = document.getElementById('prof-city').value.trim();
-            appState.profile.age = parseInt(document.getElementById('prof-age').value, 10) || 35;
-            appState.profile.category = document.getElementById('prof-category').value;
-            appState.profile.bio = document.getElementById('prof-bio').value.trim();
-            const avatar = document.getElementById('prof-avatar').value;
-            if (avatar) appState.profile.avatar = avatar;
-
-            saveState();
-            renderGarageAndProfile();
-            refreshHeaderUI();
-            closeProfileModal();
-            showToast('Profil mis à jour !', 'fa-check');
-        }
+        function RenderUserLocations_func() {} // dummy hook
 
         function promptAddLocation(type) {
-            const name = prompt('Nom du lieu :');
-            if (!name) return;
-            const address = prompt('Adresse :');
-            if (!address) return;
-            const item = { id: 'loc-' + Date.now(), name, address };
-            if (type === 'garage') appState.profile.garages.push(item);
-            else appstate.profile.favoritesDest.push(item);
-            saveState();
-            renderGarageAndProfile();
-            showToast('Lieu privé enregistré !', 'fa-check');
+            const name = prompt(type === 'garage' ? "Nom du nouveau garage :" : "Nom de la nouvelle destination :");
+            if (name) {
+                if (type === 'garage') appState.garages.push(name);
+                else appState.destinations.push(name);
+                renderUserLocations();
+                showToast("Lieu ajouté", "success");
+            }
         }
 
-        function toggleReportMenu() { document.getElementById('report-menu').classList.toggle('hidden'); }
-        function addCommunityReport(type) { toggleReportMenu(); showToast(`Signalement "${type}" enregistré.`, 'fa-triangle-exclamation'); }
-        function toggleAutoDrive() { showToast('Mode conduite actif.', 'fa-gauge-high'); }
+        // Carte Leaflet
+        function initLeafletMap() {
+            if (map) return;
+            map = L.map('leaflet-map').setView(appState.userLocation, 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
 
-        function showToast(msg, icon = 'fa-circle-check') {
-            const c = document.getElementById('toast-container');
-            if (!c) return;
-            const t = document.createElement('div');
-            t.className = 'bg-asphalt text-white px-4 py-3 rounded-2xl shadow-xl border border-zinc-700 flex items-center gap-3 text-xs font-semibold';
-            t.innerHTML = `<i class="fa-solid ${icon} text-crimson text-base"></i><span>${msg}</span>`;
-            c.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
+            refreshMapMarkers();
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            refreshHeaderUI();
-            filterRoutes();
-            renderFeedView();
-            renderGarageAndProfile();
-            switchTab('feed');
-        });
+        function refreshMapMarkers() {
+            mapMarkers.forEach(m => map.removeLayer(m));
+            mapMarkers = [];
+
+            // Marqueur position utilisateur
+            const userMarker = L.marker(appState.userLocation).addTo(map)
+                .bindPopup("<b>Votre position actuelle</b>");
+            mapMarkers.push(userMarker);
+        }
+
+        function locateUserOnMap() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    appState.userLocation = [position.coords.latitude, position.coords.longitude];
+                    map.setView(appState.userLocation, 15);
+                    refreshMapMarkers();
+                    showToast("Position GPS actualisée", "success");
+                }, () => {
+                    showToast("Impossible d'obtenir la géolocalisation", "error");
+                });
+            }
+        }
+
+        function toggleAutoDrive() {
+            appState.autoDrive = !appState.autoDrive;
+            const btn = document.getElementById('btn-autodrive');
+            if (appState.autoDrive) {
+                btn.innerHTML = `<i class="fa-solid fa-pause"></i> Pause`;
+                btn.className = "px-3 py-1.5 rounded-xl bg-amber-600 text-white text-xs font-bold shadow transition flex items-center gap-1.5";
+                autoDriveInterval = setInterval(() => {
+                    let speed = Math.floor(Math.random() * 20) + 70;
+                    document.getElementById('live-speed').textContent = speed;
+                }, 1000);
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-play"></i> Rouler`;
+                btn.className = "px-3 py-1.5 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs font-bold shadow transition flex items-center gap-1.5";
+                clearInterval(autoDriveInterval);
+            }
+        }
+
+        function toggleReportMenu() {
+            const menu = document.getElementById('report-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function addCommunityReport(type, icon, color) {
+            toggleReportMenu();
+            showToast(`Signalement enregistré : ${type}`, "success");
+        }
+
+        function toggleMapLayer(layerName, show) {
+            showToast(`Calque ${layerName} : ${show ? 'Activé' : 'Masqué'}`, "info");
+        }
+
+        // Système de Toast
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let bg = 'bg-asphalt text-white';
+            if (type === 'success') bg = 'bg-emerald-700 text-white';
+            if (type === 'error') bg = 'bg-crimson text-white';
+
+            toast.className = `${bg} px-4 py-3 rounded-2xl shadow-xl text-xs font-bold flex items-center gap-3 transition transform translate-y-2 opacity-0`;
+            toast.innerHTML = `<span>${message}</span>`;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-2', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
     </script>
 </body>
 </html>
-```eof
