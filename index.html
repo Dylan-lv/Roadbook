@@ -1,49 +1,4 @@
 <!-- ... existing code ... -->
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROADBOOK | Routes de Légende & Copilote Sportives Classiques</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- Leaflet CSS & JS pour la carte OpenStreetMap interactive -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        crimson: {
-                            DEFAULT: '#8B1E24',
-                            hover: '#70161B',
-                            soft: 'rgba(139, 30, 36, 0.08)',
-                            border: 'rgba(139, 30, 36, 0.25)'
-                        },
-                        asphalt: {
-                            DEFAULT: '#18181B',
-                            soft: '#27272A'
-                        },
-                        cream: {
-                            DEFAULT: '#F7F5F2',
-                            dark: '#EAE6DF'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif'],
-                        mono: ['JetBrains Mono', 'monospace']
-                    }
-                }
-            }
-        };
-    </script>
     <style>
         @keyframes pulseGlow {
             0%, 100% { box-shadow: 0 0 0 0 rgba(139, 30, 36, 0.4); }
@@ -52,9 +7,12 @@
         .speeding-pulse {
             animation: pulseGlow 1.2s infinite;
         }
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white !important; }
+        /* Correction indispensable pour l'affichage de la carte Leaflet sur tous navigateurs PC/Mobile */
+        #leaflet-map {
+            width: 100%;
+            height: 100%;
+            min-height: 70vh;
+            z-index: 10;
         }
     </style>
 </head>
@@ -94,7 +52,7 @@
                 </button>
                 <button onclick="switchTab('garage')" id="nav-garage" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
                     <i class="fa-solid fa-car"></i>
-                    <span>Mon Garage</span>
+                    <span>Mon Garage & Profil</span>
                 </button>
             </nav>
 
@@ -187,12 +145,12 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-[11px] font-bold text-zinc-500 uppercase mb-1">Catégorie conducteur</label>
+                    <label class="block text-[11px] font-bold text-zinc-500 uppercase mb-1">Rythme conducteur</label>
                     <select id="filter-cat" onchange="filterRoutes()" class="w-full rounded-xl bg-cream border border-zinc-300 px-3 py-2 text-xs font-semibold text-crimson">
-                        <option value="all">Toutes catégories</option>
+                        <option value="all">Tous rythmes</option>
                         <option value="Balade">Balade</option>
                         <option value="Rapide">Rapide</option>
-                        <option value="Useur de pneus">Useur de pneus</option>
+                        <option value="Sport">Sport</option>
                     </select>
                 </div>
             </div>
@@ -300,7 +258,7 @@
     </main>
 
     <!-- ===================================================================== -->
-    <!-- VUE 4 : MON GARAGE & PROFIL PILOTE                                    -->
+    <!-- VUE 4 : MON GARAGE & PROFIL PILOTE (PRIVÉ)                            -->
     <!-- ===================================================================== -->
     <main id="view-garage" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
         
@@ -360,19 +318,24 @@
                     </div>
                 </div>
 
-                <div class="bg-white rounded-2xl border border-zinc-200 p-6 shadow-sm space-y-4">
+                <!-- SECTION PRIVÉE : GARAGES ET DESTINATIONS FAVORITES -->
+                <div class="bg-white rounded-2xl border-2 border-dashed border-zinc-300 p-6 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-extrabold text-crimson uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-lock"></i> Espace Privé (Garages & Favoris)</span>
+                    </div>
+
                     <div>
                         <div class="flex items-center justify-between mb-2">
-                            <h3 class="font-bold text-sm text-asphalt"><i class="fa-solid fa-house-chimney text-crimson mr-1.5"></i>Mes Garages</h3>
-                            <button onclick="openLocationModal('garage')" class="text-xs font-bold text-crimson hover:underline">+ Ajouter</button>
+                            <h3 class="font-bold text-xs text-asphalt"><i class="fa-solid fa-house-chimney text-crimson mr-1.5"></i>Mes Garages (Privé)</h3>
+                            <button onclick="promptAddLocation('garage')" class="text-xs font-bold text-crimson hover:underline">+ Ajouter</button>
                         </div>
                         <div id="user-garages-list" class="space-y-1.5"></div>
                     </div>
 
                     <div class="pt-3 border-t border-zinc-100">
                         <div class="flex items-center justify-between mb-2">
-                            <h3 class="font-bold text-sm text-asphalt"><i class="fa-solid fa-star text-amber-500 mr-1.5"></i>Destinations Favorites</h3>
-                            <button onclick="openLocationModal('destination')" class="text-xs font-bold text-crimson hover:underline">+ Ajouter</button>
+                            <h3 class="font-bold text-xs text-asphalt"><i class="fa-solid fa-star text-amber-500 mr-1.5"></i>Destinations Favorites (Privé)</h3>
+                            <button onclick="promptAddLocation('destination')" class="text-xs font-bold text-crimson hover:underline">+ Ajouter</button>
                         </div>
                         <div id="user-destinations-list" class="space-y-1.5"></div>
                     </div>
@@ -439,7 +402,7 @@
     </footer>
 
     <!-- ===================================================================== -->
-    <!-- MODALES DESIGN INTÉGRÉES                                              -->
+    <!-- MODALES                                                               -->
     <!-- ===================================================================== -->
     
     <!-- Modal Sélection Véhicule au Démarrage -->
@@ -459,24 +422,26 @@
         </div>
     </div>
 
-    <!-- Modal Édition / Ajout Véhicule -->
+    <!-- Modal Édition / Ajout Véhicule avec Critères Dissociés -->
     <div id="vehicle-modal" class="fixed inset-0 bg-asphalt/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-zinc-200 p-6 space-y-4">
             <h3 id="vehicle-modal-title" class="font-serif text-xl font-bold text-asphalt">Ajouter un véhicule</h3>
             <input type="hidden" id="veh-modal-id">
             <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block font-bold text-zinc-600 mb-1">Marque</label>
-                    <input type="text" id="veh-modal-brand" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold">
-                </div>
-                <div>
-                    <label class="block font-bold text-zinc-600 mb-1">Modèle</label>
-                    <input type="text" id="veh-modal-model" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-zinc-600 mb-1">Marque</label>
+                        <input type="text" id="veh-modal-brand" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: Alpine">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-zinc-600 mb-1">Modèle</label>
+                        <input type="text" id="veh-modal-model" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: A110 1600S">
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
                         <label class="block font-bold text-zinc-600 mb-1">Année</label>
-                        <input type="number" id="veh-modal-year" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold">
+                        <input type="number" id="veh-modal-year" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="1972">
                     </div>
                     <div>
                         <label class="block font-bold text-zinc-600 mb-1">Carburant</label>
@@ -489,12 +454,19 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block font-bold text-zinc-600 mb-1">Motorisation & Spécificités</label>
-                    <input type="text" id="veh-modal-engine" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: Flat-6 3.2L / Carburateurs Weber">
+                    <label class="block font-bold text-zinc-600 mb-1">Motorisation (ex: 4-cyl. 1600 cm³)</label>
+                    <input type="text" id="veh-modal-engine" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="4-cyl. double carbu Weber">
                 </div>
                 <div>
-                    <label class="block font-bold text-zinc-600 mb-1">URL Photo (optionnel)</label>
-                    <input type="text" id="veh-modal-photo" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="https://...">
+                    <label class="block font-bold text-zinc-600 mb-1">Spécificité (ex: Boîte courte 5 rapports)</label>
+                    <input type="text" id="veh-modal-special" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Châssis compétition light">
+                </div>
+                <div>
+                    <label class="block font-bold text-zinc-600 mb-1">Photo du véhicule (depuis votre appareil ou URL)</label>
+                    <div class="flex items-center gap-2">
+                        <input type="file" id="veh-modal-file" accept="image/*" onchange="handleVehicleFileUpload(this)" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-1.5 text-xs">
+                    </div>
+                    <input type="hidden" id="veh-modal-photo">
                 </div>
             </div>
             <div class="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100">
@@ -504,22 +476,41 @@
         </div>
     </div>
 
-    <!-- Modal Édition Profil -->
+    <!-- Modal Édition Profil avec Rythme Conducteur -->
     <div id="profile-modal" class="fixed inset-0 bg-asphalt/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-zinc-200 p-6 space-y-4">
             <h3 class="font-serif text-xl font-bold text-asphalt">Modifier le profil</h3>
             <div class="space-y-3 text-xs">
                 <div>
-                    <label class="block font-bold text-zinc-600 mb-1">Pseudo</label>
+                    <label class="block font-bold text-zinc-600 mb-1">Pseudo (obligatoire)</label>
                     <input type="text" id="prof-modal-pseudo" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold">
                 </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-zinc-600 mb-1">Ville de résidence</label>
+                        <input type="text" id="prof-modal-city" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-zinc-600 mb-1">Âge</label>
+                        <input type="number" id="prof-modal-age" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold">
+                    </div>
+                </div>
                 <div>
-                    <label class="block font-bold text-zinc-600 mb-1">Ville de résidence</label>
-                    <input type="text" id="prof-modal-city" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold">
+                    <label class="block font-bold text-zinc-600 mb-1">Rythme conducteur (Balade / Rapide / Sport)</label>
+                    <select id="prof-modal-cat" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold text-crimson">
+                        <option value="Balade">Balade</option>
+                        <option value="Rapide">Rapide</option>
+                        <option value="Sport">Sport</option>
+                    </select>
                 </div>
                 <div>
                     <label class="block font-bold text-zinc-600 mb-1">Bio</label>
-                    <textarea id="prof-modal-bio" rows="3" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold"></textarea>
+                    <textarea id="prof-modal-bio" rows="2" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold"></textarea>
+                </div>
+                <div>
+                    <label class="block font-bold text-zinc-600 mb-1">Photo de profil (Appareil ou URL)</label>
+                    <input type="file" id="prof-modal-file" accept="image/*" onchange="handleProfileFileUpload(this)" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-1.5 text-xs">
+                    <input type="hidden" id="prof-modal-avatar">
                 </div>
             </div>
             <div class="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100">
@@ -529,53 +520,44 @@
         </div>
     </div>
 
-    <!-- Modal Ajout Garage / Destination -->
-    <div id="location-modal" class="fixed inset-0 bg-asphalt/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border border-zinc-200 p-6 space-y-4">
-            <h3 id="loc-modal-title" class="font-serif text-xl font-bold text-asphalt">Ajouter un lieu</h3>
-            <input type="hidden" id="loc-modal-type">
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block font-bold text-zinc-600 mb-1">Nom (ex: Grange de campagne)</label>
-                    <input type="text" id="loc-modal-name" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold">
-                </div>
-                <div>
-                    <label class="block font-bold text-zinc-600 mb-1">Adresse complète</label>
-                    <input type="text" id="loc-modal-addr" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold">
-                </div>
-            </div>
-            <div class="flex items-center justify-end gap-2 pt-2 border-t border-zinc-100">
-                <button onclick="closeLocationModal()" class="px-4 py-2 rounded-xl bg-zinc-200 hover:bg-zinc-300 text-xs font-bold text-zinc-700">Annuler</button>
-                <button onclick="saveLocationFromModal()" class="px-4 py-2 rounded-xl bg-crimson hover:bg-crimson-hover text-xs font-bold text-white shadow">Ajouter</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Fiche Itinéraire & Roadbook Intégré -->
+    <!-- Fiche Itinéraire Immersive (Style AllTrails Preview) -->
     <div id="route-detail-modal" class="fixed inset-0 bg-asphalt/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-        <div class="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden border border-zinc-200 max-h-[90vh] flex flex-col">
-            <div id="route-modal-header" class="bg-asphalt text-white p-6 flex justify-between items-start">
-                <div>
-                    <span id="route-modal-region" class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-crimson text-white uppercase"></span>
-                    <h2 id="route-modal-title" class="font-serif text-2xl font-bold mt-2"></h2>
+        <div class="bg-white w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden border border-zinc-200 max-h-[92vh] flex flex-col">
+            <!-- Bannière Photo AllTrails -->
+            <div class="relative h-48 sm:h-64 overflow-hidden bg-asphalt">
+                <img id="route-modal-banner" src="" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-asphalt/90 via-asphalt/30 to-transparent"></div>
+                <div class="absolute top-4 right-4">
+                    <button onclick="closeRouteDetailModal()" class="w-10 h-10 rounded-2xl bg-asphalt/80 backdrop-blur-md text-white flex items-center justify-center text-sm shadow-xl hover:bg-crimson transition"><i class="fa-solid fa-xmark"></i></button>
                 </div>
-                <button onclick="closeRouteDetailModal()" class="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white flex items-center justify-center text-sm"><i class="fa-solid fa-xmark"></i></button>
+                <div class="absolute bottom-4 left-6 right-6 flex flex-wrap items-end justify-between gap-3 text-white">
+                    <div>
+                        <span id="route-modal-region" class="px-3 py-1 rounded-lg text-[10px] font-extrabold bg-crimson uppercase tracking-wider"></span>
+                        <h2 id="route-modal-title" class="font-serif text-2xl sm:text-3xl font-bold mt-1 text-white"></h2>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-amber-400 font-mono font-bold text-sm bg-asphalt/80 px-3 py-1.5 rounded-xl border border-zinc-700">
+                        <i class="fa-solid fa-star"></i><span id="route-modal-rating">4.9</span>
+                    </div>
+                </div>
             </div>
-            <div class="p-6 overflow-y-auto space-y-6 flex-1">
-                <div class="grid grid-cols-3 gap-3 text-center font-mono text-xs bg-cream p-4 rounded-2xl border border-zinc-200">
-                    <div><span class="block text-[10px] font-sans text-zinc-500 uppercase">Distance</span><strong id="route-modal-dist" class="text-asphalt text-base"></strong></div>
-                    <div><span class="block text-[10px] font-sans text-zinc-500 uppercase">Durée estimée</span><strong id="route-modal-dur" class="text-asphalt text-base"></strong></div>
-                    <div><span class="block text-[10px] font-sans text-zinc-500 uppercase">Dénivelé D+</span><strong id="route-modal-elev" class="text-crimson text-base"></strong></div>
+
+            <!-- Contenu de la Fiche -->
+            <div class="p-6 overflow-y-auto space-y-6 flex-1 bg-cream/30">
+                <div class="grid grid-cols-3 gap-3 text-center font-mono text-xs bg-white p-4 rounded-2xl border border-zinc-200 shadow-sm">
+                    <div><span class="block text-[10px] font-sans text-zinc-400 uppercase">Distance</span><strong id="route-modal-dist" class="text-asphalt text-base"></strong></div>
+                    <div><span class="block text-[10px] font-sans text-zinc-400 uppercase">Durée estimée</span><strong id="route-modal-dur" class="text-asphalt text-base"></strong></div>
+                    <div><span class="block text-[10px] font-sans text-zinc-400 uppercase">Dénivelé D+</span><strong id="route-modal-elev" class="text-crimson text-base"></strong></div>
                 </div>
 
-                <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl space-y-1">
-                    <strong class="text-xs text-amber-900 block font-bold uppercase"><i class="fa-solid fa-wrench text-crimson mr-1.5"></i> Consigne mécanique & sécurité :</strong>
+                <!-- Consignes mécaniques affichées sur la fiche -->
+                <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl space-y-1 shadow-sm">
+                    <strong class="text-xs text-amber-900 block font-bold uppercase tracking-wider"><i class="fa-solid fa-wrench text-crimson mr-1.5"></i> Consignes mécaniques & sécurité :</strong>
                     <p id="route-modal-advice" class="text-xs text-amber-900 leading-relaxed"></p>
                 </div>
 
                 <div class="space-y-3">
                     <h3 class="font-bold text-sm text-asphalt flex items-center gap-2"><i class="fa-solid fa-book-open text-crimson"></i> Roadbook Copilote — Fléché Métré</h3>
-                    <div class="border border-zinc-200 rounded-2xl overflow-hidden">
+                    <div class="border border-zinc-200 rounded-2xl overflow-hidden bg-white shadow-sm">
                         <table class="w-full text-left border-collapse text-xs font-mono">
                             <thead>
                                 <tr class="bg-asphalt text-white text-[10px] uppercase">
@@ -595,19 +577,19 @@
                 <div class="space-y-3">
                     <h3 class="font-bold text-sm text-asphalt flex items-center gap-2"><i class="fa-solid fa-comments text-crimson"></i> Retours des utilisateurs & Photos</h3>
                     <div id="route-modal-reviews-list" class="space-y-3"></div>
-                    <div class="bg-cream p-4 rounded-2xl border border-zinc-200 space-y-3">
+                    <div class="bg-white p-4 rounded-2xl border border-zinc-200 space-y-3 shadow-sm">
                         <span class="text-xs font-bold text-asphalt block">Ajouter votre avis et vos photos (max 2)</span>
-                        <textarea id="new-review-comment" rows="2" placeholder="Qualité du bitume, épingles, panorama..." class="w-full bg-white border border-zinc-300 rounded-xl p-3 text-xs"></textarea>
+                        <textarea id="new-review-comment" rows="2" placeholder="Qualité du bitume, épingles, panorama..." class="w-full bg-cream border border-zinc-300 rounded-xl p-3 text-xs"></textarea>
                         <div class="flex items-center justify-between">
-                            <input type="text" id="new-review-photo" placeholder="URL photo (optionnel)" class="w-2/3 bg-white border border-zinc-300 rounded-xl px-3 py-2 text-xs">
+                            <input type="file" id="new-review-file" accept="image/*" class="w-2/3 text-xs text-zinc-500">
                             <button onclick="submitRouteReview()" class="px-4 py-2 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs font-bold shadow">Publier l'avis</button>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="bg-cream px-6 py-4 border-t border-zinc-200 flex justify-between items-center">
-                <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-zinc-800 text-white text-xs font-bold shadow flex items-center gap-2"><i class="fa-solid fa-print"></i> Imprimer le Roadbook</button>
-                <button id="route-modal-launch-btn" class="px-5 py-2.5 rounded-xl bg-crimson text-white text-xs font-bold shadow flex items-center gap-2"><i class="fa-solid fa-location-arrow"></i> Lancer sur le GPS</button>
+            <div class="bg-white px-6 py-4 border-t border-zinc-200 flex justify-between items-center">
+                <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-zinc-800 text-white text-xs font-bold shadow flex items-center gap-2"><i class="fa-solid fa-print"></i> Imprimer</button>
+                <button id="route-modal-launch-btn" class="px-6 py-2.5 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs font-bold shadow flex items-center gap-2"><i class="fa-solid fa-location-arrow"></i> Lancer sur le GPS</button>
             </div>
         </div>
     </div>
@@ -640,10 +622,6 @@
                     year: 1966,
                     engine: '4-cyl. Double Arbre 1570 cm³',
                     fuel: 'SP98',
-                    cc: 1570,
-                    hp: 109,
-                    torque: 142,
-                    weight: 950,
                     special: 'Coupé Bertone • Carburateurs Weber 40 DCOE',
                     kmDriven: 1420,
                     archived: false,
@@ -656,38 +634,16 @@
                     year: 1987,
                     engine: 'Flat-6 3.2L Refroidi par air',
                     fuel: 'SP98',
-                    cc: 3164,
-                    hp: 231,
-                    torque: 284,
-                    weight: 1160,
-                    special: 'Boîte G50 • Pont autobloquant 40% • Jantes Fuchs 16"',
+                    special: 'Boîte G50 • Pont autobloquant 40%',
                     kmDriven: 1060,
                     archived: false,
                     photo: 'https://placehold.co/400x250/18181B/FFFFFF?text=Porsche+911+3.2+1987'
-                },
-                {
-                    id: 'veh-gti',
-                    brand: 'Peugeot',
-                    model: '205 GTI 1.9 E85',
-                    year: 1989,
-                    engine: '4-cyl. 1905 cm³ Cartographie E85',
-                    fuel: 'E85',
-                    cc: 1905,
-                    hp: 130,
-                    torque: 161,
-                    weight: 880,
-                    special: 'Optimisée bioéthanol E85 • Châssis sport Bilstein',
-                    kmDriven: 840,
-                    archived: false,
-                    photo: 'https://placehold.co/400x250/70161B/FFFFFF?text=205+GTI+E85'
                 }
             ],
             activeVehicleId: 'veh-alfa',
             communityPilots: [
-                { pseudo: 'Julien_Alpine', city: 'Grenoble', category: 'Useur de pneus', car: 'Alpine A110 1600S', avatar: 'https://placehold.co/100x100/18181B/FFFFFF?text=JA' },
-                { pseudo: 'Sophie_Spider', city: 'Annecy', category: 'Balade', car: 'Alfa Spider Duetto', avatar: 'https://placehold.co/100x100/8B1E24/FFFFFF?text=SS' },
-                { pseudo: 'Thomas_E30', city: 'Chambéry', category: 'Rapide', car: 'BMW M3 E30', avatar: 'https://placehold.co/100x100/3F3F46/FFFFFF?text=TE' },
-                { pseudo: 'Lucie_GTI', city: 'Lyon', category: 'Rapide', car: 'Peugeot 205 GTI 1.9 E85', avatar: 'https://placehold.co/100x100/70161B/FFFFFF?text=LG' }
+                { pseudo: 'Julien_Alpine', city: 'Grenoble', category: 'Sport', car: 'Alpine A110 1600S', avatar: 'https://placehold.co/100x100/18181B/FFFFFF?text=JA' },
+                { pseudo: 'Sophie_Spider', city: 'Annecy', category: 'Balade', car: 'Alfa Spider Duetto', avatar: 'https://placehold.co/100x100/8B1E24/FFFFFF?text=SS' }
             ],
             feedActivities: [
                 {
@@ -698,21 +654,9 @@
                     time: 'Il y a 28 min',
                     type: 'drive',
                     title: 'A parcouru la Boucle du Massif de la Chartreuse — Col du Coq',
-                    meta: '112 km • +2 180 m D+ • Profil Useur de pneus',
+                    meta: '112 km • +2 180 m D+ • Rythme Sport',
                     routeId: 'r-chartreuse',
                     photo: 'https://placehold.co/700x320/18181B/FFFFFF?text=Sortie+Matinale+Col+du+Coq'
-                },
-                {
-                    id: 'act-2',
-                    author: 'Sophie_Spider',
-                    avatar: 'https://placehold.co/100x100/8B1E24/FFFFFF?text=SS',
-                    car: 'Alfa Spider Duetto',
-                    time: 'Il y a 2 heures',
-                    type: 'photo',
-                    title: 'Halte photo au Belvédère du Pas de la Faye',
-                    meta: 'La Route Napoléon — De Grasse à Castellane',
-                    routeId: 'r-napoleon',
-                    photo: 'https://placehold.co/700x320/8B1E24/FFFFFF?text=Panorama+Route+Napoleon'
                 }
             ],
             routes: [
@@ -730,6 +674,7 @@
                     isLoop: false,
                     recommendedCategory: 'Rapide',
                     rating: 4.9,
+                    bannerPhoto: 'https://placehold.co/800x400/8B1E24/FFFFFF?text=Route+Napoleon+Panorama',
                     mechanicAdvice: 'Montée prolongée sur 40 km : surveiller la température d’eau et la pression d’huile. Plein SP98 et E85 possible à Grasse.',
                     steps: [
                         { km: '0.0', name: 'Départ Grasse', desc: 'Station SP98 et E85 disponible.' },
@@ -764,6 +709,7 @@
                     isLoop: true,
                     recommendedCategory: 'Balade',
                     rating: 4.9,
+                    bannerPhoto: 'https://placehold.co/800x400/18181B/FFFFFF?text=Paris+Nocturne+Classiques',
                     mechanicAdvice: 'Attention aux pavés humides (notamment Montmartre et Champs-Élysées) et à la température d’embrayage dans les embouteillages parisiens. Privilégier les horaires tardifs.',
                     steps: [
                         { km: '0.0', name: 'Basilique du Sacré-Cœur (Montmartre)', desc: 'Point de départ sur les hauteurs.' },
@@ -798,8 +744,9 @@
                     windingType: 'SINUEUX',
                     roadTypes: ['Col de montagne', 'Forêt'],
                     isLoop: true,
-                    recommendedCategory: 'Useur de pneus',
+                    recommendedCategory: 'Sport',
                     rating: 4.8,
+                    bannerPhoto: 'https://placehold.co/800x400/3F3F46/FFFFFF?text=Chartreuse+Col+du+Coq',
                     mechanicAdvice: 'Routes techniques et étroites : freinage très sollicité dans la descente. Utiliser le frein moteur.',
                     steps: [
                         { km: '0.0', name: 'Saint-Nazaire-les-Eymes', desc: 'Départ au pied de la falaise.' },
@@ -816,86 +763,20 @@
                         { totalKm: '58.0', partKm: '38.5', tulip: 's-curve', instruction: 'Col du Granier.', note: 'Parking sommital.' },
                         { totalKm: '112.0', partKm: '54.0', tulip: 'finish', instruction: 'Boucle bouclée.', note: 'Contrôler freins.' }
                     ],
-                    reviews: [
-                        { author: 'Lucie_GTI', car: 'Peugeot 205 GTI 1.9 E85', rating: 5, comment: 'Le terrain de jeu idéal pour un châssis léger et vif.', photos: [] }
-                    ]
-                },
-                {
-                    id: 'r-corniche-dor',
-                    title: 'La Corniche d’Or — De Saint-Raphaël à Cannes',
-                    region: 'Var & Alpes-Maritimes',
-                    proximityKm: 340,
-                    distanceKm: 42,
-                    durationMins: 65,
-                    durationLabel: '1h 05',
-                    elevationGain: 450,
-                    windingType: 'MIXTE',
-                    roadTypes: ['Littoral'],
-                    isLoop: false,
-                    recommendedCategory: 'Balade',
-                    rating: 4.9,
-                    mechanicAdvice: 'Superbes panoramas marins sur roche rouge de l’Estérel. Attention aux cyclistes en saison.',
-                    steps: [
-                        { km: '0.0', name: 'Saint-Raphaël Port', desc: 'Départ le long de la mer.' },
-                        { km: '21.0', name: 'Agay & Calanques de red-rock', desc: 'Contraste entre le rouge et le bleu.' },
-                        { km: '42.0', name: 'Cannes La Croisette', desc: 'Arrivée prestigieuse.' }
-                    ],
-                    gpsCoords: [
-                        [43.4210, 6.7650], [43.4350, 6.8620], [43.5520, 7.0170]
-                    ],
-                    roadbook: [
-                        { totalKm: '0.0', partKm: '0.0', tulip: 'straight', instruction: 'Départ St-Raphaël par D559.', note: 'Vue mer.' },
-                        { totalKm: '21.0', partKm: '21.0', tulip: 's-curve', instruction: 'Traversée d’Agay.', note: 'Virages fluides.' },
-                        { totalKm: '42.0', partKm: '21.0', tulip: 'finish', instruction: 'Arrivée Cannes.', note: 'Fin de parcours.' }
-                    ],
-                    reviews: [
-                        { author: 'Sophie_Spider', car: 'Alfa Spider', rating: 5, comment: 'Capote baissée, un pur bonheur.', photos: [] }
-                    ]
-                },
-                {
-                    id: 'r-vallee-chevreuse',
-                    title: 'Échappée dans la Vallée de Chevreuse & Port-Royal',
-                    region: 'Yvelines & Île-de-France',
-                    proximityKm: 35,
-                    distanceKm: 54,
-                    durationMins: 70,
-                    durationLabel: '1h 10',
-                    elevationGain: 620,
-                    windingType: 'MIXTE',
-                    roadTypes: ['Forêt', 'Rural'],
-                    isLoop: true,
-                    recommendedCategory: 'Rapide',
-                    rating: 4.7,
-                    mechanicAdvice: 'Routes forestières sinueuses, attention aux feuilles mortes en automne et gibier.',
-                    steps: [
-                        { km: '0.0', name: 'Dampierre-en-Yvelines', desc: 'Départ au pied du château.' },
-                        { km: '24.0', name: 'Abbaye de Port-Royal des Champs', desc: 'Site historique.' },
-                        { km: '54.0', name: 'Boucle Dampierre', desc: 'Retour point de départ.' }
-                    ],
-                    gpsCoords: [
-                        [48.7050, 1.9870], [48.7520, 2.0120], [48.7050, 1.9870]
-                    ],
-                    roadbook: [
-                        { totalKm: '0.0', partKm: '0.0', tulip: 'straight', instruction: 'Départ Dampierre.', note: 'Forêt.' },
-                        { totalKm: '24.0', partKm: '24.0', tulip: 'left', instruction: 'Port-Royal.', note: 'Virages en sous-bois.' },
-                        { totalKm: '54.0', partKm: '30.0', tulip: 'finish', instruction: 'Boucle bouclée.', note: 'Parking.' }
-                    ],
                     reviews: []
                 }
             ],
             mapPOIs: {
                 stations: [
                     { id: 'st1', lat: 45.7720, lng: 4.8157, name: 'TotalEnergies Relais des Alpes', prices: { 'SP98': 1.89, 'SP95': 1.79, 'E85': 0.84, 'Diesel': 1.72, 'Électrique': 0.39 }, note: 'Pompe E85 et SP98 disponibles.' },
-                    { id: 'st2', lat: 48.8620, lng: 2.3350, name: 'TotalEnergies Paris Louvre', prices: { 'SP98': 1.98, 'SP95': 1.88, 'E85': 0.89, 'Diesel': 1.82, 'Électrique': 0.42 }, note: 'Station centre Paris avec E85.' },
-                    { id: 'st3', lat: 43.5820, lng: 7.0420, name: 'Avia Cannes E85', prices: { 'SP98': 1.92, 'SP95': 1.81, 'E85': 0.83, 'Diesel': 1.75, 'Électrique': 0.38 }, note: 'Carburant E85 en cuve dédiée.' }
+                    { id: 'st2', lat: 48.8620, lng: 2.3350, name: 'TotalEnergies Paris Louvre', prices: { 'SP98': 1.98, 'SP95': 1.88, 'E85': 0.89, 'Diesel': 1.82, 'Électrique': 0.42 }, note: 'Station centre Paris avec E85.' }
                 ],
                 radars: [
                     { id: 'rad1', lat: 45.8120, lng: 4.7920, name: 'Radar Fixe Discriminant', limit: 80, desc: 'Contrôle double sens.' },
                     { id: 'rad2', lat: 48.8650, lng: 2.3200, name: 'Radar Automatique Quai de Seine', limit: 50, desc: 'Contrôle vitesse urbain.' }
                 ],
                 spots: [
-                    { id: 'sp1', lat: 48.8631, lng: 2.2875, name: 'Esplanade du Trocadéro', desc: 'Spot photo incontournable Tour Eiffel.' },
-                    { id: 'sp2', lat: 43.4320, lng: 6.8420, name: 'Belvédère de l’Estérel', desc: 'Vue mer sur roche rouge.' }
+                    { id: 'sp1', lat: 48.8631, lng: 2.2875, name: 'Esplanade du Trocadéro', desc: 'Spot photo incontournable Tour Eiffel.' }
                 ],
                 parkings: [
                     { id: 'pk1', lat: 45.7920, lng: 4.7820, name: 'Parking Panoramique Asphalté', desc: 'Accès plat sans bordure haute.' }
@@ -906,27 +787,22 @@
                 museums: [
                     { id: 'ms1', lat: 48.8606, lng: 2.3376, name: 'Musée du Louvre & Cours Napoléon', desc: 'Joyau architectural et culturel.' }
                 ],
-                alerts: [
-                    { id: 'al1', lat: 45.8020, lng: 4.7620, type: 'Trous sur la route', icon: 'fa-circle-dot', color: '#EF4444', time: 'Il y a 12 min', author: 'Julien_Alpine' }
-                ],
+                alerts: [],
                 nearbyUsers: [
-                    { id: 'u1', lat: 45.7680, lng: 4.8250, pseudo: 'Julien_Alpine', car: 'Alpine A110 1600S', distanceKm: 1.2, avatar: 'JA', waved: false },
-                    { id: 'u2', lat: 45.7590, lng: 4.8450, pseudo: 'Sophie_Spider', car: 'Alfa Spider Duetto', distanceKm: 1.8, avatar: 'SS', waved: false }
+                    { id: 'u1', lat: 45.7680, lng: 4.8250, pseudo: 'Julien_Alpine', car: 'Alpine A110 1600S', distanceKm: 1.2, avatar: 'JA', waved: false }
                 ]
             }
         };
 
-        let appState = JSON.parse(localStorage.getItem('roadbook_app_v4')) || DEFAULT_STATE;
+        let appState = JSON.parse(localStorage.getItem('roadbook_app_v5')) || DEFAULT_STATE;
 
         function saveState() {
-            localStorage.setItem('roadbook_app_v4', JSON.stringify(appState));
+            localStorage.setItem('roadbook_app_v5', JSON.stringify(appState));
         }
 
         let selectedRouteId = appState.routes[0].id;
         let activeRoadTypes = ['Col de montagne', 'Littoral', 'Rural', 'Forêt', 'Ville'];
-        let mapLayersVisible = {
-            stations: true, radars: true, spots: true, parkings: true, meets: true, museums: true, alerts: true
-        };
+        let mapLayersVisible = { stations: true, radars: true, spots: true, parkings: true, meets: true, museums: true, alerts: true };
         let autoDriveInterval = null;
         let editorMode = false;
         let editorPoints = [];
@@ -967,7 +843,7 @@
             if (tabId === 'map') {
                 setTimeout(() => {
                     initLeafletMap();
-                }, 150);
+                }, 200);
             }
         }
 
@@ -997,141 +873,8 @@
             showToast('Véhicule actif mis à jour !', 'fa-car');
         }
 
-        function openStartupVehicleModal() {
-            const modal = document.getElementById('startup-vehicle-modal');
-            const choices = document.getElementById('startup-vehicles-choices');
-            if (!modal || !choices) return;
-
-            const activeVehicles = appState.vehicles.filter(v => !v.archived);
-            choices.innerHTML = activeVehicles.map(v => `
-                <div onclick="selectStartupVehicle('${v.id}')" class="bg-cream hover:bg-zinc-100 border-2 ${v.id === appState.activeVehicleId ? 'border-crimson bg-crimson/5' : 'border-zinc-200'} rounded-2xl p-4 cursor-pointer transition flex items-center gap-4">
-                    <img src="${v.photo}" class="w-24 h-16 rounded-xl object-cover">
-                    <div>
-                        <h4 class="font-bold text-sm text-asphalt">${v.brand} ${v.model}</h4>
-                        <span class="text-xs text-crimson font-mono font-bold">${v.year} • Carburant : ${v.fuel}</span>
-                        <p class="text-[11px] text-zinc-500 mt-0.5">${v.engine}</p>
-                    </div>
-                </div>
-            `).join('');
-
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closeStartupVehicleModal() {
-            const modal = document.getElementById('startup-vehicle-modal');
-            if (modal) {
-                modal.classList.remove('flex');
-                modal.classList.add('hidden');
-            }
-        }
-
-        function selectStartupVehicle(vehId) {
-            switchActiveVehicle(vehId);
-            closeStartupVehicleModal();
-        }
-
-        function setFeedFilter(filter) {
-            currentFeedFilter = filter;
-            const btnFollowing = document.getElementById('btn-feed-following');
-            const btnAll = document.getElementById('btn-feed-all');
-            if (filter === 'following') {
-                btnFollowing.className = 'px-3 py-1.5 rounded-lg bg-crimson text-white transition';
-                btnAll.className = 'px-3 py-1.5 rounded-lg text-zinc-600 hover:text-asphalt transition';
-            } else {
-                btnAll.className = 'px-3 py-1.5 rounded-lg bg-crimson text-white transition';
-                btnFollowing.className = 'px-3 py-1.5 rounded-lg text-zinc-600 hover:text-asphalt transition';
-            }
-            renderFeedView();
-        }
-
-        function renderFeedView() {
-            const suggestedGrid = document.getElementById('suggested-drivers-grid');
-            if (suggestedGrid) {
-                suggestedGrid.innerHTML = appState.communityPilots.map(p => {
-                    const isFollowing = (appState.profile.followingPseudos || []).includes(p.pseudo);
-                    return `
-                        <div class="bg-cream p-3 rounded-xl border border-zinc-200 flex flex-col justify-between gap-2">
-                            <div class="flex items-center gap-2.5">
-                                <img src="${p.avatar}" class="w-10 h-10 rounded-xl object-cover border border-zinc-300">
-                                <div class="overflow-hidden">
-                                    <h4 class="font-bold text-xs text-asphalt truncate">${p.pseudo}</h4>
-                                    <span class="text-[10px] text-zinc-500 block truncate">${p.car}</span>
-                                </div>
-                            </div>
-                            <button onclick="toggleFollowPilot('${p.pseudo}')" class="w-full py-1.5 rounded-lg text-[11px] font-bold transition ${isFollowing ? 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300' : 'bg-crimson text-white hover:bg-crimson-hover'}">
-                                ${isFollowing ? 'Abonné ✓' : '+ S’abonner'}
-                            </button>
-                        </div>
-                    `;
-                }).join('');
-            }
-
-            const container = document.getElementById('feed-activities-container');
-            if (container) {
-                let acts = appState.feedActivities;
-                if (currentFeedFilter === 'following') {
-                    acts = acts.filter(a => (appState.profile.followingPseudos || []).includes(a.author));
-                }
-
-                if (acts.length === 0) {
-                    container.innerHTML = `
-                        <div class="bg-white rounded-2xl border border-zinc-200 p-8 text-center text-zinc-500">
-                            <i class="fa-solid fa-rss text-3xl text-zinc-300 mb-2"></i>
-                            <p class="text-xs">Aucune activité récente pour ce filtre. Abonnez-vous à d’autres pilotes pour voir leurs sorties !</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                container.innerHTML = acts.map(act => `
-                    <div class="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm space-y-3">
-                        <div class="p-4 sm:p-5 pb-0 flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <img src="${act.avatar}" class="w-11 h-11 rounded-2xl object-cover border border-zinc-300">
-                                <div>
-                                    <h3 class="font-bold text-sm text-asphalt">${act.author} <span class="font-normal text-xs text-zinc-500">• ${act.car}</span></h3>
-                                    <span class="text-[10px] text-zinc-400 font-mono">${act.time}</span>
-                                </div>
-                            </div>
-                            <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-cream text-crimson uppercase">${act.type}</span>
-                        </div>
-                        <div class="px-4 sm:px-5 space-y-1">
-                            <h4 class="font-serif font-bold text-base text-asphalt">${act.title}</h4>
-                            <p class="text-xs text-zinc-600">${act.meta}</p>
-                        </div>
-                        ${act.photo ? `<div class="h-64 sm:h-80 overflow-hidden"><img src="${act.photo}" class="w-full h-full object-cover"></div>` : ''}
-                        <div class="bg-cream px-4 sm:px-5 py-3 border-t border-zinc-200 flex items-center justify-between">
-                            <span class="text-xs font-semibold text-zinc-600"><i class="fa-solid fa-road text-crimson mr-1"></i> Itinéraire associé</span>
-                            <button onclick="openRouteDetail('${act.routeId}')" class="px-3 py-1.5 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs font-bold shadow transition">
-                                Voir le Roadbook
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-
-        function toggleFollowPilot(pseudo) {
-            if (!appState.profile.followingPseudos) appState.profile.followingPseudos = [];
-            const idx = appState.profile.followingPseudos.indexOf(pseudo);
-            if (idx > -1) {
-                appState.profile.followingPseudos.splice(idx, 1);
-                appState.profile.followersCount = Math.max(0, appState.profile.followersCount - 1);
-                showToast(`Vous ne suivez plus ${pseudo}.`, 'fa-user-minus');
-            } else {
-                appState.profile.followingPseudos.push(pseudo);
-                appState.profile.followersCount += 1;
-                showToast(`Vous êtes maintenant abonné à ${pseudo} !`, 'fa-user-plus');
-            }
-            saveState();
-            renderFeedView();
-            renderGarageAndProfile();
-        }
-
         function filterRoutes() {
             const proxMax = parseInt(document.getElementById('filter-prox').value, 10);
-            const durFilter = document.getElementById('filter-dur').value;
             const windingFilter = document.getElementById('filter-winding').value;
             const catFilter = document.getElementById('filter-cat').value;
             const isLoopOnly = document.getElementById('filter-loop-chk').checked;
@@ -1155,25 +898,26 @@
 
             grid.innerHTML = filtered.map(r => `
                 <div class="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm flex flex-col justify-between">
-                    <div class="p-5 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-cream text-crimson uppercase">${r.region}</span>
-                            <div class="flex items-center gap-1 text-xs font-mono font-bold text-amber-500"><i class="fa-solid fa-star"></i><span>${r.rating}</span></div>
+                    <div>
+                        <div class="h-48 overflow-hidden relative cursor-pointer" onclick="openRouteDetail('${r.id}')">
+                            <img src="${r.bannerPhoto}" class="w-full h-full object-cover hover:scale-105 transition duration-500">
+                            <span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-asphalt/90 text-white uppercase">${r.region}</span>
+                            <div class="absolute top-3 right-3 bg-asphalt/80 px-2 py-1 rounded-lg text-amber-400 font-mono text-xs font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-star"></i><span>${r.rating}</span>
+                            </div>
                         </div>
-                        <h3 class="font-serif font-bold text-lg text-asphalt">${r.title}</h3>
-                        <div class="grid grid-cols-3 gap-2 py-2 border-y border-zinc-100 font-mono text-center text-xs">
-                            <div><span class="block text-[9px] font-sans text-zinc-400 uppercase">Distance</span><strong class="text-asphalt">${r.distanceKm} km</strong></div>
-                            <div><span class="block text-[9px] font-sans text-zinc-400 uppercase">Durée</span><strong class="text-asphalt">${r.durationLabel}</strong></div>
-                            <div><span class="block text-[9px] font-sans text-zinc-400 uppercase">Dénivelé</span><strong class="text-crimson">+${r.elevationGain} m</strong></div>
+                        <div class="p-5 space-y-3">
+                            <h3 class="font-serif font-bold text-lg text-asphalt cursor-pointer hover:text-crimson transition" onclick="openRouteDetail('${r.id}')">${r.title}</h3>
+                            <div class="grid grid-cols-3 gap-2 py-2 border-y border-zinc-100 font-mono text-center text-xs">
+                                <div><span class="block text-[9px] font-sans text-zinc-400 uppercase">Distance</span><strong class="text-asphalt">${r.distanceKm} km</strong></div>
+                                <div><span class="block text-[9px] font-sans text-zinc-400 uppercase">Durée</span><strong class="text-asphalt">${r.durationLabel}</strong></div>
+                                <div><span class="block text-[9px] font-sans text-zinc-400 uppercase">Dénivelé</span><strong class="text-crimson">+${r.elevationGain} m</strong></div>
+                            </div>
                         </div>
-                        <p class="text-xs text-zinc-600 bg-cream p-3 rounded-xl border border-zinc-200/70 line-clamp-2">
-                            <strong class="text-asphalt block mb-0.5"><i class="fa-solid fa-wrench text-crimson mr-1"></i>Consigne :</strong>
-                            ${r.mechanicAdvice}
-                        </p>
                     </div>
                     <div class="bg-cream px-5 py-3.5 border-t border-zinc-200 flex items-center justify-between">
                         <button onclick="openRouteDetail('${r.id}')" class="text-xs font-bold text-crimson hover:underline flex items-center gap-1.5">
-                            <i class="fa-solid fa-book-open"></i> Voir le Roadbook
+                            <i class="fa-solid fa-book-open"></i> Voir Fiche & Roadbook
                         </button>
                         <button onclick="launchRouteOnMap('${r.id}')" class="px-3.5 py-2 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs font-bold shadow transition flex items-center gap-1.5">
                             <i class="fa-solid fa-location-arrow"></i> GPS
@@ -1201,8 +945,10 @@
             if (!route) return;
             selectedRouteId = routeId;
 
+            document.getElementById('route-modal-banner').src = route.bannerPhoto;
             document.getElementById('route-modal-region').innerText = route.region;
             document.getElementById('route-modal-title').innerText = route.title;
+            document.getElementById('route-modal-rating').innerText = route.rating;
             document.getElementById('route-modal-dist').innerText = route.distanceKm + ' km';
             document.getElementById('route-modal-dur').innerText = route.durationLabel;
             document.getElementById('route-modal-elev').innerText = '+' + route.elevationGain + ' m';
@@ -1244,39 +990,53 @@
                 return;
             }
             listEl.innerHTML = route.reviews.map(rev => `
-                <div class="bg-cream p-3.5 rounded-2xl border border-zinc-200 space-y-1.5 text-xs">
+                <div class="bg-white p-3.5 rounded-2xl border border-zinc-200 space-y-1.5 text-xs shadow-sm">
                     <div class="flex items-center justify-between">
                         <strong class="text-asphalt">${rev.author} <span class="font-normal text-zinc-500">(${rev.car})</span></strong>
                         <div class="text-amber-500 font-bold">${'★'.repeat(rev.rating)}</div>
                     </div>
                     <p class="text-zinc-700">${rev.comment}</p>
+                    ${rev.photos && rev.photos.length > 0 ? `<div class="flex gap-2 pt-1">${rev.photos.map(p => `<img src="${p}" class="w-20 h-16 rounded-xl object-cover border">`).join('')}</div>` : ''}
                 </div>
             `).join('');
         }
 
         function submitRouteReview() {
             const comment = document.getElementById('new-review-comment').value.trim();
-            const photo = document.getElementById('new-review-photo').value.trim();
+            const fileInput = document.getElementById('new-review-file');
             if (!comment) {
                 showToast('Veuillez saisir un commentaire.', 'fa-triangle-exclamation');
                 return;
             }
-            const route = appState.routes.find(r => r.id === selectedRouteId);
-            if (route) {
-                const activeVeh = getActiveVehicle();
-                if (!route.reviews) route.reviews = [];
-                route.reviews.push({
-                    author: appState.profile.pseudo,
-                    car: `${activeVeh.brand} ${activeVeh.model}`,
-                    rating: 5,
-                    comment,
-                    photos: photo ? [photo] : []
-                });
-                saveState();
-                renderRouteReviews(route);
-                document.getElementById('new-review-comment').value = '';
-                document.getElementById('new-review-photo').value = '';
-                showToast('Avis publié avec succès !', 'fa-check');
+
+            const processReview = (photoUrl) => {
+                const route = appState.routes.find(r => r.id === selectedRouteId);
+                if (route) {
+                    const activeVeh = getActiveVehicle();
+                    if (!route.reviews) route.reviews = [];
+                    route.reviews.push({
+                        author: appState.profile.pseudo,
+                        car: `${activeVeh.brand} ${activeVeh.model}`,
+                        rating: 5,
+                        comment,
+                        photos: photoUrl ? [photoUrl] : []
+                    });
+                    saveState();
+                    renderRouteReviews(route);
+                    document.getElementById('new-review-comment').value = '';
+                    if (fileInput) fileInput.value = '';
+                    showToast('Avis publié avec succès !', 'fa-check');
+                }
+            };
+
+            if (fileInput && fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    processReview(e.target.result);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                processReview(null);
             }
         }
 
@@ -1285,11 +1045,10 @@
                 leafletMap = L.map('leaflet-map', { zoomControl: false }).setView([48.8566, 2.3522], 12);
                 L.control.zoom({ position: 'topright' }).addTo(leafletMap);
                 
-                // Utilisation des tuiles CartoDB Positron ultra robustes et sans blocage 403
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                     maxZoom: 19,
                     subdomains: 'abcd',
-                    attribution: '© <a href="https://carto.com/">CARTO</a>'
+                    attribution: '© CARTO'
                 }).addTo(leafletMap);
 
                 poisLayersGroup = L.layerGroup().addTo(leafletMap);
@@ -1350,16 +1109,6 @@
                     const html = `<div class="bg-asphalt text-white p-3 rounded-2xl shadow-xl border border-zinc-700 text-xs space-y-1"><strong class="text-blue-400 font-bold block"><i class="fa-solid fa-square-parking mr-1"></i>${pk.name}</strong><p class="text-zinc-300">${pk.desc}</p></div>`;
                     const marker = L.marker([pk.lat, pk.lng], {
                         icon: L.divIcon({ className: 'custom-poi-marker', html: `<div class="w-8 h-8 rounded-full bg-blue-600 border-2 border-white text-white flex items-center justify-center shadow-lg text-xs font-bold">P</div>`, iconSize: [32, 32], iconAnchor: [16, 16] })
-                    }).bindPopup(html);
-                    poisLayersGroup.addLayer(marker);
-                });
-            }
-
-            if (mapLayersVisible.museums) {
-                appState.mapPOIs.museums.forEach(ms => {
-                    const html = `<div class="bg-asphalt text-white p-3 rounded-2xl shadow-xl border border-zinc-700 text-xs space-y-1"><strong class="text-purple-400 font-bold block"><i class="fa-solid fa-landmark mr-1"></i>${ms.name}</strong><p class="text-zinc-300">${ms.desc}</p></div>`;
-                    const marker = L.marker([ms.lat, ms.lng], {
-                        icon: L.divIcon({ className: 'custom-poi-marker', html: `<div class="w-8 h-8 rounded-full bg-purple-600 border-2 border-white text-white flex items-center justify-center shadow-lg text-xs"><i class="fa-solid fa-landmark"></i></div>`, iconSize: [32, 32], iconAnchor: [16, 16] })
                     }).bindPopup(html);
                     poisLayersGroup.addLayer(marker);
                 });
@@ -1481,6 +1230,7 @@
                 isLoop: editorPoints.length > 2,
                 recommendedCategory: appState.profile.category,
                 rating: 5.0,
+                bannerPhoto: 'https://placehold.co/800x400/8B1E24/FFFFFF?text=' + encodeURIComponent(title),
                 mechanicAdvice: 'Itinéraire personnalisé.',
                 steps: editorPoints.map((pt, i) => ({ km: (i * 4.5).toFixed(1), name: `Étape ${i+1}`, desc: 'Point de passage.' })),
                 gpsCoords: [...editorPoints],
@@ -1550,7 +1300,7 @@
             const garagesList = document.getElementById('user-garages-list');
             if (garagesList) {
                 garagesList.innerHTML = p.garages.map(g => `
-                    <div class="bg-cream p-2.5 rounded-xl border border-zinc-200 text-xs flex justify-between items-center">
+                    <div class="bg-white p-2.5 rounded-xl border border-zinc-200 text-xs flex justify-between items-center shadow-sm">
                         <div><strong class="text-asphalt block">${g.name}</strong><span class="text-[10px] text-zinc-500">${g.address}</span></div>
                         <button onclick="removeLocation('garage', '${g.id}')" class="text-zinc-400 hover:text-red-500"><i class="fa-solid fa-trash text-[10px]"></i></button>
                     </div>
@@ -1560,7 +1310,7 @@
             const destList = document.getElementById('user-destinations-list');
             if (destList) {
                 destList.innerHTML = p.favoritesDest.map(d => `
-                    <div class="bg-cream p-2.5 rounded-xl border border-zinc-200 text-xs flex justify-between items-center">
+                    <div class="bg-white p-2.5 rounded-xl border border-zinc-200 text-xs flex justify-between items-center shadow-sm">
                         <div><strong class="text-asphalt block">${d.name}</strong><span class="text-[10px] text-zinc-500">${d.address}</span></div>
                         <button onclick="removeLocation('destination', '${d.id}')" class="text-zinc-400 hover:text-red-500"><i class="fa-solid fa-trash text-[10px]"></i></button>
                     </div>
@@ -1632,6 +1382,7 @@
                 document.getElementById('veh-modal-year').value = v.year;
                 document.getElementById('veh-modal-fuel').value = v.fuel;
                 document.getElementById('veh-modal-engine').value = v.engine;
+                document.getElementById('veh-modal-special').value = v.special;
                 document.getElementById('veh-modal-photo').value = v.photo;
             } else {
                 titleEl.innerText = 'Ajouter un véhicule';
@@ -1640,7 +1391,8 @@
                 document.getElementById('veh-modal-model').value = '';
                 document.getElementById('veh-modal-year').value = '1975';
                 document.getElementById('veh-modal-fuel').value = 'SP98';
-                document.getElementById('veh-modal-engine').value = 'Moteur classique';
+                document.getElementById('veh-modal-engine').value = '';
+                document.getElementById('veh-modal-special').value = '';
                 document.getElementById('veh-modal-photo').value = '';
             }
             modal.classList.remove('hidden');
@@ -1653,6 +1405,17 @@
             modal.classList.add('hidden');
         }
 
+        function handleVehicleFileUpload(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('veh-modal-photo').value = e.target.result;
+                    showToast('Photo locale chargée !', 'fa-image');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
         function saveVehicleFromModal() {
             const id = document.getElementById('veh-modal-id').value;
             const brand = document.getElementById('veh-modal-brand').value.trim();
@@ -1660,11 +1423,15 @@
             const year = parseInt(document.getElementById('veh-modal-year').value, 10) || 1975;
             const fuel = document.getElementById('veh-modal-fuel').value;
             const engine = document.getElementById('veh-modal-engine').value.trim();
-            const photo = document.getElementById('veh-modal-photo').value.trim() || `https://placehold.co/400x250/8B1E24/FFFFFF?text=${encodeURIComponent(brand + ' ' + model)}`;
+            const special = document.getElementById('veh-modal-special').value.trim();
+            let photo = document.getElementById('veh-modal-photo').value.trim();
 
             if (!brand || !model) {
                 showToast('Veuillez renseigner la marque et le modèle.', 'fa-triangle-exclamation');
                 return;
+            }
+            if (!photo) {
+                photo = `https://placehold.co/400x250/8B1E24/FFFFFF?text=${encodeURIComponent(brand + ' ' + model)}`;
             }
 
             if (id) {
@@ -1675,16 +1442,15 @@
                     v.year = year;
                     v.fuel = fuel;
                     v.engine = engine;
+                    v.special = special;
                     v.photo = photo;
                 }
                 showToast('Véhicule mis à jour !', 'fa-check');
             } else {
                 const newVeh = {
                     id: 'veh-' + Date.now(),
-                    brand, model, year, fuel, engine,
-                    cc: 2000, hp: 130, torque: 180, weight: 1000,
-                    special: 'Véhicule d’exception', kmDriven: 0, archived: false,
-                    photo
+                    brand, model, year, fuel, engine, special,
+                    kmDriven: 0, archived: false, photo
                 };
                 appState.vehicles.push(newVeh);
                 showToast('Véhicule ajouté avec succès !', 'fa-check');
@@ -1734,37 +1500,17 @@
             }
         }
 
-        function openLocationModal(type) {
-            const modal = document.getElementById('location-modal');
-            document.getElementById('loc-modal-type').value = type;
-            document.getElementById('loc-modal-title').innerText = type === 'garage' ? 'Ajouter un garage' : 'Ajouter une destination favorite';
-            document.getElementById('loc-modal-name').value = '';
-            document.getElementById('loc-modal-addr').value = '';
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-        }
-
-        function closeLocationModal() {
-            const modal = document.getElementById('location-modal');
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
-        }
-
-        function saveLocationFromModal() {
-            const type = document.getElementById('loc-modal-type').value;
-            const name = document.getElementById('loc-modal-name').value.trim();
-            const address = document.getElementById('loc-modal-addr').value.trim();
-            if (!name || !address) {
-                showToast('Veuillez remplir tous les champs.', 'fa-triangle-exclamation');
-                return;
-            }
+        function promptAddLocation(type) {
+            const name = prompt('Nom du lieu (privé) :');
+            if (!name) return;
+            const address = prompt('Adresse :');
+            if (!address) return;
             const newItem = { id: 'loc-' + Date.now(), name, address };
             if (type === 'garage') appState.profile.garages.push(newItem);
             else appState.profile.favoritesDest.push(newItem);
             saveState();
             renderGarageAndProfile();
-            closeLocationModal();
-            showToast('Lieu enregistré !', 'fa-check');
+            showToast('Lieu enregistré en privé !', 'fa-check');
         }
 
         function removeLocation(type, id) {
@@ -1779,7 +1525,10 @@
             const modal = document.getElementById('profile-modal');
             document.getElementById('prof-modal-pseudo').value = appState.profile.pseudo;
             document.getElementById('prof-modal-city').value = appState.profile.city;
+            document.getElementById('prof-modal-age').value = appState.profile.age;
+            document.getElementById('prof-modal-cat').value = appState.profile.category;
             document.getElementById('prof-modal-bio').value = appState.profile.bio;
+            document.getElementById('prof-modal-avatar').value = appState.profile.avatar;
             modal.classList.remove('hidden');
             modal.classList.add('flex');
         }
@@ -1790,17 +1539,38 @@
             modal.classList.add('hidden');
         }
 
+        function handleProfileFileUpload(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('prof-modal-avatar').value = e.target.result;
+                    showToast('Avatar chargé !', 'fa-image');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
         function saveProfileFromModal() {
             const pseudo = document.getElementById('prof-modal-pseudo').value.trim();
             const city = document.getElementById('prof-modal-city').value.trim();
+            const age = parseInt(document.getElementById('prof-modal-age').value, 10) || 35;
+            const category = document.getElementById('prof-modal-cat').value;
             const bio = document.getElementById('prof-modal-bio').value.trim();
+            let avatar = document.getElementById('prof-modal-avatar').value.trim();
+
             if (!pseudo) {
                 showToast('Le pseudo est obligatoire.', 'fa-triangle-exclamation');
                 return;
             }
+            if (!avatar) avatar = appState.profile.avatar;
+
             appState.profile.pseudo = pseudo;
-            if (city) appState.profile.city = city;
-            if (bio) appState.profile.bio = bio;
+            appState.profile.city = city;
+            appState.profile.age = age;
+            appState.profile.category = category;
+            appState.profile.bio = bio;
+            appState.profile.avatar = avatar;
+
             saveState();
             renderGarageAndProfile();
             refreshHeaderUI();
@@ -1823,10 +1593,9 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             refreshHeaderUI();
-            renderFeedView();
             filterRoutes();
             renderGarageAndProfile();
-            switchTab('feed');
+            switchTab('explorer');
         });
     </script>
 </body>
