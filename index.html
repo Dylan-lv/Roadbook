@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROADBOOK | Routes de Légende & Copilote Sportives Classiques</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Leaflet CSS & JS pour la carte OpenStreetMap interactive -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        crimson: {
+                            DEFAULT: '#8B1E24',
+                            hover: '#70161B',
+                            soft: 'rgba(139, 30, 36, 0.08)',
+                            border: 'rgba(139, 30, 36, 0.25)'
+                        },
+                        asphalt: {
+                            DEFAULT: '#18181B',
+                            soft: '#27272A'
+                        },
+                        cream: {
+                            DEFAULT: '#F7F5F2',
+                            dark: '#EAE6DF'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                        mono: ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(139, 30, 36, 0.4); }
+            50% { box-shadow: 0 0 0 12px rgba(139, 30, 36, 0); }
+        }
+        .speeding-pulse {
+            animation: pulseGlow 1.2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-cream text-asphalt font-sans min-h-screen flex flex-col selection:bg-crimson selection:text-white">
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- HEADER SUPÉRIEUR -->
+    <header class="bg-asphalt text-white border-b border-zinc-800 sticky top-0 z-40 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+            
+            <!-- Logo & Titre -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-crimson flex items-center justify-center text-white shadow-lg shadow-crimson/30">
+                    <i class="fa-solid fa-road text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-serif text-lg font-bold tracking-wider text-white">ROADBOOK</h1>
+                    <span class="text-[10px] font-mono text-zinc-400 block -mt-1 uppercase tracking-widest">Sportives Classiques</span>
+                </div>
+            </div>
+
+            <!-- Navigation Principale (Desktop) -->
+            <nav class="hidden md:flex items-center gap-1 bg-zinc-900/90 p-1.5 rounded-2xl border border-zinc-800">
+                <button onclick="switchTab('feed')" id="nav-feed" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
+                    <i class="fa-solid fa-rss"></i>
+                    <span>Actualités</span>
+                </button>
+                <button onclick="switchTab('explorer')" id="nav-explorer" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
+                    <i class="fa-solid fa-compass"></i>
+                    <span>Explorer</span>
+                </button>
+                <button onclick="switchTab('map')" id="nav-map" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
+                    <i class="fa-solid fa-location-arrow"></i>
+                    <span>Prendre la route</span>
+                </button>
+                <button onclick="switchTab('roadbook')" id="nav-roadbook" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
+                    <i class="fa-solid fa-book-open"></i>
+                    <span>Roadbook</span>
+                </button>
+                <button onclick="switchTab('garage')" id="nav-garage" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
+                    <i class="fa-solid fa-car"></i>
+                    <span>Mon Garage</span>
+                </button>
+            </nav>
+
+            <!-- Sélecteur Véhicule Actif & Profil -->
+            <div class="flex items-center gap-3">
+                <div class="relative">
+                    <select id="header-vehicle-select" onchange="switchActiveVehicle(this.value)" class="bg-zinc-900 border border-zinc-700 text-white text-xs font-bold rounded-xl px-3 py-2 pr-8 appearance-none cursor-pointer focus:outline-none focus:border-crimson">
+                    </select>
+                    <i class="fa-solid fa-chevron-down text-[10px] text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
+                </div>
+
+                <button onclick="switchTab('garage')" class="flex items-center gap-2 pl-2 border-l border-zinc-800 group">
+                    <img id="header-user-avatar" src="" alt="Avatar" class="w-9 h-9 rounded-xl object-cover border border-zinc-700 group-hover:border-crimson transition">
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===================================================================== -->
+    <!-- VUE 1 : FIL D'ACTUALITÉ DES MEMBRES SUIVIS                            -->
+    <!-- ===================================================================== -->
+    <main id="view-feed" class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
+        
+        <div class="bg-white rounded-2xl border border-zinc-200 p-5 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+            <div>
+                <h2 class="font-serif text-2xl font-bold text-asphalt">Fil d’actualité des Gentlemen Drivers</h2>
+                <p class="text-xs text-zinc-500">Suivez les dernières sorties, photos et nouveaux tracés des pilotes auxquels vous êtes abonnés.</p>
+            </div>
+            <div class="flex items-center gap-2 bg-cream p-1 rounded-xl border border-zinc-200 text-xs font-bold">
+                <button onclick="setFeedFilter('following')" id="btn-feed-following" class="px-3 py-1.5 rounded-lg bg-crimson text-white transition">Abonnements</button>
+                <button onclick="setFeedFilter('all')" id="btn-feed-all" class="px-3 py-1.5 rounded-lg text-zinc-600 hover:text-asphalt transition">Communauté</button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-3">
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-zinc-400">Pilotes recommandés</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3" id="suggested-drivers-grid">
+            </div>
+        </div>
+
+        <div id="feed-activities-container" class="space-y-5">
+        </div>
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- VUE 2 : EXPLORER LES ITINÉRAIRES                                      -->
+    <!-- ===================================================================== -->
+    <main id="view-explorer" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
+        
+        <div class="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h2 class="font-serif text-2xl font-bold text-asphalt">Explorer les Itinéraires</h2>
+                    <p class="text-xs text-zinc-500">Sélectionnez vos critères de pilotage pour dénicher les plus belles routes.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="flex items-center gap-2 bg-cream px-3.5 py-2 rounded-xl border border-zinc-300 cursor-pointer text-xs font-bold text-asphalt hover:border-crimson transition">
+                        <input type="checkbox" id="filter-loop-chk" onchange="filterRoutes()" class="accent-crimson">
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-arrows-spin text-crimson"></i> Mode Boucle</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-zinc-100">
+                <div>
+                    <label class="block text-[11px] font-bold text-zinc-500 uppercase mb-1">Proximité max</label>
+                    <select id="filter-prox" onchange="filterRoutes()" class="w-full rounded-xl bg-cream border border-zinc-300 px-3 py-2 text-xs font-semibold text-asphalt">
+                        <option value="500">Toutes les distances</option>
+                        <option value="50">Moins de 50 km</option>
+                        <option value="150">Moins de 150 km</option>
+                        <option value="300">Moins de 300 km</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-zinc-500 uppercase mb-1">Durée / Distance</label>
+                    <select id="filter-dur" onchange="filterRoutes()" class="w-full rounded-xl bg-cream border border-zinc-300 px-3 py-2 text-xs font-semibold text-asphalt">
+                        <option value="all">Tous formats</option>
+                        <option value="short">Courte (&lt; 1h / &lt; 50 km)</option>
+                        <option value="medium">Moyenne (1h - 2h30 / 50-120 km)</option>
+                        <option value="long">Longue / Journée (&gt; 2h30 / &gt; 120 km)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-zinc-500 uppercase mb-1">Tracé & Agressivité</label>
+                    <select id="filter-winding" onchange="filterRoutes()" class="w-full rounded-xl bg-cream border border-zinc-300 px-3 py-2 text-xs font-semibold text-asphalt">
+                        <option value="all">Tous profils</option>
+                        <option value="LIAISON">Liaison rapide (Sortie mégapole)</option>
+                        <option value="SINUEUX">Sinueux & Épingles</option>
+                        <option value="MIXTE">Mixte & Fluide</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-zinc-500 uppercase mb-1">Catégorie conducteur</label>
+                    <select id="filter-cat" onchange="filterRoutes()" class="w-full rounded-xl bg-cream border border-zinc-300 px-3 py-2 text-xs font-semibold text-crimson">
+                        <option value="all">Toutes catégories</option>
+                        <option value="Balade">Balade</option>
+                        <option value="Rapide">Rapide</option>
+                        <option value="Useur de pneus">Useur de pneus</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 pt-1">
+                <span class="text-[11px] font-bold text-zinc-400 uppercase mr-1">Typologie :</span>
+                <button type="button" onclick="toggleRoadTypeFilter('Col de montagne')" class="road-chip px-3 py-1 rounded-full text-xs font-bold border transition bg-crimson text-white border-crimson" data-type="Col de montagne">Col de montagne</button>
+                <button type="button" onclick="toggleRoadTypeFilter('Littoral')" class="road-chip px-3 py-1 rounded-full text-xs font-bold border transition bg-crimson text-white border-crimson" data-type="Littoral">Littoral</button>
+                <button type="button" onclick="toggleRoadTypeFilter('Rural')" class="road-chip px-3 py-1 rounded-full text-xs font-bold border transition bg-crimson text-white border-crimson" data-type="Rural">Rural</button>
+                <button type="button" onclick="toggleRoadTypeFilter('Forêt')" class="road-chip px-3 py-1 rounded-full text-xs font-bold border transition bg-crimson text-white border-crimson" data-type="Forêt">Forêt</button>
+                <button type="button" onclick="toggleRoadTypeFilter('Ville')" class="road-chip px-3 py-1 rounded-full text-xs font-bold border transition bg-crimson text-white border-crimson" data-type="Ville">Ville</button>
+            </div>
+        </div>
+
+        <div id="routes-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        </div>
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- VUE 3 : CARTE GPS INTERACTIVE & COPILOTE                              -->
+    <!-- ===================================================================== -->
+    <main id="view-map" class="hidden flex-1 flex flex-col relative pb-16">
+        <div class="absolute top-4 inset-x-4 z-30 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
+            <div class="bg-asphalt/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-xl border border-zinc-800 flex items-center gap-4 pointer-events-auto">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-crimson flex flex-col items-center justify-center font-mono font-extrabold shadow-inner">
+                        <span id="speed-limit-sign" class="text-xs leading-none">80</span>
+                        <span class="text-[9px] uppercase tracking-tighter text-white/80">km/h</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] font-mono text-zinc-400 uppercase tracking-widest block">Vitesse réelle</span>
+                        <div class="font-mono text-2xl font-extrabold flex items-baseline gap-1">
+                            <span id="live-speed">76</span>
+                            <span class="text-xs font-sans text-zinc-400">km/h</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="hidden sm:flex items-center gap-2 pl-3 border-l border-zinc-800">
+                    <button onclick="toggleAutoDrive()" id="btn-autodrive" class="px-3 py-1.5 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs font-bold shadow transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-play"></i> Rouler
+                    </button>
+                    <input type="range" id="sim-speed-slider" min="30" max="130" value="76" oninput="updateSimulatedSpeed(this.value)" class="w-24 accent-crimson">
+                </div>
+            </div>
+
+            <!-- Bouton Éditeur & Signalement -->
+            <div class="flex items-center gap-2 pointer-events-auto">
+                <button onclick="toggleEditorMode()" id="btn-toggle-editor" class="bg-asphalt/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-xl border border-zinc-800 text-xs font-bold hover:border-crimson transition flex items-center gap-2">
+                    <i class="fa-solid fa-pen-ruler text-crimson"></i>
+                    <span>Mode Éditeur Tracé</span>
+                </button>
+                <div class="relative">
+                    <button onclick="toggleReportMenu()" class="bg-crimson hover:bg-crimson-hover text-white px-4 py-3 rounded-2xl shadow-xl text-xs font-bold flex items-center gap-2 transition">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>Signaler</span>
+                    </button>
+                    <div id="report-menu" class="hidden absolute right-0 mt-2 w-56 bg-asphalt text-white rounded-2xl shadow-2xl border border-zinc-800 p-2 z-40 space-y-1">
+                        <button onclick="addCommunityReport('Police', 'fa-shield-halved', '#3B82F6')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-800 flex items-center gap-2"><i class="fa-solid fa-shield-halved text-blue-400"></i> Police / Contrôle</button>
+                        <button onclick="addCommunityReport('Trous sur la route', 'fa-circle-dot', '#EF4444')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-800 flex items-center gap-2"><i class="fa-solid fa-circle-dot text-red-400"></i> Trous sur la route</button>
+                        <button onclick="addCommunityReport('Dos-d’âne trop haut', 'fa-road-barrier', '#F59E0B')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-800 flex items-center gap-2"><i class="fa-solid fa-road-barrier text-amber-400"></i> Dos-d’âne trop haut</button>
+                        <button onclick="addCommunityReport('Objet sur la route', 'fa-box', '#A855F7')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-800 flex items-center gap-2"><i class="fa-solid fa-box text-purple-400"></i> Objet sur la route</button>
+                        <button onclick="addCommunityReport('Verglas', 'fa-snowflake', '#06B6D4')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-800 flex items-center gap-2"><i class="fa-solid fa-snowflake text-cyan-400"></i> Verglas</button>
+                        <button onclick="addCommunityReport('Brume', 'fa-smog', '#94A3B8')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-800 flex items-center gap-2"><i class="fa-solid fa-smog text-zinc-400"></i> Brume / Brouillard</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panneau Éditeur Tracé Actif -->
+        <div id="editor-toolbar" class="hidden absolute bottom-20 inset-x-4 z-30 max-w-lg mx-auto bg-asphalt/95 backdrop-blur-md text-white p-4 rounded-2xl shadow-2xl border border-zinc-800 flex items-center justify-between gap-3">
+            <div>
+                <span class="text-xs font-bold block text-crimson">Mode Éditeur de Tracé Actif</span>
+                <span id="editor-stats" class="text-[11px] font-mono text-zinc-300">0 points • 0 km</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="editorCloseLoop()" class="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-bold">Fermer boucle</button>
+                <button onclick="editorClear()" class="px-3 py-1.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-xs font-bold text-red-400">Effacer</button>
+                <button onclick="openSaveEditedRouteModal()" class="px-4 py-1.5 rounded-xl bg-crimson hover:bg-crimson-hover text-xs font-bold text-white shadow">Enregistrer</button>
+            </div>
+        </div>
+
+        <!-- Conteneur de la Carte Leaflet -->
+        <div id="leaflet-map" class="flex-1 w-full h-full min-h-[70vh]"></div>
+
+        <!-- Barres de calques & Pilotes proches en bas de carte -->
+        <div class="absolute bottom-4 inset-x-4 z-30 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
+            <div class="bg-asphalt/95 backdrop-blur-md text-white px-4 py-2.5 rounded-2xl shadow-xl border border-zinc-800 flex flex-wrap items-center gap-3 pointer-events-auto text-xs font-bold">
+                <span class="text-zinc-400 uppercase text-[10px]">Calques :</span>
+                <label class="flex items-center gap-1.5 cursor-pointer hover:text-crimson"><input type="checkbox" checked onchange="toggleMapLayer('stations', this.checked)" class="accent-crimson"> Carburants</label>
+                <label class="flex items-center gap-1.5 cursor-pointer hover:text-crimson"><input type="checkbox" checked onchange="toggleMapLayer('radars', this.checked)" class="accent-crimson"> Radars</label>
+                <label class="flex items-center gap-1.5 cursor-pointer hover:text-crimson"><input type="checkbox" checked onchange="toggleMapLayer('spots', this.checked)" class="accent-crimson"> Spots Photo</label>
+                <label class="flex items-center gap-1.5 cursor-pointer hover:text-crimson"><input type="checkbox" checked onchange="toggleMapLayer('parkings', this.checked)" class="accent-crimson"> Parkings</label>
+                <label class="flex items-center gap-1.5 cursor-pointer hover:text-crimson"><input type="checkbox" checked onchange="toggleMapLayer('meets', this.checked)" class="accent-crimson"> Rassemblements</label>
+                <label class="flex items-center gap-1.5 cursor-pointer hover:text-crimson"><input type="checkbox" checked onchange="toggleMapLayer('museums', this.checked)" class="accent-crimson"> Musées</label>
+                <label class="flex items-center gap-1.5 cursor-pointer hover:text-crimson"><input type="checkbox" checked onchange="toggleMapLayer('alerts', this.checked)" class="accent-crimson"> Signalements</label>
+            </div>
+
+            <!-- Liste rapide pilotes proches pour Salut -->
+            <div class="bg-asphalt/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-xl border border-zinc-800 pointer-events-auto max-w-sm w-full">
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 block mb-2">Pilotes à proximité (-2 km pour Salut)</span>
+                <div id="nearby-drivers-list" class="space-y-2 max-h-40 overflow-y-auto">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- VUE 4 : ROADBOOK PAPIER RALLYE IMPRIMABLE                             -->
+    <!-- ===================================================================== -->
+    <main id="view-roadbook" class="hidden flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-5">
+        <div class="bg-white rounded-2xl border border-zinc-200 p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4 shadow-sm no-print">
+            <div>
+                <h2 class="font-serif text-xl font-bold text-asphalt">Roadbook Copilote — Fléché Métré</h2>
+                <p class="text-xs text-zinc-500">Format papier haute lisibilité à glisser sur le tableau de bord.</p>
+            </div>
+            <div class="flex items-center gap-2.5">
+                <select id="roadbook-route-select" onchange="renderPrintableRoadbook(this.value)" class="rounded-xl bg-cream border border-zinc-300 px-3 py-2 text-xs font-bold text-asphalt">
+                </select>
+                <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs font-bold shadow flex items-center gap-2">
+                    <i class="fa-solid fa-print"></i> Imprimer
+                </button>
+            </div>
+        </div>
+
+        <div id="roadbook-print-area" class="bg-white rounded-2xl border-2 border-asphalt p-6 shadow-md space-y-5">
+        </div>
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- VUE 5 : MON GARAGE & PROFIL PILOTE                                    -->
+    <!-- ===================================================================== -->
+    <main id="view-garage" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-5 space-y-6">
+                <div class="bg-white rounded-2xl border border-zinc-200 p-6 shadow-sm space-y-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex items-center gap-4">
+                            <img id="profile-avatar-display" src="" alt="Avatar" class="w-16 h-16 rounded-2xl object-cover border-2 border-crimson shadow">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <h2 id="profile-pseudo-display" class="font-extrabold text-xl text-asphalt">Enzo_Veloce</h2>
+                                    <span id="profile-age-display" class="text-xs text-zinc-400 font-mono">38 ans</span>
+                                </div>
+                                <p id="profile-city-display" class="text-xs text-zinc-500"><i class="fa-solid fa-location-dot text-crimson mr-1"></i>Lyon, France</p>
+                                <div class="flex items-center gap-2 mt-1.5">
+                                    <span id="profile-cat-display" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-crimson text-white">Rapide</span>
+                                    <span id="profile-social-stats" class="text-xs font-semibold text-zinc-600">2 abonnements • 14 abonnés</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="openEditProfileModal()" class="px-3 py-1.5 rounded-xl border border-zinc-300 hover:border-crimson text-xs font-semibold text-asphalt transition">
+                            <i class="fa-solid fa-pen mr-1"></i>Éditer
+                        </button>
+                    </div>
+
+                    <p id="profile-bio-display" class="text-xs sm:text-sm text-zinc-600 italic bg-cream p-3 rounded-xl border border-zinc-200/70">
+                    </p>
+
+                    <div class="pt-3 border-t border-zinc-100 space-y-3">
+                        <div class="flex items-end justify-between">
+                            <div>
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-400 block">Distance totale enregistrée</span>
+                                <span id="profile-total-km" class="font-mono text-3xl font-extrabold text-crimson">2 480 <small class="text-sm font-sans text-zinc-500">km</small></span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] uppercase font-bold text-zinc-400 block">Grade actuel</span>
+                                <span id="profile-current-badge" class="px-2.5 py-1 rounded-lg bg-asphalt text-white text-xs font-bold"><i class="fa-solid fa-medal text-amber-400 mr-1"></i>Pilote d'Endurance</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-[11px] text-zinc-500 mb-1">
+                                <span id="badge-progress-label">Progression vers Légende du Bitume : 5 000 km</span>
+                                <span id="badge-progress-pct" class="font-mono font-bold">50%</span>
+                            </div>
+                            <div class="w-full h-2.5 bg-zinc-200 rounded-full overflow-hidden">
+                                <div id="badge-progress-bar" class="h-full bg-crimson rounded-full transition-all duration-500" style="width: 50%"></div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-4 gap-2 pt-2" id="badges-grid">
+                        </div>
+
+                        <div class="pt-3 border-t border-zinc-100">
+                            <span class="text-xs font-bold text-asphalt block mb-2">Répartition kilométrique par machine :</span>
+                            <div id="km-breakdown-list" class="space-y-2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl border border-zinc-200 p-6 shadow-sm space-y-4">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-bold text-sm text-asphalt"><i class="fa-solid fa-house-chimney text-crimson mr-1.5"></i>Mes Garages</h3>
+                            <button onclick="promptAddLocation('garage')" class="text-xs font-bold text-crimson hover:underline">+ Ajouter</button>
+                        </div>
+                        <div id="user-garages-list" class="space-y-1.5"></div>
+                    </div>
+
+                    <div class="pt-3 border-t border-zinc-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-bold text-sm text-asphalt"><i class="fa-solid fa-star text-amber-500 mr-1.5"></i>Destinations Favorites</h3>
+                            <button onclick="promptAddLocation('destination')" class="text-xs font-bold text-crimson hover:underline">+ Ajouter</button>
+                        </div>
+                        <div id="user-destinations-list" class="space-y-1.5"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7 space-y-5">
+                <div class="bg-white rounded-2xl border border-zinc-200 p-5 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+                    <div>
+                        <h2 class="font-serif text-2xl font-bold text-asphalt">Mon Garage</h2>
+                        <p class="text-xs text-zinc-500">Sélectionnez le véhicule actif pour adapter les tarifs carburant et les alertes route.</p>
+                    </div>
+                    <button onclick="openVehicleFormModal()" class="px-4 py-2.5 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs sm:text-sm font-bold shadow flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Ajouter un véhicule
+                    </button>
+                </div>
+
+                <div id="garage-vehicles-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                </div>
+
+                <div class="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm">
+                    <button type="button" onclick="toggleArchivedVehiclesSection()" class="w-full px-5 py-3.5 flex items-center justify-between text-left hover:bg-cream/60 transition">
+                        <span class="text-xs sm:text-sm font-bold text-zinc-700 flex items-center gap-2">
+                            <i class="fa-solid fa-box-archive text-crimson"></i>
+                            <span>Véhicules archivés</span>
+                            <span id="archived-count-badge" class="px-2 py-0.5 rounded-full text-[11px] font-mono bg-zinc-100 text-zinc-600">0</span>
+                        </span>
+                        <i id="archived-chevron" class="fa-solid fa-chevron-down text-xs text-zinc-400 transition-transform"></i>
+                    </button>
+                    <div id="archived-vehicles-container" class="hidden p-5 pt-2 border-t border-zinc-100 grid grid-cols-1 md:grid-cols-2 gap-4 bg-cream/40">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- BARRE DE NAVIGATION INFÉRIEURE STYLE GPS                              -->
+    <!-- ===================================================================== -->
+    <footer class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-zinc-200 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] no-print">
+        <div class="max-w-3xl mx-auto px-2 sm:px-6 h-16 flex items-center justify-between relative">
+            <button onclick="switchTab('feed')" id="bnav-feed" class="bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-bold text-crimson transition">
+                <i class="fa-solid fa-rss text-base"></i>
+                <span>Actualités</span>
+            </button>
+
+            <button onclick="switchTab('explorer')" id="bnav-explorer" class="bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-crimson transition">
+                <i class="fa-solid fa-compass text-base"></i>
+                <span>Explorer</span>
+            </button>
+
+            <div class="px-2 -mt-5">
+                <button onclick="switchTab('map')" id="bnav-map" class="px-5 sm:px-7 py-3.5 rounded-full bg-crimson hover:bg-crimson-hover text-white font-extrabold text-xs sm:text-sm shadow-xl shadow-crimson/35 border-2 border-white flex items-center gap-2 transition transform hover:scale-105 active:scale-95">
+                    <i class="fa-solid fa-location-arrow text-base"></i>
+                    <span>Prendre la route</span>
+                </button>
+            </div>
+
+            <button onclick="switchTab('roadbook')" id="bnav-roadbook" class="bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-crimson transition">
+                <i class="fa-solid fa-book-open text-base"></i>
+                <span>Roadbook</span>
+            </button>
+
+            <button onclick="switchTab('garage')" id="bnav-garage" class="bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-crimson transition">
+                <i class="fa-solid fa-user text-base"></i>
+                <span>Profil</span>
+            </button>
+        </div>
+    </footer>
+
+    <!-- ===================================================================== -->
+    <!-- MODALES                                                               -->
+    <!-- ===================================================================== -->
+    <div id="startup-vehicle-modal" class="fixed inset-0 bg-asphalt/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-zinc-200 animate-fade-in">
+            <div class="bg-crimson text-white p-6 text-center">
+                <span class="text-[11px] font-mono uppercase tracking-widest text-white/80">Check-list Départ</span>
+                <h2 class="font-serif text-2xl sm:text-3xl font-bold mt-1">Avec quelle machine prenez-vous la route aujourd'hui ?</h2>
+                <p class="text-xs text-white/85 mt-1">Le carburant affiché sur la carte et vos kilomètres parcourus seront associés à ce véhicule.</p>
+            </div>
+            <div id="startup-vehicles-choices" class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[65vh] overflow-y-auto">
+            </div>
+            <div class="bg-cream px-6 py-3.5 border-t border-zinc-200 flex justify-between items-center text-xs text-zinc-500">
+                <span>Vous pourrez changer de monture à tout moment en haut à droite.</span>
+                <button onclick="closeStartupVehicleModal()" class="font-bold text-asphalt hover:text-crimson">Continuer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DEFAULT_STATE = {
+            profile: {
+                pseudo: 'Enzo_Veloce',
+                city: 'Lyon',
+                age: 38,
+                avatar: 'https://placehold.co/150x150/8B1E24/FFFFFF?text=EV',
+                bio: 'Amoureux des doubles arbres à cames italiens et des cols alpins au lever du soleil.',
+                category: 'Rapide',
+                followersCount: 14,
+                followingPseudos: ['Julien_Alpine', 'Sophie_Spider'],
+                garages: [
+                    { id: 'g1', name: 'Garage Principal — Lyon', address: '14 Quai des Célestins, 69002 Lyon' },
+                    { id: 'g2', name: 'Grange Alpine — Annecy', address: 'Route de Talloires, 74290 Veyrier-du-Lac' }
+                ],
+                favoritesDest: [
+                    { id: 'd1', name: 'Circuit de Charade', address: '63122 Saint-Genès-Champanelle' },
+                    { id: 'd2', name: 'Col de la Croix-Fry', address: '74230 Manigod' }
+                ]
+            },
+            vehicles: [
+                {
+                    id: 'veh-alfa',
+                    brand: 'Alfa Romeo',
+                    model: 'Giulia Sprint GT 1600',
+                    year: 1966,
+                    engine: '4-cyl. Double Arbre 1570 cm³',
+                    fuel: 'SP98',
+                    cc: 1570,
+                    hp: 109,
+                    torque: 142,
+                    weight: 950,
+                    special: 'Coupé Bertone • Carburateurs Weber 40 DCOE',
+                    kmDriven: 1420,
+                    archived: false,
+                    photo: 'https://placehold.co/400x250/8B1E24/FFFFFF?text=Alfa+Giulia+GT+1966'
+                },
+                {
+                    id: 'veh-porsche',
+                    brand: 'Porsche',
+                    model: '911 Carrera 3.2',
+                    year: 1987,
+                    engine: 'Flat-6 3.2L Refroidi par air',
+                    fuel: 'SP98',
+                    cc: 3164,
+                    hp: 231,
+                    torque: 284,
+                    weight: 1160,
+                    special: 'Boîte G50 • Pont autobloquant 40% • Jantes Fuchs 16"',
+                    kmDriven: 1060,
+                    archived: false,
+                    photo: 'https://placehold.co/400x250/18181B/FFFFFF?text=Porsche+911+3.2+1987'
+                },
+                {
+                    id: 'veh-gti',
+                    brand: 'Peugeot',
+                    model: '205 GTI 1.9 E85',
+                    year: 1989,
+                    engine: '4-cyl. 1905 cm³ Cartographie E85',
+                    fuel: 'E85',
+                    cc: 1905,
+                    hp: 130,
+                    torque: 161,
+                    weight: 880,
+                    special: 'Optimisée bioéthanol E85 • Châssis sport Bilstein',
+                    kmDriven: 840,
+                    archived: false,
+                    photo: 'https://placehold.co/400x250/70161B/FFFFFF?text=205+GTI+E85'
+                }
+            ],
+            activeVehicleId: 'veh-alfa',
+            savedRouteIds: ['r-napoleon', 'r-chartreuse'],
+            communityPilots: [
+                { pseudo: 'Julien_Alpine', city: 'Grenoble', category: 'Useur de pneus', car: 'Alpine A110 1600S', avatar: 'https://placehold.co/100x100/18181B/FFFFFF?text=JA' },
+                { pseudo: 'Sophie_Spider', city: 'Annecy', category: 'Balade', car: 'Alfa Spider Duetto', avatar: 'https://placehold.co/100x100/8B1E24/FFFFFF?text=SS' },
+                { pseudo: 'Thomas_E30', city: 'Chambéry', category: 'Rapide', car: 'BMW M3 E30', avatar: 'https://placehold.co/100x100/3F3F46/FFFFFF?text=TE' },
+                { pseudo: 'Lucie_GTI', city: 'Lyon', category: 'Rapide', car: 'Peugeot 205 GTI 1.9 E85', avatar: 'https://placehold.co/100x100/70161B/FFFFFF?text=LG' }
+            ],
+            feedActivities: [
+                {
+                    id: 'act-1',
+                    author: 'Julien_Alpine',
+                    avatar: 'https://placehold.co/100x100/18181B/FFFFFF?text=JA',
+                    car: 'Alpine A110 1600S',
+                    time: 'Il y a 28 min',
+                    type: 'drive',
+                    title: 'A parcouru la Boucle du Massif de la Chartreuse — Col du Coq',
+                    meta: '112 km • +2 180 m D+ • Profil Useur de pneus',
+                    routeId: 'r-chartreuse',
+                    photo: 'https://placehold.co/700x320/18181B/FFFFFF?text=Sortie+Matinale+Col+du+Coq'
+                },
+                {
+                    id: 'act-2',
+                    author: 'Sophie_Spider',
+                    avatar: 'https://placehold.co/100x100/8B1E24/FFFFFF?text=SS',
+                    car: 'Alfa Spider Duetto',
+                    time: 'Il y a 2 heures',
+                    type: 'photo',
+                    title: 'Halte photo au Belvédère du Pas de la Faye',
+                    meta: 'La Route Napoléon — De Grasse à Castellane',
+                    routeId: 'r-napoleon',
+                    photo: 'https://placehold.co/700x320/8B1E24/FFFFFF?text=Panorama+Route+Napoleon'
+                }
+            ],
+            routes: [
+                {
+                    id: 'r-napoleon',
+                    title: 'La Route Napoléon — De Grasse à Castellane',
+                    region: 'Alpes-Maritimes & Verdon',
+                    proximityKm: 280,
+                    distanceKm: 66,
+                    durationMins: 75,
+                    durationLabel: '1h 15',
+                    elevationGain: 1320,
+                    windingType: 'MIXTE',
+                    roadTypes: ['Col de montagne', 'Rural'],
+                    isLoop: false,
+                    recommendedCategory: 'Rapide',
+                    rating: 4.9,
+                    mechanicAdvice: 'Montée prolongée sur 40 km : surveiller la température d’eau et la pression d’huile. Plein SP98 et E85 possible à Grasse.',
+                    steps: [
+                        { km: '0.0', name: 'Départ Grasse', desc: 'Station SP98 et E85 disponible.' },
+                        { km: '18.4', name: 'Pas de la Faye — 984 m', desc: 'Épingle panoramique avec vue sur la baie.' },
+                        { km: '39.2', name: 'Col de Luens — 1054 m', desc: 'Enchaînement de courbes rapides.' },
+                        { km: '66.0', name: 'Castellane', desc: 'Halte café sur la place centrale.' }
+                    ],
+                    gpsCoords: [
+                        [43.6585, 6.9237], [43.7120, 6.8450], [43.7650, 6.7920], [43.8450, 6.5130]
+                    ],
+                    roadbook: [
+                        { totalKm: '0.0', partKm: '0.0', tulip: 'straight', instruction: 'Départ Grasse par la N85 dir. Castellane.', note: 'Stations SP98 & E85.' },
+                        { totalKm: '18.4', partKm: '18.4', tulip: 'hairpin-left', instruction: 'Épingle gauche au Pas de la Faye.', note: 'Belvédère photo.' },
+                        { totalKm: '39.2', partKm: '20.8', tulip: 's-curve', instruction: 'Courbes rapides Col de Luens.', note: 'Bitume propre.' },
+                        { totalKm: '66.0', partKm: '26.8', tulip: 'finish', instruction: 'Arrivée Castellane.', note: 'Fin de parcours.' }
+                    ],
+                    reviews: [
+                        { author: 'Julien_Alpine', car: 'Alpine A110 1600S', rating: 5, comment: 'Aucun ralentisseur agressif sur tout le tracé !', photos: [] }
+                    ]
+                },
+                {
+                    id: 'r-chartreuse',
+                    title: 'Boucle du Massif de la Chartreuse — Col du Coq',
+                    region: 'Isère & Savoie',
+                    proximityKm: 85,
+                    distanceKm: 112,
+                    durationMins: 135,
+                    durationLabel: '2h 15',
+                    elevationGain: 2180,
+                    windingType: 'SINUEUX',
+                    roadTypes: ['Col de montagne', 'Forêt'],
+                    isLoop: true,
+                    recommendedCategory: 'Useur de pneus',
+                    rating: 4.8,
+                    mechanicAdvice: 'Routes techniques et étroites : freinage très sollicité dans la descente. Utiliser le frein moteur.',
+                    steps: [
+                        { km: '0.0', name: 'Saint-Nazaire-les-Eymes', desc: 'Départ au pied de la falaise.' },
+                        { km: '19.5', name: 'Col du Coq — 1434 m', desc: 'Ascension raide en sous-bois.' },
+                        { km: '58.0', name: 'Col du Granier — 1134 m', desc: 'Vue spectaculaire.' },
+                        { km: '112.0', name: 'Retour boucle par Col de Porte', desc: 'Boucle complète sans retour par le même axe.' }
+                    ],
+                    gpsCoords: [
+                        [45.2410, 5.8520], [45.2890, 5.8920], [45.4210, 6.0420], [45.2410, 5.8520]
+                    ],
+                    roadbook: [
+                        { totalKm: '0.0', partKm: '0.0', tulip: 'left', instruction: 'Départ St-Nazaire vers Col du Coq.', note: 'Pente raide.' },
+                        { totalKm: '19.5', partKm: '19.5', tulip: 'hairpin-right', instruction: 'Sommet Col du Coq.', note: 'Étroit.' },
+                        { totalKm: '58.0', partKm: '38.5', tulip: 's-curve', instruction: 'Col du Granier.', note: 'Parking sommital.' },
+                        { totalKm: '112.0', partKm: '54.0', tulip: 'finish', instruction: 'Boucle bouclée.', note: 'Contrôler freins.' }
+                    ],
+                    reviews: [
+                        { author: 'Lucie_GTI', car: 'Peugeot 205 GTI 1.9 E85', rating: 5, comment: 'Le terrain de jeu idéal pour un châssis léger et vif.', photos: [] }
+                    ]
+                }
+            ],
+            mapPOIs: {
+                stations: [
+                    { id: 'st1', lat: 45.7720, lng: 4.8157, name: 'TotalEnergies Relais des Alpes', prices: { 'SP98': 1.89, 'SP95': 1.79, 'E85': 0.84, 'Diesel': 1.72, 'Électrique': 0.39 }, note: 'Pompe E85 et SP98 disponibles.' },
+                    { id: 'st2', lat: 45.8420, lng: 4.6520, name: 'Esso Express Col de Luens', prices: { 'SP98': 1.94, 'SP95': 1.83, 'E85': null, 'Diesel': 1.76, 'Électrique': null }, note: 'Station d’altitude (Pas de E85).' },
+                    { id: 'st3', lat: 45.9120, lng: 4.5120, name: 'Avia Grand Tourisme E85', prices: { 'SP98': 1.87, 'SP95': 1.77, 'E85': 0.82, 'Diesel': 1.70, 'Électrique': 0.35 }, note: 'Carburant E85 en cuve dédiée.' }
+                ],
+                radars: [
+                    { id: 'rad1', lat: 45.8120, lng: 4.7920, name: 'Radar Fixe Discriminant', limit: 80, desc: 'Contrôle double sens.' },
+                    { id: 'rad2', lat: 45.9820, lng: 4.3820, name: 'Radar Tronçon Descente', limit: 70, desc: 'Mesure vitesse moyenne.' }
+                ],
+                spots: [
+                    { id: 'sp1', lat: 45.8320, lng: 4.7420, name: 'Belvédère du Pas de la Faye', desc: 'Vue panoramique pour photos de votre auto.' }
+                ],
+                parkings: [
+                    { id: 'pk1', lat: 45.7920, lng: 4.7820, name: 'Parking Panoramique Asphalté', desc: 'Accès plat sans bordure haute.' }
+                ],
+                meets: [
+                    { id: 'mt1', lat: 45.7520, lng: 4.8520, name: 'Rassemblement Mensuel Classiques', desc: 'Chaque 1er dimanche du mois.' }
+                ],
+                museums: [
+                    { id: 'ms1', lat: 45.7320, lng: 4.8920, name: 'Collection Privée GT Historiques', desc: 'Modèles de compétition et d’exception.' }
+                ],
+                alerts: [
+                    { id: 'al1', lat: 45.8020, lng: 4.7620, type: 'Trous sur la route', icon: 'fa-circle-dot', color: '#EF4444', time: 'Il y a 12 min', author: 'Julien_Alpine' }
+                ],
+                nearbyUsers: [
+                    { id: 'u1', lat: 45.7680, lng: 4.8250, pseudo: 'Julien_Alpine', car: 'Alpine A110 1600S', distanceKm: 1.2, avatar: 'JA', waved: false },
+                    { id: 'u2', lat: 45.7590, lng: 4.8450, pseudo: 'Sophie_Spider', car: 'Alfa Spider Duetto', distanceKm: 1.8, avatar: 'SS', waved: false }
+                ]
+            }
+        };
+
+        let appState = JSON.parse(localStorage.getItem('roadbook_app_v3')) || DEFAULT_STATE;
+
+        function saveState() {
+            localStorage.setItem('roadbook_app_v3', JSON.stringify(appState));
+        }
+
+        let selectedRouteId = appState.routes[0].id;
+        let activeRoadTypes = ['Col de montagne', 'Littoral', 'Rural', 'Forêt', 'Ville'];
+        let mapLayersVisible = {
+            stations: true, radars: true, spots: true, parkings: true, meets: true, museums: true, alerts: true
+        };
+        let autoDriveInterval = null;
+        let editorMode = false;
+        let editorPoints = [];
+        let currentFeedFilter = 'following';
+
+        let leafletMap = null;
+        let routePolylineLayer = null;
+        let editorPolylineLayer = null;
+        let editorMarkersGroup = null;
+        let poisLayersGroup = null;
+        let playerCarMarker = null;
+
+        function switchTab(tabId) {
+            ['feed', 'explorer', 'map', 'roadbook', 'garage'].forEach(id => {
+                const el = document.getElementById(`view-${id}`);
+                if (el) {
+                    if (id === tabId) el.classList.remove('hidden');
+                    else el.classList.add('hidden');
+                }
+            });
+
+            ['feed', 'explorer', 'map', 'roadbook', 'garage'].forEach(id => {
+                const btn = document.getElementById(`nav-${id}`);
+                if (btn) {
+                    if (id === tabId) btn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-crimson text-white shadow';
+                    else btn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 text-zinc-300 hover:text-white hover:bg-zinc-800';
+                }
+            });
+
+            ['feed', 'explorer', 'roadbook', 'garage'].forEach(id => {
+                const bbtn = document.getElementById(`bnav-${id}`);
+                if (bbtn) {
+                    if (id === tabId) bbtn.className = 'bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-bold text-crimson transition';
+                    else bbtn.className = 'bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-crimson transition';
+                }
+            });
+
+            if (tabId === 'map') {
+                setTimeout(() => {
+                    initLeafletMap();
+                }, 100);
+            }
+        }
+
+        function getActiveVehicle() {
+            return appState.vehicles.find(v => v.id === appState.activeVehicleId) || appState.vehicles[0];
+        }
+
+        function refreshHeaderUI() {
+            const selectEl = document.getElementById('header-vehicle-select');
+            const avatarEl = document.getElementById('header-user-avatar');
+
+            if (selectEl) {
+                const activeVehicles = appState.vehicles.filter(v => !v.archived);
+                selectEl.innerHTML = activeVehicles.map(v => `
+                    <option value="${v.id}" ${v.id === appState.activeVehicleId ? 'selected' : ''}>${v.brand} ${v.model} (${v.fuel})</option>
+                `).join('');
+            }
+            if (avatarEl) avatarEl.src = appState.profile.avatar;
+        }
+
+        function switchActiveVehicle(vehId) {
+            appState.activeVehicleId = vehId;
+            saveState();
+            refreshHeaderUI();
+            renderGarageAndProfile();
+            renderLeafletMapData();
+            showToast('Véhicule actif mis à jour !', 'fa-car');
+        }
+
+        function openVehicleSelectorModal() {
+            const modal = document.getElementById('startup-vehicle-modal');
+            const choices = document.getElementById('startup-vehicles-choices');
+            if (!modal || !choices) return;
+
+            const activeVehicles = appState.vehicles.filter(v => !v.archived);
+            choices.innerHTML = activeVehicles.map(v => `
+                <div onclick="selectStartupVehicle('${v.id}')" class="bg-cream hover:bg-zinc-100 border-2 ${v.id === appState.activeVehicleId ? 'border-crimson bg-crimson/5' : 'border-zinc-200'} rounded-2xl p-4 cursor-pointer transition flex items-center gap-4">
+                    <img src="${v.photo}" class="w-24 h-16 rounded-xl object-cover">
+                    <div>
+                        <h4 class="font-bold text-sm text-asphalt">${v.brand} ${v.model}</h4>
+                        <span class="text-xs text-crimson font-mono font-bold">${v.year} • Carburant : ${v.fuel}</span>
+                        <p class="text-[11px] text-zinc-500 mt-0.5">${v.engine}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeStartupVehicleModal() {
+            const modal = document.getElementById('startup-vehicle-modal');
+            if (modal) {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }
+        }
+
+        function selectStartupVehicle(vehId) {
+            switchActiveVehicle(vehId);
+            closeStartupVehicleModal();
+        }
+
+        function setFeedFilter(filter) {
+            currentFeedFilter = filter;
+            const btnFollowing = document.getElementById('btn-feed-following');
+            const btnAll = document.getElementById('btn-feed-all');
+            if (filter === 'following') {
+                btnFollowing.className = 'px-3 py-1.5 rounded-lg bg-crimson text-white transition';
+                btnAll.className = 'px-3 py-1.5 rounded-lg text-zinc-600 hover:text-asphalt transition';
+            } else {
+                btnAll.className = 'px-3 py-1.5 rounded-lg bg-crimson text-white transition';
+                btnFollowing.className = 'px-3 py-1.5 rounded-lg text-zinc-600 hover:text-asphalt transition';
+            }
+            renderFeedView();
+        }
+
+        function renderFeedView() {
+            const suggestedGrid = document.getElementById('suggested-drivers-grid');
+            if (suggestedGrid) {
+                suggestedGrid.innerHTML = appState.communityPilots.map(p => {
+                    const isFollowing = (appState.profile.followingPseudos || []).includes(p.pseudo);
+                    return `
+                        <div class="bg-cream p-3 rounded-xl border border-zinc-200 flex flex-col justify-between gap-2">
+                            <div class="flex items-center gap-2.5">
+                                <img src="${p.avatar}" class="w-10 h-10 rounded-xl object-cover border border-zinc-300">
+                                <div class="overflow-hidden">
+                                    <h4 class="font-bold text-xs text-asphalt truncate">${p.pseudo}</h4>
+                                    <span class="text-[10px] text-zinc-500 block truncate">${p.car}</span>
+                                </div>
+                            </div>
+                            <button onclick="toggleFollowPilot('${p.pseudo}')" class="w-full py-1.5 rounded-lg text-[11px] font-bold transition ${isFollowing ? 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300' : 'bg-crimson text-white hover:bg-crimson-hover'}">
+                                ${isFollowing ? 'Abonné ✓' : '+ S’abonner'}
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            const container = document.getElementById('feed-activities-container');
+            if (container) {
+                let acts = appState.feedActivities;
+                if (currentFeedFilter === 'following') {
+                    acts = acts.filter(a => (appState.profile.followingPseudos || []).includes(a.author));
+                }
+
+                if (acts.length === 0) {
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl border border-zinc-200 p-8 text-center text-zinc-500">
+                            <i class="fa-solid fa-rss text-3xl text-zinc-300 mb-2"></i>
+                            <p class="text-xs">Aucune activité récente pour ce filtre. Abonnez-vous à d’autres pilotes pour voir leurs sorties !</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = acts.map(act => `
+                    <div class="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm space-y-3">
+                        <div class="p-4 sm:p-5 pb-0 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <img src="${act.avatar}" class="w-11 h-11 rounded-2xl object-cover border border-zinc-300">
+                                <div>
+                                    <h3 class="font-bold text-sm text-asphalt">${act.author} <span class="font-normal text-xs text-zinc-500">• ${act.car}</span></h3>
+                                    <span class="text-[10px] text-zinc-400 font-mono">${act.time}</span>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-cream text-crimson uppercase">${act.type}</span>
+                        </div>
+                        <div class="px-4 sm:px-5 space-y-1">
+                            <h4 class="font-serif font-bold text-base text-asphalt">${act.title}</h4>
+                            <p class="text-xs text-zinc-600">${act.meta}</p>
+                        </div>
+                        ${act.photo ? `<div class="h-64 sm:h-80 overflow-hidden"><img src="${act.photo}" class="w-full h-full object-cover"></div>` : ''}
+                        <div class="bg-cream px-4 sm:px-5 py-3 border-t border-zinc-200 flex items-center justify-between">
+                            <span class="text-xs font-semibold text-zinc-600"><i class="fa-solid fa-road text-crimson mr-1"></i> Itinéraire associé</span>
+                            <button onclick="launchRouteOnMap('${act.routeId}')" class="px-3 py-1.5 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs font-bold shadow transition">
+                                Voir sur le GPS
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function toggleFollowPilot(pseudo) {
+            if (!appState.profile.followingPseudos) appState.profile.followingPseudos = [];
+            const idx = appState.profile.followingPseudos.indexOf(pseudo);
+            if (idx > -1) {
+                appState.profile.followingPseudos.splice(idx, 1);
+                appState.profile.followersCount = Math.max(0, appState.profile.followersCount - 1);
+                showToast(`Vous ne suivez plus ${pseudo}.`, 'fa-user-minus');
+            } else {
+                appState.profile.followingPseudos.push(pseudo);
+                appState.profile.followersCount += 1;
+                showToast(`Vous êtes maintenant abonné à ${pseudo} !`, 'fa-user-plus');
+            }
+            saveState();
+            renderFeedView();
+            renderGarageAndProfile();
+        }
+
+        function filterRoutes() {
+            const proxMax = parseInt(document.getElementById('filter-prox').value, 10);
+            const durFilter = document.getElementById('filter-dur').value;
+            const windingFilter = document.getElementById('filter-winding').value;
+            const catFilter = document.getElementById('filter-cat').value;
+            const isLoopOnly = document.getElementById('filter-loop-chk').checked;
+
+            const grid = document.getElementById('routes-grid');
+            if (!grid) return;
+
+            let filtered = appState.routes.filter(r => {
+                if (r.proximityKm > proxMax) return false;
+                if (isLoopOnly && !r.isLoop) return false;
+                if (windingFilter !== 'all' && r.windingType !== windingFilter) return false;
+                if (catFilter !== 'all' && r.recommendedCategory !== catFilter) return false;
+                if (activeRoadTypes.length > 0 && !r.roadTypes.some(t => activeRoadTypes.includes(t))) return false;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full bg-white rounded-2xl border border-zinc-200 p-8 text-center text-zinc-500"><i class="fa-solid fa-compass text-3xl text-zinc-300 mb-2"></i><p class="text-xs">Aucun itinéraire ne correspond à vos critères.</p></div>`;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(r => `
+                <div class="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm flex flex-col justify-between">
+                    <div class="p-5 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-cream text-crimson uppercase">${r.region}</span>
+                            <div class="flex items-center gap-1 text-xs font-mono font-bold text-amber-500"><i class="fa-solid fa-star"></i><span>${r.rating}</span></div>
+                        </div>
+                        <h3 class="font-serif font-bold text-lg text-asphalt">${r.title}</h3>
+                        <div class="grid grid-cols-3 gap-2 py-2 border-y border-zinc-100 font-mono text-center text-xs">
+                            <div><span class="block text-[9px] font-sans text-zinc-400 uppercase">Distance</span><strong class="text-asphalt">${r.distanceKm} km</strong></div>
+                            <div><span class="block text-[9px] font-sans text-zinc-400 uppercase">Durée</span><strong class="text-asphalt">${r.durationLabel}</strong></div>
+                            <div><span class="block text-[9px] font-sans text-zinc-400 uppercase">Dénivelé</span><strong class="text-crimson">+${r.elevationGain} m</strong></div>
+                        </div>
+                        <p class="text-xs text-zinc-600 bg-cream p-3 rounded-xl border border-zinc-200/70">
+                            <strong class="text-asphalt block mb-0.5"><i class="fa-solid fa-wrench text-crimson mr-1"></i>Consigne mécanique :</strong>
+                            ${r.mechanicAdvice}
+                        </p>
+                    </div>
+                    <div class="bg-cream px-5 py-3.5 border-t border-zinc-200 flex items-center justify-between">
+                        <span class="text-xs font-bold text-zinc-600">Recommandé : <span class="text-crimson">${r.recommendedCategory}</span></span>
+                        <button onclick="launchRouteOnMap('${r.id}')" class="px-3.5 py-2 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs font-bold shadow transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-location-arrow"></i> Lancer
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function toggleRoadTypeFilter(type) {
+            const idx = activeRoadTypes.indexOf(type);
+            const btn = document.querySelector(`.road-chip[data-type="${type}"]`);
+            if (idx > -1) {
+                activeRoadTypes.splice(idx, 1);
+                if (btn) btn.className = 'road-chip px-3 py-1 rounded-full text-xs font-bold border transition bg-cream text-zinc-600 border-zinc-300';
+            } else {
+                activeRoadTypes.push(type);
+                if (btn) btn.className = 'road-chip px-3 py-1 rounded-full text-xs font-bold border transition bg-crimson text-white border-crimson';
+            }
+            filterRoutes();
+        }
+
+        function initLeafletMap() {
+            if (!leafletMap) {
+                leafletMap = L.map('leaflet-map', { zoomControl: false }).setView([45.7640, 4.8357], 11);
+                L.control.zoom({ position: 'topright' }).addTo(leafletMap);
+                L.tileLayer('https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}{r}.png', {
+                    maxZoom: 18,
+                    attribution: '&copy; Wikimedia contributors',
+                    referrerPolicy: 'no-referrer-when-downgrade'
+                }).addTo(leafletMap);
+
+                poisLayersGroup = L.layerGroup().addTo(leafletMap);
+                editorMarkersGroup = L.layerGroup().addTo(leafletMap);
+
+                leafletMap.on('click', (e) => {
+                    if (!editorMode) return;
+                    editorPoints.push([e.latlng.lat, e.latlng.lng]);
+                    updateEditorUI();
+                });
+
+                renderLeafletMapData();
+            } else {
+                leafletMap.invalidateSize();
+            }
+        }
+
+        function renderLeafletMapData() {
+            if (!leafletMap) return;
+            if (poisLayersGroup) poisLayersGroup.clearLayers();
+
+            const activeVeh = getActiveVehicle();
+            const activeFuel = activeVeh ? activeVeh.fuel : 'SP98';
+
+            if (mapLayersVisible.stations) {
+                appState.mapPOIs.stations.forEach(st => {
+                    const price = st.prices[activeFuel] !== undefined && st.prices[activeFuel] !== null ? `${st.prices[activeFuel]} €/L` : 'Non dispo';
+                    const html = `<div class="bg-asphalt text-white p-3 rounded-2xl shadow-xl border border-zinc-700 text-xs space-y-1"><strong class="text-crimson font-bold block">${st.name}</strong><p class="text-zinc-300">${st.note}</p><div class="font-mono font-bold text-amber-400">Tarif ${activeFuel} : ${price}</div></div>`;
+                    const marker = L.marker([st.lat, st.lng], {
+                        icon: L.divIcon({ className: 'custom-poi-marker', html: `<div class="w-8 h-8 rounded-full bg-asphalt border-2 border-crimson text-white flex items-center justify-center shadow-lg text-xs"><i class="fa-solid fa-gas-pump"></i></div>`, iconSize: [32, 32], iconAnchor: [16, 16] })
+                    }).bindPopup(html);
+                    poisLayersGroup.addLayer(marker);
+                });
+            }
+
+            if (mapLayersVisible.radars) {
+                appState.mapPOIs.radars.forEach(rad => {
+                    const html = `<div class="bg-asphalt text-white p-3 rounded-2xl shadow-xl border border-zinc-700 text-xs space-y-1"><strong class="text-red-400 font-bold block"><i class="fa-solid fa-camera mr-1"></i>${rad.name}</strong><span class="px-2 py-0.5 bg-red-500/20 text-red-300 font-mono font-bold rounded">Limitation : ${rad.limit} km/h</span></div>`;
+                    const marker = L.marker([rad.lat, rad.lng], {
+                        icon: L.divIcon({ className: 'custom-poi-marker', html: `<div class="w-8 h-8 rounded-full bg-red-600 border-2 border-white text-white flex items-center justify-center shadow-lg text-xs"><i class="fa-solid fa-camera"></i></div>`, iconSize: [32, 32], iconAnchor: [16, 16] })
+                    }).bindPopup(html);
+                    poisLayersGroup.addLayer(marker);
+                });
+            }
+
+            if (mapLayersVisible.spots) {
+                appState.mapPOIs.spots.forEach(sp => {
+                    const html = `<div class="bg-asphalt text-white p-3 rounded-2xl shadow-xl border border-zinc-700 text-xs space-y-1"><strong class="text-amber-400 font-bold block"><i class="fa-solid fa-camera-retro mr-1"></i>${sp.name}</strong><p class="text-zinc-300">${sp.desc}</p></div>`;
+                    const marker = L.marker([sp.lat, sp.lng], {
+                        icon: L.divIcon({ className: 'custom-poi-marker', html: `<div class="w-8 h-8 rounded-full bg-amber-500 border-2 border-white text-asphalt flex items-center justify-center shadow-lg text-xs"><i class="fa-solid fa-camera-retro"></i></div>`, iconSize: [32, 32], iconAnchor: [16, 16] })
+                    }).bindPopup(html);
+                    poisLayersGroup.addLayer(marker);
+                });
+            }
+
+            if (mapLayersVisible.parkings) {
+                appState.mapPOIs.parkings.forEach(pk => {
+                    const html = `<div class="bg-asphalt text-white p-3 rounded-2xl shadow-xl border border-zinc-700 text-xs space-y-1"><strong class="text-blue-400 font-bold block"><i class="fa-solid fa-square-parking mr-1"></i>${pk.name}</strong><p class="text-zinc-300">${pk.desc}</p></div>`;
+                    const marker = L.marker([pk.lat, pk.lng], {
+                        icon: L.divIcon({ className: 'custom-poi-marker', html: `<div class="w-8 h-8 rounded-full bg-blue-600 border-2 border-white text-white flex items-center justify-center shadow-lg text-xs font-bold">P</div>`, iconSize: [32, 32], iconAnchor: [16, 16] })
+                    }).bindPopup(html);
+                    poisLayersGroup.addLayer(marker);
+                });
+            }
+
+            const route = appState.routes.find(r => r.id === selectedRouteId) || appState.routes[0];
+            if (route && route.gpsCoords) {
+                if (routePolylineLayer) leafletMap.removeLayer(routePolylineLayer);
+                routePolylineLayer = L.polyline(route.gpsCoords, { color: '#8B1E24', weight: 5, opacity: 0.85 }).addTo(leafletMap);
+                leafletMap.fitBounds(routePolylineLayer.getBounds(), { padding: [50, 50] });
+            }
+
+            if (!playerCarMarker) {
+                playerCarMarker = L.marker([45.7640, 4.8357], {
+                    icon: L.divIcon({ className: 'player-car-marker', html: `<div class="w-10 h-10 rounded-full bg-crimson border-2 border-white text-white flex items-center justify-center shadow-xl text-sm animate-pulse"><i class="fa-solid fa-car-side"></i></div>`, iconSize: [40, 40], iconAnchor: [20, 20] })
+                }).addTo(leafletMap);
+            }
+            renderNearbyDrivers();
+        }
+
+        function toggleMapLayer(layerKey, isVisible) {
+            mapLayersVisible[layerKey] = isVisible;
+            renderLeafletMapData();
+        }
+
+        function launchRouteOnMap(routeId) {
+            selectedRouteId = routeId;
+            switchTab('map');
+            showToast('Itinéraire chargé sur le GPS !', 'fa-location-arrow');
+        }
+
+        function renderNearbyDrivers() {
+            const listEl = document.getElementById('nearby-drivers-list');
+            if (!listEl) return;
+            listEl.innerHTML = appState.mapPOIs.nearbyUsers.map(u => `
+                <div class="flex items-center justify-between bg-zinc-900/90 p-2 rounded-xl border border-zinc-800 text-xs">
+                    <div class="flex items-center gap-2">
+                        <div class="w-7 h-7 rounded-lg bg-crimson text-white font-bold flex items-center justify-center text-[10px]">${u.avatar}</div>
+                        <div><strong class="text-white block leading-none">${u.pseudo}</strong><span class="text-[10px] text-zinc-400">${u.distanceKm} km • ${u.car}</span></div>
+                    </div>
+                    <button onclick="sendDriverWave('${u.pseudo}')" class="px-2.5 py-1 rounded-lg bg-crimson hover:bg-crimson-hover text-white text-[10px] font-bold shadow transition">${u.waved ? 'Salué ! 👋' : 'Salut ! 🏎️'}</button>
+                </div>
+            `).join('');
+        }
+
+        function sendDriverWave(pseudo) {
+            const user = appState.mapPOIs.nearbyUsers.find(u => u.pseudo === pseudo);
+            if (user) {
+                user.waved = true;
+                renderNearbyDrivers();
+                showToast(`Salut envoyé à ${pseudo} ! 👋`, 'fa-hand');
+            }
+        }
+
+        function toggleEditorMode() {
+            editorMode = !editorMode;
+            const btn = document.getElementById('btn-toggle-editor');
+            const toolbar = document.getElementById('editor-toolbar');
+            if (editorMode) {
+                btn.className = 'bg-crimson text-white px-4 py-3 rounded-2xl shadow-xl text-xs font-bold flex items-center gap-2 transition';
+                toolbar.classList.remove('hidden');
+                showToast('Mode éditeur activé : cliquez sur la carte.', 'fa-pen-ruler');
+            } else {
+                btn.className = 'bg-asphalt/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-xl border border-zinc-800 text-xs font-bold hover:border-crimson transition flex items-center gap-2';
+                toolbar.classList.add('hidden');
+            }
+        }
+
+        function updateEditorUI() {
+            if (!leafletMap) return;
+            if (editorPolylineLayer) leafletMap.removeLayer(editorPolylineLayer);
+            if (editorMarkersGroup) editorMarkersGroup.clearLayers();
+            if (editorPoints.length > 0) {
+                editorPolylineLayer = L.polyline(editorPoints, { color: '#F59E0B', weight: 4, dashArray: '6,6' }).addTo(leafletMap);
+                editorPoints.forEach((pt, idx) => {
+                    const m = L.marker(pt, {
+                        icon: L.divIcon({ className: 'editor-pt', html: `<div class="w-6 h-6 rounded-full bg-amber-500 text-asphalt font-bold text-[10px] flex items-center justify-center shadow">${idx + 1}</div>`, iconSize: [24, 24], iconAnchor: [12, 12] })
+                    });
+                    editorMarkersGroup.addLayer(m);
+                });
+            }
+            const statsEl = document.getElementById('editor-stats');
+            if (statsEl) statsEl.innerText = `${editorPoints.length} points • ~${(editorPoints.length * 4.5).toFixed(1)} km`;
+        }
+
+        function editorCloseLoop() {
+            if (editorPoints.length > 2) {
+                editorPoints.push(editorPoints[0]);
+                updateEditorUI();
+                showToast('Boucle fermée !', 'fa-arrows-spin');
+            }
+        }
+
+        function editorClear() {
+            editorPoints = [];
+            updateEditorUI();
+            showToast('Tracé effacé.', 'fa-trash');
+        }
+
+        function openSaveEditedRouteModal() {
+            if (editorPoints.length < 2) {
+                showToast('Tracez au moins 2 points.', 'fa-triangle-exclamation');
+                return;
+            }
+            const title = prompt('Nom de votre nouvel itinéraire :', 'Échappée en Ancienne');
+            if (!title) return;
+
+            const newRoute = {
+                id: 'custom-' + Date.now(),
+                title: title,
+                region: appState.profile.city + ' & Alentours',
+                proximityKm: 15,
+                distanceKm: Math.round(editorPoints.length * 4.5),
+                durationMins: Math.round(editorPoints.length * 6),
+                durationLabel: `${Math.floor((editorPoints.length * 6)/60)}h ${(editorPoints.length * 6)%60}min`,
+                elevationGain: editorPoints.length * 120,
+                windingType: 'SINUEUX',
+                roadTypes: ['Col de montagne', 'Rural'],
+                isLoop: editorPoints.length > 2,
+                recommendedCategory: appState.profile.category,
+                rating: 5.0,
+                mechanicAdvice: 'Itinéraire personnalisé.',
+                steps: editorPoints.map((pt, i) => ({ km: (i * 4.5).toFixed(1), name: `Étape ${i+1}`, desc: 'Point de passage.' })),
+                gpsCoords: [...editorPoints],
+                roadbook: editorPoints.map((pt, i) => ({ totalKm: (i * 4.5).toFixed(1), partKm: '4.5', tulip: 'straight', instruction: `Étape ${i+1}`, note: 'Libre' })),
+                reviews: []
+            };
+
+            appState.routes.push(newRoute);
+            saveState();
+            toggleEditorMode();
+            editorClear();
+            filterRoutes();
+            populateRoadbookSelect();
+            showToast('Itinéraire enregistré !', 'fa-check');
+            switchTab('explorer');
+        }
+
+        function toggleReportMenu() {
+            const menu = document.getElementById('report-menu');
+            if (menu) menu.classList.toggle('hidden');
+        }
+
+        function addCommunityReport(type, icon, color) {
+            toggleReportMenu();
+            const newAlert = { id: 'al-' + Date.now(), lat: 45.7640 + (Math.random() - 0.5) * 0.05, lng: 4.8357 + (Math.random() - 0.5) * 0.05, type, icon, color, time: 'À l’instant', author: appState.profile.pseudo };
+            appState.mapPOIs.alerts.push(newAlert);
+            saveState();
+            renderLeafletMapData();
+            showToast(`Signalement "${type}" publié !`, 'fa-triangle-exclamation');
+        }
+
+        function toggleAutoDrive() {
+            const btn = document.getElementById('btn-autodrive');
+            if (autoDriveInterval) {
+                clearInterval(autoDriveInterval);
+                autoDriveInterval = null;
+                btn.innerHTML = '<i class="fa-solid fa-play"></i> Rouler';
+                btn.className = 'px-3 py-1.5 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs font-bold shadow transition flex items-center gap-1.5';
+            } else {
+                autoDriveInterval = setInterval(() => {
+                    const speedEl = document.getElementById('live-speed');
+                    if (speedEl) speedEl.innerText = Math.floor(65 + Math.random() * 35);
+                }, 1500);
+                btn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
+                btn.className = 'px-3 py-1.5 rounded-xl bg-amber-600 text-white text-xs font-bold shadow transition flex items-center gap-1.5';
+                showToast('Simulation de roulage active !', 'fa-gauge-high');
+            }
+        }
+
+        function updateSimulatedSpeed(val) {
+            const speedEl = document.getElementById('live-speed');
+            if (speedEl) speedEl.innerText = val;
+        }
+
+        function populateRoadbookSelect() {
+            const sel = document.getElementById('roadbook-route-select');
+            if (!sel) return;
+            sel.innerHTML = appState.routes.map(r => `<option value="${r.id}">${r.title}</option>`).join('');
+            renderPrintableRoadbook(appState.routes[0].id);
+        }
+
+        function renderPrintableRoadbook(routeId) {
+            const route = appState.routes.find(r => r.id === routeId) || appState.routes[0];
+            const area = document.getElementById('roadbook-print-area');
+            if (!area) return;
+            const activeVeh = getActiveVehicle();
+
+            area.innerHTML = `
+                <div class="border-b-2 border-asphalt pb-4 flex justify-between items-end">
+                    <div>
+                        <span class="text-[10px] font-mono text-crimson uppercase tracking-widest font-bold">ROADBOOK OFFICIEL • FLÉCHÉ MÉTRÉ</span>
+                        <h2 class="font-serif text-2xl font-extrabold text-asphalt mt-1">${route.title}</h2>
+                        <p class="text-xs text-zinc-500 mt-0.5">Région : ${route.region} • Véhicule : ${activeVeh.brand} ${activeVeh.model} (${activeVeh.fuel})</p>
+                    </div>
+                    <div class="text-right font-mono">
+                        <span class="text-xs font-bold block text-asphalt">Distance : ${route.distanceKm} km</span>
+                        <span class="text-xs font-bold block text-crimson">Dénivelé : +${route.elevationGain} m</span>
+                    </div>
+                </div>
+                <div class="bg-cream border border-zinc-300 p-4 rounded-xl space-y-1.5">
+                    <strong class="text-xs text-asphalt block uppercase tracking-wider"><i class="fa-solid fa-wrench text-crimson mr-1"></i> Consignes mécaniques & sécurité :</strong>
+                    <p class="text-xs text-zinc-700 leading-relaxed">${route.mechanicAdvice}</p>
+                </div>
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-asphalt text-white text-[11px] font-mono uppercase">
+                            <th class="p-2.5 rounded-l-xl">Total</th>
+                            <th class="p-2.5">Partiel</th>
+                            <th class="p-2.5 text-center">Tulipe</th>
+                            <th class="p-2.5">Consigne</th>
+                            <th class="p-2.5 rounded-r-xl">Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-zinc-200 text-xs font-mono">
+                        ${route.roadbook.map((rb, idx) => `
+                            <tr class="${idx % 2 === 0 ? 'bg-white' : 'bg-cream/40'}">
+                                <td class="p-3 font-bold text-asphalt">${rb.totalKm} km</td>
+                                <td class="p-3 text-zinc-600">${rb.partKm} km</td>
+                                <td class="p-3 text-center text-crimson text-base"><i class="fa-solid ${rb.tulip === 'hairpin-left' ? 'fa-arrow-turn-down' : rb.tulip === 'finish' ? 'fa-flag-checkered' : 'fa-arrow-up'}"></i></td>
+                                <td class="p-3 font-sans font-semibold text-asphalt">${rb.instruction}</td>
+                                <td class="p-3 font-sans text-zinc-500 text-[11px]">${rb.note}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function renderGarageAndProfile() {
+            const p = appState.profile;
+            document.getElementById('profile-pseudo-display').innerText = p.pseudo;
+            document.getElementById('profile-age-display').innerText = p.age + ' ans';
+            document.getElementById('profile-city-display').innerHTML = `<i class="fa-solid fa-location-dot text-crimson mr-1"></i>${p.city}, France`;
+            document.getElementById('profile-cat-display').innerText = p.category;
+            document.getElementById('profile-bio-display').innerText = p.bio;
+            document.getElementById('profile-avatar-display').src = p.avatar;
+            document.getElementById('profile-social-stats').innerText = `${(p.followingPseudos || []).length} abonnements • ${p.followersCount} abonnés`;
+
+            const totalKm = appState.vehicles.reduce((acc, v) => acc + (v.kmDriven || 0), 0);
+            document.getElementById('profile-total-km').innerHTML = `${totalKm.toLocaleString()} <small class="text-sm font-sans text-zinc-500">km</small>`;
+
+            const garagesList = document.getElementById('user-garages-list');
+            if (garagesList) {
+                garagesList.innerHTML = p.garages.map(g => `
+                    <div class="bg-cream p-2.5 rounded-xl border border-zinc-200 text-xs flex justify-between items-center">
+                        <div><strong class="text-asphalt block">${g.name}</strong><span class="text-[10px] text-zinc-500">${g.address}</span></div>
+                        <button onclick="removeLocation('garage', '${g.id}')" class="text-zinc-400 hover:text-red-500"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                    </div>
+                `).join('');
+            }
+
+            const destList = document.getElementById('user-destinations-list');
+            if (destList) {
+                destList.innerHTML = p.favoritesDest.map(d => `
+                    <div class="bg-cream p-2.5 rounded-xl border border-zinc-200 text-xs flex justify-between items-center">
+                        <div><strong class="text-asphalt block">${d.name}</strong><span class="text-[10px] text-zinc-500">${d.address}</span></div>
+                        <button onclick="removeLocation('destination', '${d.id}')" class="text-zinc-400 hover:text-red-500"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                    </div>
+                `).join('');
+            }
+
+            const breakdownList = document.getElementById('km-breakdown-list');
+            if (breakdownList) {
+                breakdownList.innerHTML = appState.vehicles.map(v => `
+                    <div class="flex items-center justify-between text-xs bg-cream p-2 rounded-xl">
+                        <span class="font-bold text-asphalt truncate">${v.brand} ${v.model} ${v.archived ? '(Archivé)' : ''}</span>
+                        <span class="font-mono font-bold text-crimson">${v.kmDriven} km</span>
+                    </div>
+                `).join('');
+            }
+
+            const vehGrid = document.getElementById('garage-vehicles-grid');
+            const activeVehicles = appState.vehicles.filter(v => !v.archived);
+            if (vehGrid) {
+                vehGrid.innerHTML = activeVehicles.map(v => `
+                    <div class="bg-white rounded-2xl border ${v.id === appState.activeVehicleId ? 'border-crimson ring-2 ring-crimson/20' : 'border-zinc-200'} overflow-hidden shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="h-40 overflow-hidden relative">
+                                <img src="${v.photo}" class="w-full h-full object-cover">
+                                <span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-asphalt/90 text-white">${v.year} • ${v.fuel}</span>
+                                ${v.id === appState.activeVehicleId ? '<span class="absolute top-3 right-3 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-crimson text-white shadow">Actif ✓</span>' : ''}
+                            </div>
+                            <div class="p-4 space-y-2">
+                                <h3 class="font-serif font-bold text-base text-asphalt">${v.brand} ${v.model}</h3>
+                                <p class="text-xs text-crimson font-mono font-bold">${v.engine}</p>
+                                <p class="text-xs text-zinc-500">${v.special}</p>
+                            </div>
+                        </div>
+                        <div class="bg-cream px-4 py-3 border-t border-zinc-200 flex items-center justify-between">
+                            <span class="text-xs font-mono font-bold text-asphalt">${v.kmDriven} km</span>
+                            <div class="flex items-center gap-2">
+                                ${v.id !== appState.activeVehicleId ? `<button onclick="switchActiveVehicle('${v.id}')" class="px-3 py-1.5 rounded-xl bg-crimson text-white text-xs font-bold shadow">Sélectionner</button>` : ''}
+                                <button onclick="archiveVehicle('${v.id}')" class="px-3 py-1.5 rounded-xl border border-zinc-300 hover:border-amber-500 text-zinc-600 text-xs font-semibold">Archiver</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            const archivedVehicles = appState.vehicles.filter(v => v.archived);
+            document.getElementById('archived-count-badge').innerText = archivedVehicles.length;
+            const archivedContainer = document.getElementById('archived-vehicles-container');
+            if (archivedContainer) {
+                archivedContainer.innerHTML = archivedVehicles.map(v => `
+                    <div class="bg-white rounded-xl border border-zinc-200 p-3 flex items-center justify-between gap-3">
+                        <div><h4 class="font-bold text-xs text-asphalt">${v.brand} ${v.model}</h4><span class="text-[10px] text-zinc-400 font-mono">Archivé • ${v.kmDriven} km</span></div>
+                        <button onclick="restoreVehicle('${v.id}')" class="px-3 py-1.5 rounded-xl bg-asphalt text-white text-xs font-bold">Restaurer</button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function archiveVehicle(vehId) {
+            const v = appState.vehicles.find(item => item.id === vehId);
+            if (v) {
+                if (appState.vehicles.filter(item => !item.archived).length <= 1) {
+                    showToast('Conservez au moins un véhicule actif.', 'fa-triangle-exclamation');
+                    return;
+                }
+                v.archived = true;
+                if (appState.activeVehicleId === vehId) {
+                    const firstActive = appState.vehicles.find(item => !item.archived);
+                    if (firstActive) appState.activeVehicleId = firstActive.id;
+                }
+                saveState();
+                refreshHeaderUI();
+                renderGarageAndProfile();
+                showToast('Véhicule archivé.', 'fa-box-archive');
+            }
+        }
+
+        function restoreVehicle(vehId) {
+            const v = appState.vehicles.find(item => item.id === vehId);
+            if (v) {
+                v.archived = false;
+                saveState();
+                refreshHeaderUI();
+                renderGarageAndProfile();
+                showToast('Véhicule restauré !', 'fa-car');
+            }
+        }
+
+        function toggleArchivedVehiclesSection() {
+            const container = document.getElementById('archived-vehicles-container');
+            const chevron = document.getElementById('archived-chevron');
+            if (container) {
+                container.classList.toggle('hidden');
+                if (chevron) chevron.classList.toggle('rotate-180');
+            }
+        }
+
+        function promptAddLocation(type) {
+            const name = prompt('Nom du lieu :');
+            if (!name) return;
+            const address = prompt('Adresse :');
+            if (!address) return;
+            const newItem = { id: 'loc-' + Date.now(), name, address };
+            if (type === 'garage') appState.profile.garages.push(newItem);
+            else appState.profile.favoritesDest.push(newItem);
+            saveState();
+            renderGarageAndProfile();
+            showToast('Lieu enregistré !', 'fa-check');
+        }
+
+        function removeLocation(type, id) {
+            if (type === 'garage') appState.profile.garages = appState.profile.garages.filter(g => g.id !== id);
+            else appState.profile.favoritesDest = appState.profile.favoritesDest.filter(d => d.id !== id);
+            saveState();
+            renderGarageAndProfile();
+            showToast('Lieu supprimé.', 'fa-trash');
+        }
+
+        function openVehicleFormModal() {
+            const brand = prompt('Marque :');
+            if (!brand) return;
+            const model = prompt('Modèle :');
+            if (!model) return;
+            const year = prompt('Année :');
+            if (!year) return;
+            const fuel = prompt('Carburant (SP98, SP95, E85, Diesel) :', 'SP98');
+            if (!fuel) return;
+
+            const newVeh = {
+                id: 'veh-' + Date.now(),
+                brand, model, year: parseInt(year, 10) || 1975,
+                engine: 'Moteur classique', fuel: fuel.toUpperCase(),
+                cc: 2000, hp: 130, torque: 180, weight: 1000,
+                special: 'Véhicule d’exception', kmDriven: 0, archived: false,
+                photo: 'https://placehold.co/400x250/8B1E24/FFFFFF?text=' + encodeURIComponent(`${brand} ${model}`)
+            };
+            appState.vehicles.push(newVeh);
+            saveState();
+            refreshHeaderUI();
+            renderGarageAndProfile();
+            showToast('Véhicule ajouté !', 'fa-car');
+        }
+
+        function openEditProfileModal() {
+            const newPseudo = prompt('Modifier votre pseudo :', appState.profile.pseudo);
+            if (!newPseudo) return;
+            appState.profile.pseudo = newPseudo;
+            saveState();
+            renderGarageAndProfile();
+            refreshHeaderUI();
+            showToast('Profil mis à jour !', 'fa-check');
+        }
+
+        function showToast(message, icon = 'fa-circle-check') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = 'bg-asphalt text-white px-4 py-3 rounded-2xl shadow-2xl border border-zinc-700 flex items-center gap-3 text-xs font-semibold pointer-events-auto animate-fade-in';
+            toast.innerHTML = `<i class="fa-solid ${icon} text-crimson text-base"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            refreshHeaderUI();
+            renderFeedView();
+            filterRoutes();
+            renderGarageAndProfile();
+            populateRoadbookSelect();
+            switchTab('feed');
+        });
+    </script>
+</body>
+</html>
