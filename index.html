@@ -44,15 +44,15 @@
             width: 100%;
             z-index: 1;
         }
-        /* Style Waze Navigation Glowing Route */
-        .waze-route-glow {
+        /* Style de surbrillance dynamique pour l'itinéraire */
+        .route-glow {
             stroke: #3B82F6;
             stroke-opacity: 0.6;
             stroke-width: 10px;
             stroke-linecap: round;
             stroke-linejoin: round;
         }
-        .waze-route-main {
+        .route-main {
             stroke: #2563EB;
             stroke-opacity: 1;
             stroke-width: 5px;
@@ -70,6 +70,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
             
             <div class="flex items-center gap-3 shrink-0">
+                <!-- Logo Volant Momo Prototipo D350 gros, décentré et coupé sur le bord droit -->
                 <div class="w-10 h-10 rounded-xl bg-crimson flex items-center justify-center text-white shadow-lg shadow-crimson/30 overflow-hidden relative">
                     <svg viewBox="0 0 48 48" class="w-12 h-12 translate-x-2.5 translate-y-0.5 shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="24" cy="24" r="19" stroke-width="4" />
@@ -94,7 +95,7 @@
                 </div>
             </div>
 
-            <!-- Onglets -->
+            <!-- Onglets (Communauté retiré) -->
             <nav class="flex items-center gap-1 bg-zinc-900/90 p-1 rounded-2xl border border-zinc-800 overflow-x-auto">
                 <button onclick="switchTab('feed')" id="nav-feed" class="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 bg-crimson text-white">
                     <i class="fa-solid fa-rss"></i>
@@ -120,6 +121,7 @@
                     </select>
                     <i class="fa-solid fa-chevron-down text-[10px] text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
                 </div>
+
                 <button onclick="switchTab('garage')" class="flex items-center gap-2 pl-2 border-l border-zinc-800 group">
                     <img id="header-user-avatar" src="" alt="Avatar" class="w-9 h-9 rounded-xl object-cover border border-zinc-700 group-hover:border-crimson transition">
                 </button>
@@ -127,7 +129,7 @@
         </div>
     </header>
 
-    <!-- VUE 1 : ACTUALITÉ -->
+    <!-- VUE 1 : ACTUALITÉ & RECHERCHE DE PASSIONNÉS -->
     <main id="view-feed" class="flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 py-6 pb-12 space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <h2 class="font-serif text-xl font-bold text-asphalt">Actualité de la communauté</h2>
@@ -157,6 +159,7 @@
                     </label>
                 </div>
             </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2 border-t border-zinc-100 text-xs">
                 <div>
                     <label class="block font-bold text-zinc-500 uppercase mb-1">1. Proximité</label>
@@ -207,10 +210,11 @@
                 </div>
             </div>
         </div>
+
         <div id="routes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </main>
 
-    <!-- VUE 3 : CARTE GPS / NAVIGATION -->
+    <!-- VUE 3 : CARTE GPS -->
     <main id="view-map" class="hidden flex-1 flex flex-col relative">
         <div class="absolute top-4 inset-x-4 z-30 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
             <div class="bg-asphalt/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-xl border border-zinc-800 flex items-center gap-4 pointer-events-auto">
@@ -232,8 +236,22 @@
                         <i class="fa-solid fa-crosshairs text-crimson"></i> Ma Position GPS
                     </button>
                     <button onclick="toggleAutoDrive()" id="btn-autodrive" class="px-3 py-1.5 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs font-bold shadow transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-play"></i> Rouler (Waze Mode)
+                        <i class="fa-solid fa-play"></i> Rouler
                     </button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 pointer-events-auto">
+                <div class="relative">
+                    <button onclick="toggleReportMenu()" class="bg-crimson hover:bg-crimson-hover text-white px-4 py-3 rounded-2xl shadow-xl text-xs font-bold flex items-center gap-2 transition">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>Signaler</span>
+                    </button>
+                    <div id="report-menu" class="hidden absolute right-0 mt-2 w-56 bg-asphalt text-white rounded-2xl shadow-2xl border border-zinc-800 p-2 z-40 space-y-1">
+                        <button onclick="addCommunityReport('Police', 'fa-shield-halved', '#3B82F6')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-800 flex items-center gap-2"><i class="fa-solid fa-shield-halved text-blue-400"></i> Police / Contrôle</button>
+                        <button onclick="addCommunityReport('Trous sur la route', 'fa-circle-dot', '#EF4444')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-800 flex items-center gap-2"><i class="fa-solid fa-circle-dot text-red-400"></i> Trous sur la route</button>
+                        <button onclick="addCommunityReport('Dos-d’âne trop haut', 'fa-road-barrier', '#F59E0B')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-800 flex items-center gap-2"><i class="fa-solid fa-road-barrier text-amber-400"></i> Dos-d’âne trop haut</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -251,10 +269,11 @@
         </div>
     </main>
 
-    <!-- VUE 4 : MON GARAGE -->
+    <!-- VUE 4 : MON GARAGE & PROFIL PERSONNEL -->
     <main id="view-garage" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-12 space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div class="lg:col-span-5 space-y-6">
+                <!-- Carte Profil Personnel -->
                 <div class="bg-white rounded-2xl border border-zinc-200 p-6 shadow-sm space-y-5">
                     <div class="flex items-start justify-between gap-3">
                         <div class="flex items-center gap-4">
@@ -270,8 +289,13 @@
                                 </div>
                             </div>
                         </div>
+                        <button onclick="openEditProfileModal()" class="px-3 py-1.5 rounded-xl border border-zinc-300 hover:border-crimson text-xs font-semibold text-asphalt transition">
+                            <i class="fa-solid fa-pen mr-1"></i>Éditer
+                        </button>
                     </div>
                     <p id="profile-bio-display" class="text-xs text-zinc-600 italic bg-cream p-3 rounded-xl border border-zinc-200/70"></p>
+
+                    <!-- Stats kilométriques (Kilomètres parcourus) -->
                     <div class="grid grid-cols-2 gap-3 pt-3 border-t border-zinc-100 font-mono text-center">
                         <div class="bg-cream p-3 rounded-xl border border-zinc-200">
                             <span class="text-[10px] text-zinc-400 uppercase block">Kilomètres parcourus</span>
@@ -282,177 +306,188 @@
                             <strong id="profile-total-trips" class="text-crimson text-lg">0</strong>
                         </div>
                     </div>
+
+                    <!-- Badges -->
+                    <div class="space-y-2 pt-2">
+                        <h4 class="text-xs font-extrabold uppercase tracking-wider text-zinc-400">Badges</h4>
+                        <div id="profile-badges-container" class="grid grid-cols-3 gap-2"></div>
+                    </div>
+                </div>
+
+                <!-- Espace Privé (Garages & Destinations secrètes) -->
+                <div class="bg-white rounded-2xl border-2 border-dashed border-zinc-300 p-6 shadow-sm space-y-4">
+                    <span class="text-xs font-extrabold text-crimson uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-lock"></i> Espace Privé</span>
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-bold text-xs text-asphalt"><i class="fa-solid fa-house-chimney text-crimson mr-1.5"></i>Mes Garages</h3>
+                            <button onclick="openLocationModal('garage')" class="text-xs font-bold text-crimson hover:underline">+ Ajouter</button>
+                        </div>
+                        <div id="user-garages-list" class="space-y-1.5"></div>
+                    </div>
+                    <div class="pt-3 border-t border-zinc-100">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-bold text-xs text-asphalt"><i class="fa-solid fa-star text-amber-500 mr-1.5"></i>Destinations Favorites</h3>
+                            <button onclick="openLocationModal('destination')" class="text-xs font-bold text-crimson hover:underline">+ Ajouter</button>
+                        </div>
+                        <div id="user-destinations-list" class="space-y-1.5"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-7 space-y-5">
+                <div class="bg-white rounded-2xl border border-zinc-200 p-5 flex flex-wrap items-center justify-between gap-3 shadow-sm">
+                    <div>
+                        <h2 class="font-serif text-xl font-bold text-asphalt">Mon Garage</h2>
+                        <p class="text-xs text-zinc-500">Suivi des kilomètres par véhicule et fiches techniques.</p>
+                    </div>
+                    <button onclick="openVehicleModal(null)" class="px-4 py-2.5 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs sm:text-sm font-bold shadow flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Ajouter un véhicule
+                    </button>
+                </div>
+                <div id="garage-vehicles-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+                <div class="bg-white rounded-2xl border border-zinc-200 p-5 space-y-3 shadow-sm">
+                    <h3 class="text-xs font-extrabold uppercase tracking-wider text-zinc-400">Véhicules Archivés</h3>
+                    <div id="archived-vehicles-list" class="space-y-2"></div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Script Application Intégré -->
+    <!-- PAGE DÉDIÉE PAR PROFIL MEMBRE -->
+    <div id="member-profile-modal" class="fixed inset-0 bg-asphalt/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden border border-zinc-200 max-h-[92vh] flex flex-col">
+            <div class="p-6 bg-asphalt text-white flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <img id="mp-avatar" class="w-16 h-16 rounded-2xl object-cover border-2 border-crimson">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h3 id="mp-pseudo" class="font-extrabold text-xl"></h3>
+                            <span id="mp-age" class="text-xs text-zinc-400 font-mono"></span>
+                        </div>
+                        <p id="mp-city" class="text-xs text-zinc-400"></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button id="mp-follow-btn" onclick="" class="px-4 py-2 rounded-xl text-xs font-bold transition shadow bg-crimson text-white hover:bg-crimson-hover"></button>
+                    <button onclick="closeMemberProfileModal()" class="w-10 h-10 rounded-xl bg-zinc-800 text-white flex items-center justify-center hover:bg-crimson transition"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+
+            <div class="p-6 overflow-y-auto space-y-6 flex-1 bg-cream/30">
+                <div class="bg-white p-4 rounded-2xl border border-zinc-200 shadow-sm space-y-3">
+                    <span class="text-[10px] font-mono text-zinc-400 uppercase block">Bio & Style</span>
+                    <p id="mp-bio" class="text-xs text-zinc-700 italic"></p>
+                    <div class="grid grid-cols-2 gap-3 pt-3 border-t border-zinc-100 font-mono text-center">
+                        <div class="bg-cream p-3 rounded-xl border border-zinc-200">
+                            <span class="text-[10px] text-zinc-400 uppercase block">Kilomètres parcourus</span>
+                            <strong id="mp-km" class="text-asphalt text-base"></strong>
+                        </div>
+                        <div class="bg-cream p-3 rounded-xl border border-zinc-200">
+                            <span class="text-[10px] text-zinc-400 uppercase block">Catégorie</span>
+                            <strong id="mp-cat" class="text-crimson text-base"></strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-zinc-400 mb-3">Garage du membre</h4>
+                    <div id="mp-vehicles" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                </div>
+
+                <div>
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-zinc-400 mb-3">Dernières activités</h4>
+                    <div id="mp-activities" class="space-y-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE VÉHICULE -->
+    <div id="vehicle-modal" class="fixed inset-0 bg-asphalt/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <h3 id="veh-modal-title" class="font-serif text-xl font-bold text-asphalt">Fiche Véhicule</h3>
+            <input type="hidden" id="veh-id">
+            <div class="space-y-3 text-xs">
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block font-bold text-zinc-600 mb-1">Marque *</label><input type="text" id="veh-brand" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: Alpine"></div>
+                    <div><label class="block font-bold text-zinc-600 mb-1">Modèle *</label><input type="text" id="veh-model" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: A110"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div><label class="block font-bold text-zinc-600 mb-1">Année *</label><input type="number" id="veh-year" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="1972"></div>
+                    <div><label class="block font-bold text-zinc-600 mb-1">Kilométrage (km)</label><input type="number" id="veh-km" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="45000"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-zinc-600 mb-1">Cylindrée</label>
+                        <div class="relative flex items-center">
+                            <input type="number" id="veh-cc" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 pr-12 font-semibold" placeholder="1596">
+                            <span class="absolute right-3 text-zinc-400 font-mono font-bold pointer-events-none">cm³</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-zinc-600 mb-1">Puissance</label>
+                        <div class="relative flex items-center">
+                            <input type="number" id="veh-hp" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 pr-10 font-semibold" placeholder="138">
+                            <span class="absolute right-3 text-zinc-400 font-mono font-bold pointer-events-none">ch</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block font-bold text-zinc-600 mb-1">Couple</label>
+                        <div class="relative flex items-center">
+                            <input type="number" id="veh-torque" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 pr-12 font-semibold" placeholder="148">
+                            <span class="absolute right-3 text-zinc-400 font-mono font-bold pointer-events-none">N.m</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-zinc-600 mb-1">Poids</label>
+                        <div class="relative flex items-center">
+                            <input type="number" id="veh-weight" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 pr-10 font-semibold" placeholder="805">
+                            <span class="absolute right-3 text-zinc-400 font-mono font-bold pointer-events-none">kg</span>
+                        </div>
+                    </div>
+                </div>
+                <div><label class="block font-bold text-zinc-600 mb-1">Version spéciale</label><input type="text" id="veh-special" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: Châssis pont de biche"></div>
+                <div>
+                    <label class="block font-bold text-zinc-600 mb-1">Photo</label>
+                    <input type="file" id="veh-file" accept="image/*" onchange="handleVehicleFile(this)" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-1.5 text-xs">
+                    <input type="hidden" id="veh-photo">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t border-zinc-100">
+                <button type="button" onclick="closeVehicleModal()" class="px-4 py-2 rounded-xl bg-zinc-200 text-asphalt text-xs font-bold">Annuler</button>
+                <button type="button" onclick="saveVehicle()" class="px-4 py-2 rounded-xl bg-crimson text-white text-xs font-bold">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Application Intégré + Tracé de navigation -->
     <script>
-        // Données d'exemple et intégration de l'itinéraire Nord Ardèche
-        const ARDECHE_ROUTE_COORDS = [
+        // Coordonnées du tracé de test intégré
+        const TEST_ROUTE_COORDS = [
             [45.31593, 4.81329], [45.31652, 4.81231], [45.31802, 4.80901], [45.29787, 4.82187],
             [45.24112, 4.79927], [45.1821, 4.7999], [45.14399, 4.8091], [45.09446, 4.83573],
             [45.04405, 4.82874], [44.94443, 4.85009], [44.98448, 4.57683], [45.1196, 4.53668],
             [45.16482, 4.67569], [45.18559, 4.73535], [45.27637, 4.8003], [45.31766, 4.76614], [45.31748, 4.80975]
         ];
 
-        let routesData = [
-            {
-                id: 'ardeche-nord',
-                title: 'Pour user le bord de vos pneus en nord Ardèche !!!!',
-                type: 'Col de montagne',
-                distance: 162.5,
-                duration: '3h15',
-                elevation: 2950,
-                winding: 'SINUEUX',
-                isLoop: true,
-                coords: ARDECHE_ROUTE_COORDS,
-                image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=600&q=80'
-            }
-        ];
+        let routeGlowLayer, routeMainLayer;
 
-        let map, mainRouteLayer, mainRouteGlowLayer, userMarker;
-        let isAutoDriving = false;
-        let currentRouteIndex = 0;
+        function displayRouteOnMap(coords) {
+            if (!window.map) return;
+            
+            // Nettoyage des calques précédents
+            if (routeGlowLayer) window.map.removeLayer(routeGlowLayer);
+            if (routeMainLayer) window.map.removeLayer(routeMainLayer);
 
-        function initApp() {
-            initMap();
-            renderRoutesExplorer();
+            // Double polyligne pour l'effet lumineux de guidage
+            routeGlowLayer = L.polyline(coords, { className: 'route-glow' }).addTo(window.map);
+            routeMainLayer = L.polyline(coords, { className: 'route-main' }).addTo(window.map);
+
+            window.map.fitBounds(routeMainLayer.getBounds(), { padding: [50, 50] });
         }
-
-        function initMap() {
-            if (map) return;
-            map = L.map('leaflet-map', { zoomControl: false }).setView([45.12, 4.75], 11);
-            L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-
-            loadRouteOnMap(routesData[0]);
-        }
-
-        function loadRouteOnMap(route) {
-            if (!map) return;
-            if (mainRouteLayer) map.removeLayer(mainRouteLayer);
-            if (mainRouteGlowLayer) map.removeLayer(mainRouteGlowLayer);
-
-            // Style Waze Neon Glow
-            mainRouteGlowLayer = L.polyline(route.coords, {
-                color: '#3B82F6',
-                weight: 10,
-                opacity: 0.6,
-                lineCap: 'round',
-                lineJoin: 'round'
-            }).addTo(map);
-
-            mainRouteLayer = L.polyline(route.coords, {
-                color: '#2563EB',
-                weight: 5,
-                opacity: 1,
-                lineCap: 'round',
-                lineJoin: 'round'
-            }).addTo(map);
-
-            map.fitBounds(mainRouteLayer.getBounds(), { padding: [50, 50] });
-        }
-
-        function renderRoutesExplorer() {
-            const grid = document.getElementById('routes-grid');
-            if (!grid) return;
-            grid.innerHTML = routesData.map(route => `
-                <div class="bg-white rounded-2xl border border-zinc-200 overflow-hidden shadow-sm flex flex-col hover:border-crimson transition">
-                    <div class="relative h-40 bg-zinc-100 overflow-hidden">
-                        <img src="${route.image}" alt="${route.title}" class="w-full h-full object-cover">
-                        <div class="absolute top-3 left-3 bg-asphalt/80 backdrop-blur-md text-white px-2.5 py-1 rounded-xl text-[10px] font-bold">
-                            ${route.type}
-                        </div>
-                    </div>
-                    <div class="p-4 flex-1 flex flex-col justify-between space-y-4">
-                        <div>
-                            <h3 class="font-bold text-sm text-asphalt line-clamp-1">${route.title}</h3>
-                            <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-zinc-100 font-mono text-center text-xs">
-                                <div class="bg-cream p-2 rounded-xl">
-                                    <span class="text-[9px] text-zinc-400 block uppercase">Dist.</span>
-                                    <strong>${route.distance} km</strong>
-                                </div>
-                                <div class="bg-cream p-2 rounded-xl">
-                                    <span class="text-[9px] text-zinc-400 block uppercase">D+</span>
-                                    <strong>+${route.elevation}m</strong>
-                                </div>
-                                <div class="bg-cream p-2 rounded-xl">
-                                    <span class="text-[9px] text-zinc-400 block uppercase">Temps</span>
-                                    <strong>${route.duration}</strong>
-                                </div>
-                            </div>
-                        </div>
-                        <button onclick="startRouteNavigation('${route.id}')" class="w-full py-2.5 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs font-bold transition flex items-center justify-center gap-2 shadow">
-                            <i class="fa-solid fa-location-arrow"></i> Lancer l'itinéraire (Mode Waze)
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function startRouteNavigation(routeId) {
-            const route = routesData.find(r => r.id === routeId);
-            if (!route) return;
-            switchTab('map');
-            loadRouteOnMap(route);
-            showToast(`Itinéraire chargé : ${route.title}`, 'success');
-        }
-
-        function switchTab(tabId) {
-            ['feed', 'explorer', 'map', 'garage'].forEach(id => {
-                const el = document.getElementById(`view-${id}`);
-                const nav = document.getElementById(`nav-${id}`);
-                if (el) el.classList.toggle('hidden', id !== tabId);
-                if (nav) {
-                    if (id === tabId) {
-                        nav.className = "px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 bg-crimson text-white";
-                    } else {
-                        nav.className = "px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 text-zinc-400";
-                    }
-                }
-            });
-            if (tabId === 'map' && map) {
-                setTimeout(() => map.invalidateSize(), 200);
-            }
-        }
-
-        function filterRoutes() {
-            renderRoutesExplorer();
-        }
-
-        function showToast(msg, type = 'info') {
-            const container = document.getElementById('toast-container');
-            if (!container) return;
-            const toast = document.createElement('div');
-            toast.className = `bg-asphalt text-white px-4 py-3 rounded-2xl shadow-2xl border border-zinc-800 text-xs font-bold flex items-center gap-3 transition transform translate-y-2 opacity-0`;
-            toast.innerHTML = `<i class="fa-solid fa-circle-check text-crimson"></i><span>${msg}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 50);
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        function toggleAutoDrive() {
-            isAutoDriving = !isAutoDriving;
-            const btn = document.getElementById('btn-autodrive');
-            if (isAutoDriving) {
-                btn.innerHTML = `<i class="fa-solid fa-pause"></i> Pause`;
-                showToast('Mode guidage Waze actif', 'success');
-            } else {
-                btn.innerHTML = `<i class="fa-solid fa-play"></i> Rouler`;
-                showToast('Guidage en pause', 'info');
-            }
-        }
-
-        window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
