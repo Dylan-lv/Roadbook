@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROADBOOK | La France des belles routes</title>
+    <title>ROADBOOK | La route autrement</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,21 +58,16 @@
                 <!-- Logo Volant Momo Prototipo D350 gros, décentré et coupé sur le bord droit -->
                 <div class="w-10 h-10 rounded-xl bg-crimson flex items-center justify-center text-white shadow-lg shadow-crimson/30 overflow-hidden relative">
                     <svg viewBox="0 0 48 48" class="w-12 h-12 translate-x-2.5 translate-y-0.5 shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-                        <!-- Jante extérieure épaisse -->
                         <circle cx="24" cy="24" r="19" stroke-width="4" />
-                        <!-- Moyeu central et bouton klaxon -->
                         <circle cx="24" cy="24" r="5" stroke-width="2.5" fill="#18181B" />
                         <circle cx="24" cy="24" r="2" fill="currentColor" stroke="none" />
-                        <!-- Branche gauche ajourée style Prototipo -->
                         <line x1="6" y1="22.5" x2="18.5" y2="22.5" stroke-width="2.2" />
                         <line x1="6" y1="25.5" x2="18.5" y2="25.5" stroke-width="2.2" />
                         <circle cx="11" cy="24" r="0.8" fill="currentColor" stroke="none" />
                         <circle cx="15" cy="24" r="0.8" fill="currentColor" stroke="none" />
-                        <!-- Branche droite ajourée (coupée par le bord) -->
                         <line x1="29.5" y1="22.5" x2="42" y2="22.5" stroke-width="2.2" />
                         <line x1="29.5" y1="25.5" x2="42" y2="25.5" stroke-width="2.2" />
                         <circle cx="33" cy="24" r="0.8" fill="currentColor" stroke="none" />
-                        <!-- Branche inférieure verticale ajourée -->
                         <line x1="22.5" y1="29.5" x2="22.5" y2="42" stroke-width="2.2" />
                         <line x1="25.5" y1="29.5" x2="25.5" y2="42" stroke-width="2.2" />
                         <circle cx="24" cy="33.5" r="0.8" fill="currentColor" stroke="none" />
@@ -81,7 +76,7 @@
                 </div>
                 <div>
                     <h1 class="font-serif text-lg font-bold tracking-wider text-white">ROADBOOK</h1>
-                    <span class="text-[10px] font-mono text-zinc-400 block -mt-1 uppercase tracking-widest">La France des belles routes</span>
+                    <span class="text-[10px] font-mono text-zinc-400 block -mt-1 uppercase tracking-widest">La route autrement</span>
                 </div>
             </div>
 
@@ -97,6 +92,10 @@
                 <button onclick="switchTab('map')" id="nav-map" class="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 text-zinc-400">
                     <i class="fa-solid fa-location-arrow"></i>
                     <span class="hidden sm:inline">Prendre la route</span>
+                </button>
+                <button onclick="switchTab('community')" id="nav-community" class="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 text-zinc-400">
+                    <i class="fa-solid fa-users"></i>
+                    <span class="hidden sm:inline">Communauté</span>
                 </button>
                 <button onclick="switchTab('garage')" id="nav-garage" class="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 text-zinc-400">
                     <i class="fa-solid fa-car"></i>
@@ -197,7 +196,7 @@
         <div id="routes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </main>
 
-    <!-- VUE 3 : CARTE GPS (Style épuré sans clé API) -->
+    <!-- VUE 3 : CARTE GPS -->
     <main id="view-map" class="hidden flex-1 flex flex-col relative">
         <div class="absolute top-4 inset-x-4 z-30 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
             <div class="bg-asphalt/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-xl border border-zinc-800 flex items-center gap-4 pointer-events-auto">
@@ -252,11 +251,30 @@
         </div>
     </main>
 
-    <!-- VUE 4 : MON GARAGE & PROFIL -->
+    <!-- VUE 4 : COMMUNAUTÉ & AMIS (Recherche & Abonnements) -->
+    <main id="view-community" class="hidden flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 pb-12 space-y-6">
+        <div class="bg-white rounded-2xl border border-zinc-200 p-6 shadow-sm space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h2 class="font-serif text-xl font-bold text-asphalt">Communauté Roadbook</h2>
+                    <p class="text-xs text-zinc-500">Trouvez des passionnés, suivez leurs activités et découvrez leurs garages.</p>
+                </div>
+                <div class="relative w-full sm:w-72">
+                    <i class="fa-solid fa-magnifying-glass text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                    <input type="text" id="community-search" oninput="filterCommunityMembers(this.value)" placeholder="Rechercher un membre, une ville..." class="w-full bg-cream border border-zinc-300 rounded-xl pl-10 pr-4 py-2 text-xs font-semibold focus:outline-none focus:border-crimson">
+                </div>
+            </div>
+        </div>
+
+        <div id="community-members-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+    </main>
+
+    <!-- VUE 5 : MON GARAGE & PROFIL -->
     <main id="view-garage" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-12 space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div class="lg:col-span-5 space-y-6">
-                <div class="bg-white rounded-2xl border border-zinc-200 p-6 shadow-sm space-y-4">
+                <!-- Carte Profil avec Statistiques Kilométriques et Badges -->
+                <div class="bg-white rounded-2xl border border-zinc-200 p-6 shadow-sm space-y-5">
                     <div class="flex items-start justify-between gap-3">
                         <div class="flex items-center gap-4">
                             <img id="profile-avatar-display" src="" alt="Avatar" class="w-16 h-16 rounded-2xl object-cover border-2 border-crimson shadow">
@@ -276,6 +294,24 @@
                         </button>
                     </div>
                     <p id="profile-bio-display" class="text-xs text-zinc-600 italic bg-cream p-3 rounded-xl border border-zinc-200/70"></p>
+
+                    <!-- Stats kilométriques globales du profil -->
+                    <div class="grid grid-cols-2 gap-3 pt-3 border-t border-zinc-100 font-mono text-center">
+                        <div class="bg-cream p-3 rounded-xl border border-zinc-200">
+                            <span class="text-[10px] text-zinc-400 uppercase block">Kilomètres totaux</span>
+                            <strong id="profile-total-km" class="text-asphalt text-lg">0 km</strong>
+                        </div>
+                        <div class="bg-cream p-3 rounded-xl border border-zinc-200">
+                            <span class="text-[10px] text-zinc-400 uppercase block">Sorties validées</span>
+                            <strong id="profile-total-trips" class="text-crimson text-lg">0</strong>
+                        </div>
+                    </div>
+
+                    <!-- Badges de Paliers de KM -->
+                    <div class="space-y-2 pt-2">
+                        <h4 class="text-xs font-extrabold uppercase tracking-wider text-zinc-400">Badges de Paliers</h4>
+                        <div id="profile-badges-container" class="grid grid-cols-3 gap-2"></div>
+                    </div>
                 </div>
 
                 <div class="bg-white rounded-2xl border-2 border-dashed border-zinc-300 p-6 shadow-sm space-y-4">
@@ -301,7 +337,7 @@
                 <div class="bg-white rounded-2xl border border-zinc-200 p-5 flex flex-wrap items-center justify-between gap-3 shadow-sm">
                     <div>
                         <h2 class="font-serif text-xl font-bold text-asphalt">Mon Garage</h2>
-                        <p class="text-xs text-zinc-500">Marque, modèle et année obligatoires. Fiche technique et archivage complet.</p>
+                        <p class="text-xs text-zinc-500">Suivi des kilomètres par véhicule et fiches techniques.</p>
                     </div>
                     <button onclick="openVehicleModal(null)" class="px-4 py-2.5 rounded-xl bg-crimson hover:bg-crimson-hover text-white text-xs sm:text-sm font-bold shadow flex items-center gap-2">
                         <i class="fa-solid fa-plus"></i> Ajouter un véhicule
@@ -317,6 +353,32 @@
         </div>
     </main>
 
+    <!-- MODALE VISUALISATION PROFIL AMI -->
+    <div id="member-detail-modal" class="fixed inset-0 bg-asphalt/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-zinc-200 max-h-[90vh] flex flex-col">
+            <div class="p-6 bg-asphalt text-white flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <img id="modal-member-avatar" class="w-14 h-14 rounded-2xl object-cover border-2 border-crimson">
+                    <div>
+                        <h3 id="modal-member-pseudo" class="font-bold text-xl"></h3>
+                        <p id="modal-member-city" class="text-xs text-zinc-400"></p>
+                    </div>
+                </div>
+                <button onclick="closeMemberDetailModal()" class="w-10 h-10 rounded-xl bg-zinc-800 text-white flex items-center justify-center hover:bg-crimson transition"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 overflow-y-auto space-y-6 flex-1 bg-cream/30">
+                <div class="bg-white p-4 rounded-2xl border border-zinc-200 shadow-sm space-y-2">
+                    <span class="text-[10px] font-mono text-zinc-400 uppercase block">Bio & Style</span>
+                    <p id="modal-member-bio" class="text-xs text-zinc-700 italic"></p>
+                </div>
+                <div>
+                    <h4 class="text-xs font-extrabold uppercase tracking-wider text-zinc-400 mb-3">Garage du membre</h4>
+                    <div id="modal-member-vehicles" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- MODALE VÉHICULE -->
     <div id="vehicle-modal" class="fixed inset-0 bg-asphalt/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
@@ -329,15 +391,7 @@
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div><label class="block font-bold text-zinc-600 mb-1">Année *</label><input type="number" id="veh-year" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="1972"></div>
-                    <div>
-                        <label class="block font-bold text-zinc-600 mb-1">Carburant</label>
-                        <select id="veh-fuel" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold">
-                            <option value="SP98">SP98</option>
-                            <option value="SP95">SP95 / E10</option>
-                            <option value="E85">E85 Superéthanol</option>
-                            <option value="Diesel">Diesel</option>
-                        </select>
-                    </div>
+                    <div><label class="block font-bold text-zinc-600 mb-1">Kilométrage (km)</label><input type="number" id="veh-km" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="45000"></div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
@@ -385,7 +439,7 @@
         </div>
     </div>
 
-    <!-- MODALE ADRESSE AVEC AUTO-COMPLÉTION -->
+    <!-- MODALE ADRESSE -->
     <div id="location-modal" class="fixed inset-0 bg-asphalt/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4">
             <div class="flex items-center justify-between">
@@ -396,7 +450,7 @@
             <div class="space-y-3 text-xs relative">
                 <div>
                     <label class="block font-bold text-zinc-600 mb-1">Nom personnalisé (optionnel)</label>
-                    <input type="text" id="loc-custom-name" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: Garage secondaire, Maison de campagne...">
+                    <input type="text" id="loc-custom-name" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: Garage secondaire...">
                 </div>
                 <div>
                     <label class="block font-bold text-zinc-600 mb-1">Rechercher une adresse *</label>
@@ -505,7 +559,6 @@
 
     <!-- SCRIPTS JAVASCRIPT -->
     <script>
-        // Clé API gratuite ImgBB pour hébergement externe des photos (remplaçable par ta propre clé sur api.imgbb.com)
         const IMGBB_API_KEY = '6d207e02198a847aa98d0a2a901485a5';
 
         let defaultState = {
@@ -525,101 +578,86 @@
             garages: ["Garage principal - 12 Rue de Paris, Boulogne-Billancourt", "Box sécurisé - Dampierre-en-Yvelines"],
             destinations: ["Col du Galibier, Valloire", "Le Touquet-Paris-Plage"],
             vehicles: [
-                { id: 'veh_1', brand: 'Alpine', model: 'A110 S', year: 2022, fuel: 'SP98', cc: '1798', hp: '300', torque: '340', weight: '1114', special: 'Pack Aéro & Échappement Sport', photo: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=400', archived: false },
-                { id: 'veh_2', brand: 'Porsche', model: '911 Carrera 3.2', year: 1984, fuel: 'SP98', cc: '3164', hp: '231', torque: '284', weight: '1210', special: 'Boîte G50, Jantes Fuchs', photo: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400', archived: false }
+                { id: 'veh_1', brand: 'Alpine', model: 'A110 S', year: 2022, fuel: 'SP98', cc: '1798', hp: '300', torque: '340', weight: '1114', special: 'Pack Aéro & Échappement Sport', photo: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=400', km: 12450, archived: false },
+                { id: 'veh_2', brand: 'Porsche', model: '911 Carrera 3.2', year: 1984, fuel: 'SP98', cc: '3164', hp: '231', torque: '284', weight: '1210', special: 'Boîte G50, Jantes Fuchs', photo: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400', km: 8320, archived: false }
+            ],
+            // 4 Nouveaux profils de la communauté (Amis / Abonnements)
+            communityMembers: [
+                {
+                    id: 'usr_1',
+                    pseudo: 'Marc V.',
+                    city: 'Lyon',
+                    age: 38,
+                    category: 'Sport',
+                    bio: 'Amateur de belles routes alpines et de flat-6.',
+                    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&fit=crop&crop=faces',
+                    following: true,
+                    vehicles: [
+                        { brand: 'Porsche', model: '911 SC', year: 1981, km: 15400, photo: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400' }
+                    ]
+                },
+                {
+                    id: 'usr_2',
+                    pseudo: 'Sophie L.',
+                    city: 'Rambouillet',
+                    age: 29,
+                    category: 'Balade',
+                    bio: 'Roadsters légers et virages de forêt le week-end.',
+                    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&fit=crop&crop=faces',
+                    following: true,
+                    vehicles: [
+                        { brand: 'Mazda', model: 'MX-5 NA', year: 1992, km: 9200, photo: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=400' }
+                    ]
+                },
+                {
+                    id: 'usr_3',
+                    pseudo: 'Antoine D.',
+                    city: 'Strasbourg',
+                    age: 45,
+                    category: 'Rapide',
+                    bio: 'Italiennes vintage et cols vosgiens.',
+                    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&fit=crop&crop=faces',
+                    following: true,
+                    vehicles: [
+                        { brand: 'Alfa Romeo', model: 'Giulia GT 1600', year: 1971, km: 11100, photo: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=400' }
+                    ]
+                },
+                {
+                    id: 'usr_4',
+                    pseudo: 'Lucas M.',
+                    city: 'Marseille',
+                    age: 34,
+                    category: 'Sport',
+                    bio: 'Youngtimers explosives et routes de la corniche.',
+                    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&fit=crop&crop=faces',
+                    following: false,
+                    vehicles: [
+                        { brand: 'Renault', model: 'R5 Turbo 2', year: 1985, km: 6400, photo: 'https://images.unsplash.com/photo-1563720223185-11003d516935?w=400' }
+                    ]
+                }
             ],
             routes: [
-                { id: 'route_1', title: 'La Route des Grandes Alpes', region: 'Alpes', dist: '684 km', dur: '14h30', elev: '11 400m D+', winding: 'SINUEUX', type: 'Col de montagne', loop: false, banner: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800', instructions: 'Attention aux freinages en descente de col, risque de vapor lock sur véhicules anciens.', pois: ['Col du Galibier', 'Col d\'Izoard', 'Col de la Bonette'], likes: 142, coords: [[45.1885, 5.7245], [45.0685, 6.4045], [44.556, 6.745]], comments: [{author: "Marc V.", text: "Fait le mois dernier en Porsche 911, magique !"}] },
-                { id: 'route_2', title: 'Boucle de la Vallée de Chevreuse', region: 'Île-de-France', dist: '78 km', dur: '1h45', elev: '850m D+', winding: 'MIXTE', type: 'Forêt', loop: true, banner: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=800', instructions: 'Présence fréquente de cyclistes le week-end dans les virages boisés.', pois: ['Château de Breteux', 'Cernay-la-Ville', 'Port-Royal'], likes: 89, coords: [[48.702, 2.054], [48.692, 1.984], [48.732, 2.014]], comments: [{author: "Sophie L.", text: "Idéal pour une sortie matinale."}] },
-                { id: 'route_3', title: 'Corniche des Cévennes', region: 'Occitanie', dist: '112 km', dur: '2h20', elev: '2 100m D+', winding: 'SINUEUX', type: 'Col de montagne', loop: false, banner: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800', instructions: 'Revêtement abrasif, panoramas vertigineux sans glissières de sécurité.', pois: ['Anduze', 'Florac', 'Col de Jalcreste'], likes: 116, coords: [[44.048, 3.984], [44.228, 3.594], [44.321, 3.582]], comments: [] },
-                { id: 'route_4', title: 'La Route des Crêtes (Vosges)', region: 'Grand Est', dist: '73 km', dur: '1h30', elev: '1 400m D+', winding: 'SINUEUX', type: 'Col de montagne', loop: true, banner: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800', instructions: 'Panorama exceptionnel sur la plaine d’Alsace, attention aux rafales de vent.', pois: ['Le Hohneck', 'Col de la Schlucht', 'Grand Ballon'], likes: 98, coords: [[48.072, 7.029], [48.022, 7.089], [47.908, 7.142]], comments: [] },
-                { id: 'route_5', title: 'Côte d’Opale & Caps', region: 'Hauts-de-France', dist: '95 km', dur: '2h00', elev: '450m D+', winding: 'MIXTE', type: 'Littoral', loop: false, banner: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800', instructions: 'Vents marins forts, embruns sur le pare-brise près des falaises.', pois: ['Cap Gris-Nez', 'Cap Blanc-Nez', 'Wimereux'], likes: 74, coords: [[50.824, 1.613], [50.871, 1.587], [50.724, 1.611]], comments: [] }
+                { id: 'route_1', title: 'La Route des Grandes Alpes', region: 'Alpes', dist: '684 km', dur: '14h30', elev: '11 400m D+', winding: 'SINUEUX', type: 'Col de montagne', loop: false, banner: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800', instructions: 'Attention aux freinages en descente de col.', pois: ['Col du Galibier', 'Col d\'Izoard'], likes: 142, coords: [[45.1885, 5.7245], [45.0685, 6.4045]], comments: [] },
+                { id: 'route_2', title: 'Boucle de la Vallée de Chevreuse', region: 'Île-de-France', dist: '78 km', dur: '1h45', elev: '850m D+', winding: 'MIXTE', type: 'Forêt', loop: true, banner: 'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?w=800', instructions: 'Présence fréquente de cyclistes.', pois: ['Château de Breteux'], likes: 89, coords: [[48.702, 2.054], [48.692, 1.984]], comments: [] }
             ],
             feed: [
-                {
-                    id: 'f_1',
-                    author: 'Marc V.',
-                    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&fit=crop&crop=faces',
-                    vehicle: 'Porsche 911 SC (1981)',
-                    time: 'Il y a 2h',
-                    title: 'Itinéraire - Corniche des Cévennes',
-                    dist: '28 km',
-                    dur: '40 min',
-                    elev: '200m D+',
-                    coords: [[44.162, 3.742], [44.185, 3.710], [44.212, 3.685], [44.238, 3.642], [44.265, 3.605]],
-                    likes: 24,
-                    comments: 4,
-                    following: true
-                },
-                {
-                    id: 'f_2',
-                    author: 'Sophie L.',
-                    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&fit=crop&crop=faces',
-                    vehicle: 'Mazda MX-5 NA (1992)',
-                    time: 'Il y a 5h',
-                    title: 'Itinéraire - Boucle des 17 Tournants',
-                    dist: '42 km',
-                    dur: '55 min',
-                    elev: '410m D+',
-                    coords: [[48.702, 2.054], [48.698, 2.012], [48.692, 1.984], [48.715, 1.995], [48.732, 2.014], [48.702, 2.054]],
-                    likes: 37,
-                    comments: 6,
-                    following: true
-                },
-                {
-                    id: 'f_3',
-                    author: 'Antoine D.',
-                    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&fit=crop&crop=faces',
-                    vehicle: 'Alfa Romeo Giulia GT 1600 Junior',
-                    time: 'Hier à 18:15',
-                    title: 'Itinéraire - Col de la Schlucht & Crêtes',
-                    dist: '64 km',
-                    dur: '1h 15min',
-                    elev: '1 120m D+',
-                    coords: [[48.063, 7.022], [48.041, 7.048], [48.015, 7.065], [47.982, 7.089], [47.945, 7.118]],
-                    likes: 51,
-                    comments: 9,
-                    following: true
-                },
-                {
-                    id: 'f_4',
-                    author: 'Lucas M.',
-                    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&fit=crop&crop=faces',
-                    vehicle: 'Renault 5 Turbo 2',
-                    time: 'Hier à 14:30',
-                    title: 'Itinéraire - Gorges du Verdon Rive Gauche',
-                    dist: '85 km',
-                    dur: '1h 40min',
-                    elev: '1 350m D+',
-                    coords: [[43.765, 6.321], [43.742, 6.368], [43.728, 6.412], [43.751, 6.465], [43.792, 6.512]],
-                    likes: 83,
-                    comments: 12,
-                    following: false
-                }
+                { id: 'f_1', author: 'Marc V.', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&fit=crop&crop=faces', vehicle: 'Porsche 911 SC', time: 'Il y a 2h', title: 'Itinéraire - Corniche des Cévennes', dist: '28 km', dur: '40 min', elev: '200m D+', coords: [[44.162, 3.742], [44.185, 3.710]], likes: 24, comments: 4, following: true },
+                { id: 'f_2', author: 'Sophie L.', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&fit=crop&crop=faces', vehicle: 'Mazda MX-5 NA', time: 'Il y a 5h', title: 'Itinéraire - Boucle des 17 Tournants', dist: '42 km', dur: '55 min', elev: '410m D+', coords: [[48.702, 2.054], [48.698, 2.012]], likes: 37, comments: 6, following: true }
             ]
         };
 
-        let appState = JSON.parse(localStorage.getItem('roadbook_state_v3')) || defaultState;
+        let appState = JSON.parse(localStorage.getItem('roadbook_state_v4')) || defaultState;
 
         function saveStateToStorage() {
             try {
-                localStorage.setItem('roadbook_state_v3', JSON.stringify(appState));
+                localStorage.setItem('roadbook_state_v4', JSON.stringify(appState));
                 return true;
             } catch (e) {
-                // Purge automatique des anciennes clés si saturation
-                localStorage.removeItem('roadbook_state');
-                localStorage.removeItem('roadbook_state_v2');
-                try {
-                    localStorage.setItem('roadbook_state_v3', JSON.stringify(appState));
-                    return true;
-                } catch (err) {
-                    showToast("Stockage local plein", "error");
-                    return false;
-                }
+                showToast("Stockage local plein", "error");
+                return false;
             }
         }
 
-        // Fonction d'envoi vers API externe gratuite (ImgBB) + compression de secours
         async function uploadImageToCloudAPI(file, targetInputId, saveBtnId) {
             const btn = document.getElementById(saveBtnId);
             if (btn) {
@@ -627,7 +665,6 @@
                 btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Envoi...';
             }
 
-            // 1. Compression légère préalable via Canvas
             const base64Compressed = await new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.onload = function(event) {
@@ -652,7 +689,6 @@
                 reader.readAsDataURL(file);
             });
 
-            // 2. Tentative d'envoi vers l'API externe ImgBB pour récupérer une URL légère
             try {
                 const base64Data = base64Compressed.split(',')[1];
                 const formData = new FormData();
@@ -668,13 +704,12 @@
                     document.getElementById(targetInputId).value = result.data.url;
                     showToast("Photo hébergée sur le cloud !", "success");
                 } else {
-                    // Repli sur l'image compressée ultra-légère
                     document.getElementById(targetInputId).value = base64Compressed;
                     showToast("Photo optimisée prête", "info");
                 }
             } catch (error) {
                 document.getElementById(targetInputId).value = base64Compressed;
-                showToast("Photo optimisée prête (mode local)", "info");
+                showToast("Photo optimisée prête", "info");
             } finally {
                 if (btn) {
                     btn.disabled = false;
@@ -701,12 +736,13 @@
             renderRoutes(appState.routes);
             renderGarage();
             renderUserLocations();
+            renderCommunityMembers('');
             initLeafletMap();
         }
 
         function switchTab(tabId) {
             appState.activeTab = tabId;
-            ['feed', 'explorer', 'map', 'garage'].forEach(t => {
+            ['feed', 'explorer', 'map', 'community', 'garage'].forEach(t => {
                 const el = document.getElementById(`view-${t}`);
                 if (el) el.classList.toggle('hidden', t !== tabId);
                 
@@ -718,12 +754,8 @@
                 }
             });
 
-            if (tabId === 'map' && map) {
-                setTimeout(() => map.invalidateSize(), 200);
-            }
-            if (tabId === 'feed') {
-                setTimeout(() => feedMiniMaps.forEach(m => m.invalidateSize()), 200);
-            }
+            if (tabId === 'map' && map) setTimeout(() => map.invalidateSize(), 200);
+            if (tabId === 'feed') setTimeout(() => feedMiniMaps.forEach(m => m.invalidateSize()), 200);
         }
 
         function renderHeaderVehicleSelect() {
@@ -749,6 +781,33 @@
             document.getElementById('profile-city-display').innerHTML = `<i class="fa-solid fa-location-dot text-crimson mr-1"></i>${p.city}`;
             document.getElementById('profile-cat-display').textContent = p.category;
             document.getElementById('profile-bio-display').textContent = p.bio;
+
+            // Calcul des kilomètres totaux et des badges
+            let totalKm = appState.vehicles.filter(v => !v.archived).reduce((acc, v) => acc + (parseInt(v.km) || 0), 0);
+            document.getElementById('profile-total-km').textContent = `${totalKm.toLocaleString()} km`;
+            document.getElementById('profile-total-trips').textContent = appState.routes.length + 12;
+
+            renderBadges(totalKm);
+        }
+
+        function renderBadges(totalKm) {
+            const container = document.getElementById('profile-badges-container');
+            const badges = [
+                { name: 'Pilote Bronze', threshold: 5000, icon: 'fa-award', color: 'text-amber-700 bg-amber-50 border-amber-200' },
+                { name: 'Routard Argent', threshold: 10000, icon: 'fa-medal', color: 'text-zinc-600 bg-zinc-100 border-zinc-300' },
+                { name: 'Légende Or', threshold: 25000, icon: 'fa-trophy', color: 'text-amber-500 bg-amber-50 border-amber-300' }
+            ];
+
+            container.innerHTML = badges.map(b => {
+                const unlocked = totalKm >= b.threshold;
+                return `
+                    <div class="p-2.5 rounded-xl border flex flex-col items-center justify-center text-center ${unlocked ? b.color : 'bg-zinc-50 border-zinc-200 text-zinc-300 opacity-50'}">
+                        <i class="fa-solid ${b.icon} text-base mb-1"></i>
+                        <span class="text-[10px] font-bold leading-tight">${b.name}</span>
+                        <span class="text-[9px] font-mono mt-0.5">${b.threshold.toLocaleString()} km</span>
+                    </div>
+                `;
+            }).join('');
         }
 
         function openEditProfileModal() {
@@ -789,15 +848,89 @@
             appState.userProfile.bio = document.getElementById('prof-bio').value;
             
             const customAvatar = document.getElementById('prof-avatar').value;
-            if (customAvatar) {
-                appState.userProfile.avatar = customAvatar;
-            }
+            if (customAvatar) appState.userProfile.avatar = customAvatar;
 
             if (saveStateToStorage()) {
                 renderUserProfile();
                 closeProfileModal();
                 showToast("Profil enregistré !", "success");
             }
+        }
+
+        // COMMUNAUTÉ & AMIS
+        function filterCommunityMembers(query) {
+            renderCommunityMembers(query);
+        }
+
+        function renderCommunityMembers(query) {
+            const container = document.getElementById('community-members-grid');
+            if (!container) return;
+
+            const filtered = appState.communityMembers.filter(m => 
+                m.pseudo.toLowerCase().includes(query.toLowerCase()) || 
+                m.city.toLowerCase().includes(query.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="col-span-full py-12 text-center text-zinc-400 text-xs font-semibold">Aucun membre trouvé.</div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(m => `
+                <div class="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-4 cursor-pointer" onclick="openMemberDetail('${m.id}')">
+                        <img src="${m.avatar}" class="w-14 h-14 rounded-2xl object-cover border border-zinc-200">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h4 class="font-bold text-sm text-asphalt">${m.pseudo}</h4>
+                                <span class="text-[10px] text-zinc-400 font-mono">${m.age} ans</span>
+                            </div>
+                            <p class="text-xs text-zinc-500"><i class="fa-solid fa-location-dot text-crimson mr-1"></i>${m.city}</p>
+                            <span class="inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-cream text-asphalt border border-zinc-200">${m.category}</span>
+                        </div>
+                    </div>
+                    <button onclick="toggleFollowMember('${m.id}')" class="px-4 py-2 rounded-xl text-xs font-bold transition shadow ${m.following ? 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300' : 'bg-crimson text-white hover:bg-crimson-hover'}">
+                        ${m.following ? 'Abonné' : '+ S’abonner'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function toggleFollowMember(id) {
+            const m = appState.communityMembers.find(x => x.id === id);
+            if (m) {
+                m.following = !m.following;
+                saveStateToStorage();
+                renderCommunityMembers(document.getElementById('community-search').value || '');
+                renderFeed();
+                showToast(m.following ? `Vous suivez maintenant ${m.pseudo}` : `Vous ne suivez plus ${m.pseudo}`, "info");
+            }
+        }
+
+        function openMemberDetail(id) {
+            const m = appState.communityMembers.find(x => x.id === id);
+            if (!m) return;
+            document.getElementById('modal-member-avatar').src = m.avatar;
+            document.getElementById('modal-member-pseudo').textContent = m.pseudo;
+            document.getElementById('modal-member-city').textContent = `${m.city} · ${m.age} ans`;
+            document.getElementById('modal-member-bio').textContent = m.bio;
+            document.getElementById('modal-member-vehicles').innerHTML = m.vehicles.map(v => `
+                <div class="bg-cream p-3 rounded-xl border border-zinc-200 flex items-center gap-3">
+                    <img src="${v.photo}" class="w-16 h-12 rounded-lg object-cover">
+                    <div>
+                        <strong class="text-xs text-asphalt block">${v.brand} ${v.model} (${v.year})</strong>
+                        <span class="text-[10px] font-mono text-crimson font-bold">${v.km.toLocaleString()} km</span>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('member-detail-modal').classList.remove('hidden');
+            document.getElementById('member-detail-modal').classList.add('flex');
+        }
+
+        function closeMemberDetailModal() {
+            document.getElementById('member-detail-modal').classList.remove('flex');
+            document.getElementById('member-detail-modal').classList.add('hidden');
         }
 
         // FIL D'ACTUALITÉ
@@ -815,8 +948,10 @@
             feedMiniMaps.forEach(m => m.remove());
             feedMiniMaps = [];
 
+            // Filtrer selon les abonnements si demandé
+            const followingNames = appState.communityMembers.filter(m => m.following).map(m => m.pseudo);
             const items = appState.feedFilter === 'following' 
-                ? appState.feed.filter(i => i.following) 
+                ? appState.feed.filter(i => followingNames.includes(i.author)) 
                 : appState.feed;
 
             container.innerHTML = items.map((item, idx) => `
@@ -852,7 +987,6 @@
                         </div>
                     </div>
 
-                    <!-- Aperçu carte sans clé API -->
                     <div class="rounded-xl overflow-hidden border border-zinc-200 relative">
                         <div id="feed-map-${idx}" class="strava-mini-map"></div>
                     </div>
@@ -864,7 +998,6 @@
                 </div>
             `).join('');
 
-            // Tuiles ArcGIS World Street Map (gratuit, sans API KEY REQUIRED)
             items.forEach((item, idx) => {
                 const mapEl = document.getElementById(`feed-map-${idx}`);
                 if (mapEl && item.coords) {
@@ -880,7 +1013,6 @@
                     }).addTo(miniMap);
 
                     const poly = L.polyline(item.coords, { color: '#8B1E24', weight: 4, opacity: 0.95 }).addTo(miniMap);
-                    
                     L.circleMarker(item.coords[0], { radius: 4, color: '#10B981', fillOpacity: 1 }).addTo(miniMap);
                     L.circleMarker(item.coords[item.coords.length - 1], { radius: 4, color: '#8B1E24', fillOpacity: 1 }).addTo(miniMap);
 
@@ -974,7 +1106,7 @@
         function renderRouteComments(r) {
             const container = document.getElementById('route-modal-comments');
             if (!r.comments || r.comments.length === 0) {
-                container.innerHTML = `<p class="text-xs text-zinc-400 italic">Aucun commentaire pour le moment. Soyez le premier !</p>`;
+                container.innerHTML = `<p class="text-xs text-zinc-400 italic">Aucun commentaire pour le moment.</p>`;
                 return;
             }
             container.innerHTML = r.comments.map(c => `
@@ -1025,7 +1157,7 @@
                         <div class="flex-1">
                             <span class="text-[10px] font-mono text-zinc-400 uppercase">${v.year} · ${v.fuel}</span>
                             <h4 class="font-bold text-sm text-asphalt">${v.brand} ${v.model}</h4>
-                            <p class="text-[11px] text-zinc-500">${v.hp ? v.hp + ' ch' : 'N/C'} ${v.cc ? '· ' + v.cc + ' cm³' : ''}</p>
+                            <p class="text-[11px] text-zinc-500 font-mono text-crimson font-bold">${(parseInt(v.km) || 0).toLocaleString()} km</p>
                         </div>
                     </div>
                     <div class="flex items-center justify-between pt-2 border-t border-zinc-100 text-xs">
@@ -1055,13 +1187,14 @@
                 document.getElementById('veh-model').value = v.model;
                 document.getElementById('veh-year').value = v.year;
                 document.getElementById('veh-fuel').value = v.fuel;
+                document.getElementById('veh-km').value = v.km || 0;
                 document.getElementById('veh-cc').value = String(v.cc || '').replace(/\D/g, '');
                 document.getElementById('veh-hp').value = String(v.hp || '').replace(/\D/g, '');
                 document.getElementById('veh-torque').value = String(v.torque || '').replace(/\D/g, '');
                 document.getElementById('veh-weight').value = String(v.weight || '').replace(/\D/g, '');
                 document.getElementById('veh-special').value = v.special || '';
             } else {
-                ['veh-brand', 'veh-model', 'veh-year', 'veh-cc', 'veh-hp', 'veh-torque', 'veh-weight', 'veh-special'].forEach(el => document.getElementById(el).value = '');
+                ['veh-brand', 'veh-model', 'veh-year', 'veh-km', 'veh-cc', 'veh-hp', 'veh-torque', 'veh-weight', 'veh-special'].forEach(el => document.getElementById(el).value = '');
             }
             document.getElementById('vehicle-modal').classList.remove('hidden');
             document.getElementById('vehicle-modal').classList.add('flex');
@@ -1092,9 +1225,7 @@
             let existingPhoto = 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400';
             if (id) {
                 const oldVeh = appState.vehicles.find(x => x.id === id);
-                if (oldVeh && oldVeh.photo) {
-                    existingPhoto = oldVeh.photo;
-                }
+                if (oldVeh && oldVeh.photo) existingPhoto = oldVeh.photo;
             }
 
             const customPhoto = document.getElementById('veh-photo').value;
@@ -1104,6 +1235,7 @@
                 id: id || `veh_${Date.now()}`,
                 brand, model, year,
                 fuel: document.getElementById('veh-fuel').value,
+                km: parseInt(document.getElementById('veh-km').value) || 0,
                 cc: document.getElementById('veh-cc').value.trim(),
                 hp: document.getElementById('veh-hp').value.trim(),
                 torque: document.getElementById('veh-torque').value.trim(),
@@ -1123,6 +1255,7 @@
             if (saveStateToStorage()) {
                 renderGarage();
                 renderHeaderVehicleSelect();
+                renderUserProfile();
                 closeVehicleModal();
                 showToast("Véhicule enregistré !", "success");
             }
@@ -1134,6 +1267,7 @@
             saveStateToStorage();
             renderGarage();
             renderHeaderVehicleSelect();
+            renderUserProfile();
             showToast("Véhicule archivé", "info");
         }
 
@@ -1143,10 +1277,10 @@
             saveStateToStorage();
             renderGarage();
             renderHeaderVehicleSelect();
+            renderUserProfile();
             showToast("Véhicule restauré", "success");
         }
 
-        // MODALE ADRESSE AVEC SUGGESTIONS
         function renderUserLocations() {
             document.getElementById('user-garages-list').innerHTML = appState.garages.map((g, idx) => `
                 <div class="flex items-center justify-between text-xs bg-cream p-2.5 rounded-xl border border-zinc-200/70">
@@ -1235,7 +1369,6 @@
             }
 
             const finalEntry = customName ? `${customName} - ${address}` : address;
-
             if (type === 'garage') appState.garages.push(finalEntry);
             else appState.destinations.push(finalEntry);
 
@@ -1245,24 +1378,20 @@
             showToast("Adresse enregistrée !", "success");
         }
 
-        // CARTE LEAFLET SANS API KEY REQUIRED (ArcGIS World Street Map)
         function initLeafletMap() {
             if (map) return;
             map = L.map('leaflet-map').setView(appState.userLocation, 13);
-            
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
                 maxZoom: 19,
                 attribution: '© Esri, OpenStreetMap'
             }).addTo(map);
-
             refreshMapMarkers();
         }
 
         function refreshMapMarkers() {
             mapMarkers.forEach(m => map.removeLayer(m));
             mapMarkers = [];
-            const userMarker = L.marker(appState.userLocation).addTo(map)
-                .bindPopup("<b>Votre position actuelle</b>");
+            const userMarker = L.marker(appState.userLocation).addTo(map).bindPopup("<b>Votre position actuelle</b>");
             mapMarkers.push(userMarker);
         }
 
@@ -1297,8 +1426,7 @@
         }
 
         function toggleReportMenu() {
-            const menu = document.getElementById('report-menu');
-            menu.classList.toggle('hidden');
+            document.getElementById('report-menu').classList.toggle('hidden');
         }
 
         function addCommunityReport(type, icon, color) {
@@ -1321,10 +1449,7 @@
             toast.innerHTML = `<span>${message}</span>`;
             container.appendChild(toast);
 
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
-
+            setTimeout(() => toast.classList.remove('translate-y-2', 'opacity-0'), 10);
             setTimeout(() => {
                 toast.classList.add('translate-y-2', 'opacity-0');
                 setTimeout(() => toast.remove(), 300);
