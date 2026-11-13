@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROADBOOK | Routes de Légende & Copilote GPS</title>
+    <title>ROADBOOK | La France des belles routes</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,8 +36,13 @@
         #leaflet-map {
             width: 100%;
             height: 100%;
-            min-height: 75vh;
+            min-height: calc(100vh - 4rem);
             z-index: 10;
+        }
+        .strava-mini-map {
+            height: 180px;
+            width: 100%;
+            z-index: 1;
         }
     </style>
 </head>
@@ -47,39 +52,46 @@
 
     <!-- HEADER SUPÉRIEUR -->
     <header class="bg-asphalt text-white border-b border-zinc-800 sticky top-0 z-40 shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
             
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-crimson flex items-center justify-center text-white shadow-lg shadow-crimson/30">
-                    <i class="fa-solid fa-road text-lg"></i>
+            <div class="flex items-center gap-3 shrink-0">
+                <!-- Logo Volant 3 branches coupé à moitié -->
+                <div class="w-10 h-10 rounded-xl bg-crimson flex items-center justify-center text-white shadow-lg shadow-crimson/30 overflow-hidden relative">
+                    <svg viewBox="0 0 40 40" class="w-9 h-9 translate-y-1.5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="20" cy="22" r="14" />
+                        <circle cx="20" cy="22" r="3.5" fill="currentColor" />
+                        <line x1="6" y1="22" x2="16.5" y2="22" />
+                        <line x1="23.5" y1="22" x2="34" y2="22" />
+                        <line x1="20" y1="25.5" x2="20" y2="36" />
+                    </svg>
                 </div>
                 <div>
                     <h1 class="font-serif text-lg font-bold tracking-wider text-white">ROADBOOK</h1>
-                    <span class="text-[10px] font-mono text-zinc-400 block -mt-1 uppercase tracking-widest">GPS Sportives Classiques</span>
+                    <span class="text-[10px] font-mono text-zinc-400 block -mt-1 uppercase tracking-widest">La France des belles routes</span>
                 </div>
             </div>
 
-            <nav class="hidden md:flex items-center gap-1 bg-zinc-900/90 p-1.5 rounded-2xl border border-zinc-800">
-                <button onclick="switchTab('feed')" id="nav-feed" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
+            <nav class="flex items-center gap-1 bg-zinc-900/90 p-1 rounded-2xl border border-zinc-800 overflow-x-auto">
+                <button onclick="switchTab('feed')" id="nav-feed" class="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 bg-crimson text-white">
                     <i class="fa-solid fa-rss"></i>
-                    <span>Actualité</span>
+                    <span class="hidden sm:inline">Actualité</span>
                 </button>
-                <button onclick="switchTab('explorer')" id="nav-explorer" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
+                <button onclick="switchTab('explorer')" id="nav-explorer" class="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 text-zinc-400">
                     <i class="fa-solid fa-compass"></i>
-                    <span>Explorer</span>
+                    <span class="hidden sm:inline">Explorer</span>
                 </button>
-                <button onclick="switchTab('map')" id="nav-map" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
+                <button onclick="switchTab('map')" id="nav-map" class="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 text-zinc-400">
                     <i class="fa-solid fa-location-arrow"></i>
-                    <span>Prendre la route</span>
+                    <span class="hidden sm:inline">Prendre la route</span>
                 </button>
-                <button onclick="switchTab('garage')" id="nav-garage" class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2">
+                <button onclick="switchTab('garage')" id="nav-garage" class="px-3 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shrink-0 text-zinc-400">
                     <i class="fa-solid fa-car"></i>
-                    <span>Mon Garage</span>
+                    <span class="hidden sm:inline">Mon Garage</span>
                 </button>
             </nav>
 
-            <div class="flex items-center gap-3">
-                <div class="relative">
+            <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <div class="relative hidden sm:block">
                     <select id="header-vehicle-select" onchange="switchActiveVehicle(this.value)" class="bg-zinc-900 border border-zinc-700 text-white text-xs font-bold rounded-xl px-3 py-2 pr-8 appearance-none cursor-pointer focus:outline-none focus:border-crimson">
                     </select>
                     <i class="fa-solid fa-chevron-down text-[10px] text-zinc-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"></i>
@@ -93,7 +105,7 @@
     </header>
 
     <!-- VUE 1 : ACTUALITÉ -->
-    <main id="view-feed" class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
+    <main id="view-feed" class="flex-1 max-w-3xl w-full mx-auto px-4 sm:px-6 py-6 pb-12 space-y-6">
         <div class="flex items-center justify-between gap-4">
             <h2 class="font-serif text-xl font-bold text-asphalt">Actualité de la communauté</h2>
             <div class="flex items-center gap-2 bg-white p-1 rounded-xl border border-zinc-200 text-xs font-bold shadow-sm">
@@ -105,7 +117,7 @@
     </main>
 
     <!-- VUE 2 : EXPLORER -->
-    <main id="view-explorer" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
+    <main id="view-explorer" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-12 space-y-6">
         <div class="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-4">
             <div class="flex flex-wrap items-center justify-between gap-4">
                 <h2 class="font-serif text-xl font-bold text-asphalt">Explorer les Itinéraires de France</h2>
@@ -171,8 +183,8 @@
         <div id="routes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </main>
 
-    <!-- VUE 3 : CARTE GPS -->
-    <main id="view-map" class="hidden flex-1 flex flex-col relative pb-16">
+    <!-- VUE 3 : CARTE GPS (Style épuré Waze) -->
+    <main id="view-map" class="hidden flex-1 flex flex-col relative">
         <div class="absolute top-4 inset-x-4 z-30 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
             <div class="bg-asphalt/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-xl border border-zinc-800 flex items-center gap-4 pointer-events-auto">
                 <div class="flex items-center gap-3">
@@ -213,7 +225,7 @@
             </div>
         </div>
 
-        <div id="leaflet-map" class="flex-1 w-full h-full min-h-[75vh]"></div>
+        <div id="leaflet-map" class="flex-1 w-full h-full"></div>
 
         <div class="absolute bottom-4 inset-x-4 z-30 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
             <div class="bg-asphalt/95 backdrop-blur-md text-white px-4 py-2.5 rounded-2xl shadow-xl border border-zinc-800 flex flex-wrap items-center gap-3 pointer-events-auto text-xs font-bold">
@@ -227,7 +239,7 @@
     </main>
 
     <!-- VUE 4 : MON GARAGE & PROFIL -->
-    <main id="view-garage" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-28 space-y-6">
+    <main id="view-garage" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-12 space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <div class="lg:col-span-5 space-y-6">
                 <div class="bg-white rounded-2xl border border-zinc-200 p-6 shadow-sm space-y-4">
@@ -257,14 +269,14 @@
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <h3 class="font-bold text-xs text-asphalt"><i class="fa-solid fa-house-chimney text-crimson mr-1.5"></i>Mes Garages</h3>
-                            <button onclick="promptAddLocation('garage')" class="text-xs font-bold text-crimson hover:underline">+ Ajouter</button>
+                            <button onclick="openLocationModal('garage')" class="text-xs font-bold text-crimson hover:underline">+ Ajouter</button>
                         </div>
                         <div id="user-garages-list" class="space-y-1.5"></div>
                     </div>
                     <div class="pt-3 border-t border-zinc-100">
                         <div class="flex items-center justify-between mb-2">
                             <h3 class="font-bold text-xs text-asphalt"><i class="fa-solid fa-star text-amber-500 mr-1.5"></i>Destinations Favorites</h3>
-                            <button onclick="promptAddLocation('destination')" class="text-xs font-bold text-crimson hover:underline">+ Ajouter</button>
+                            <button onclick="openLocationModal('destination')" class="text-xs font-bold text-crimson hover:underline">+ Ajouter</button>
                         </div>
                         <div id="user-destinations-list" class="space-y-1.5"></div>
                     </div>
@@ -291,29 +303,7 @@
         </div>
     </main>
 
-    <!-- BARRE DE NAVIGATION INFÉRIEURE -->
-    <footer class="fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-zinc-200 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] no-print">
-        <div class="max-w-3xl mx-auto px-2 sm:px-6 h-16 flex items-center justify-between">
-            <button onclick="switchTab('feed')" id="bnav-feed" class="bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-bold text-crimson transition">
-                <i class="fa-solid fa-rss text-base"></i>
-                <span>Actualité</span>
-            </button>
-            <button onclick="switchTab('explorer')" id="bnav-explorer" class="bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-crimson transition">
-                <i class="fa-solid fa-compass text-base"></i>
-                <span>Explorer</span>
-            </button>
-            <button onclick="switchTab('map')" id="bnav-map" class="bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-crimson transition">
-                <i class="fa-solid fa-location-arrow text-base"></i>
-                <span>Prendre la route</span>
-            </button>
-            <button onclick="switchTab('garage')" id="bnav-garage" class="bnav-tab flex-1 flex flex-col items-center justify-center gap-1 text-[11px] font-semibold text-zinc-500 hover:text-crimson transition">
-                <i class="fa-solid fa-car text-base"></i>
-                <span>Mon Garage</span>
-            </button>
-        </div>
-    </footer>
-
-    <!-- MODALE VÉHICULE -->
+    <!-- MODALE VÉHICULE (Unités forcées & compression image) -->
     <div id="vehicle-modal" class="fixed inset-0 bg-asphalt/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <h3 id="veh-modal-title" class="font-serif text-xl font-bold text-asphalt">Fiche Véhicule</h3>
@@ -336,23 +326,77 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <div><label class="block font-bold text-zinc-600 mb-1">Cylindrée</label><input type="text" id="veh-cc" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: 1596 cm³"></div>
-                    <div><label class="block font-bold text-zinc-600 mb-1">Puissance (chevaux)</label><input type="text" id="veh-hp" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: 138 ch"></div>
+                    <div>
+                        <label class="block font-bold text-zinc-600 mb-1">Cylindrée</label>
+                        <div class="relative flex items-center">
+                            <input type="number" id="veh-cc" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 pr-12 font-semibold" placeholder="1596">
+                            <span class="absolute right-3 text-zinc-400 font-mono font-bold pointer-events-none">cm³</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-zinc-600 mb-1">Puissance</label>
+                        <div class="relative flex items-center">
+                            <input type="number" id="veh-hp" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 pr-10 font-semibold" placeholder="138">
+                            <span class="absolute right-3 text-zinc-400 font-mono font-bold pointer-events-none">ch</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <div><label class="block font-bold text-zinc-600 mb-1">Couple (N.m)</label><input type="text" id="veh-torque" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: 148 N.m"></div>
-                    <div><label class="block font-bold text-zinc-600 mb-1">Poids</label><input type="text" id="veh-weight" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: 805 kg"></div>
+                    <div>
+                        <label class="block font-bold text-zinc-600 mb-1">Couple</label>
+                        <div class="relative flex items-center">
+                            <input type="number" id="veh-torque" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 pr-12 font-semibold" placeholder="148">
+                            <span class="absolute right-3 text-zinc-400 font-mono font-bold pointer-events-none">N.m</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-zinc-600 mb-1">Poids</label>
+                        <div class="relative flex items-center">
+                            <input type="number" id="veh-weight" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 pr-10 font-semibold" placeholder="805">
+                            <span class="absolute right-3 text-zinc-400 font-mono font-bold pointer-events-none">kg</span>
+                        </div>
+                    </div>
                 </div>
                 <div><label class="block font-bold text-zinc-600 mb-1">Version spéciale</label><input type="text" id="veh-special" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: Châssis pont de biche, carbu Weber"></div>
                 <div>
-                    <label class="block font-bold text-zinc-600 mb-1">Photo (appareil)</label>
+                    <label class="block font-bold text-zinc-600 mb-1">Photo</label>
                     <input type="file" id="veh-file" accept="image/*" onchange="handleVehicleFile(this)" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-1.5 text-xs">
                     <input type="hidden" id="veh-photo">
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-2 border-t border-zinc-100">
-                <button onclick="closeVehicleModal()" class="px-4 py-2 rounded-xl bg-zinc-200 text-xs font-bold text-zinc-700">Annuler</button>
-                <button onclick="saveVehicleModal()" class="px-4 py-2 rounded-xl bg-crimson text-xs font-bold text-white shadow">Enregistrer</button>
+                <button type="button" onclick="closeVehicleModal()" class="px-4 py-2 rounded-xl bg-zinc-200 text-xs font-bold text-zinc-700">Annuler</button>
+                <button type="button" onclick="saveVehicleModal()" class="px-4 py-2 rounded-xl bg-crimson text-xs font-bold text-white shadow">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE ADRESSE AVEC AUTO-COMPLÉTION (Style Waze) -->
+    <div id="location-modal" class="fixed inset-0 bg-asphalt/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between">
+                <h3 id="loc-modal-title" class="font-serif text-xl font-bold text-asphalt">Ajouter un lieu</h3>
+                <button onclick="closeLocationModal()" class="text-zinc-400 hover:text-crimson"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <input type="hidden" id="loc-type">
+            <div class="space-y-3 text-xs relative">
+                <div>
+                    <label class="block font-bold text-zinc-600 mb-1">Nom personnalisé (optionnel)</label>
+                    <input type="text" id="loc-custom-name" class="w-full bg-cream border border-zinc-300 rounded-xl px-3 py-2 font-semibold" placeholder="Ex: Garage secondaire, Maison de campagne...">
+                </div>
+                <div>
+                    <label class="block font-bold text-zinc-600 mb-1">Rechercher une adresse *</label>
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+                        <input type="text" id="loc-search-input" oninput="searchAddressSuggestions(this.value)" autocomplete="off" class="w-full bg-cream border border-zinc-300 rounded-xl pl-9 pr-3 py-2.5 font-semibold focus:outline-none focus:border-crimson" placeholder="Tapez une rue, un col, une ville...">
+                    </div>
+                    <!-- Liste des suggestions -->
+                    <div id="loc-suggestions" class="hidden mt-1 bg-white border border-zinc-200 rounded-xl shadow-lg max-h-48 overflow-y-auto divide-y divide-zinc-100"></div>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t border-zinc-100">
+                <button type="button" onclick="closeLocationModal()" class="px-4 py-2 rounded-xl bg-zinc-200 text-xs font-bold text-zinc-700">Annuler</button>
+                <button type="button" onclick="saveLocationModal()" class="px-4 py-2 rounded-xl bg-crimson text-xs font-bold text-white shadow">Enregistrer</button>
             </div>
         </div>
     </div>
@@ -383,8 +427,8 @@
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-2 border-t border-zinc-100">
-                <button onclick="closeProfileModal()" class="px-4 py-2 rounded-xl bg-zinc-200 text-xs font-bold text-zinc-700">Annuler</button>
-                <button onclick="saveProfileModal()" class="px-4 py-2 rounded-xl bg-crimson text-xs font-bold text-white shadow">Enregistrer</button>
+                <button type="button" onclick="closeProfileModal()" class="px-4 py-2 rounded-xl bg-zinc-200 text-xs font-bold text-zinc-700">Annuler</button>
+                <button type="button" onclick="saveProfileModal()" class="px-4 py-2 rounded-xl bg-crimson text-xs font-bold text-white shadow">Enregistrer</button>
             </div>
         </div>
     </div>
@@ -427,7 +471,6 @@
                     <div id="route-modal-pois" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
                 </div>
 
-                <!-- Section Commentaires -->
                 <div class="space-y-3 pt-4 border-t border-zinc-200">
                     <h3 class="text-xs font-extrabold uppercase tracking-wider text-zinc-400">Avis & Commentaires de la communauté</h3>
                     <div id="route-modal-comments" class="space-y-2"></div>
@@ -463,11 +506,11 @@
                 bio: "Passionné d'Alpine et de vieilles mécaniques des années 70. En quête de cols alpins.",
                 avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150"
             },
-            garages: ["Garage principal (Boulogne)", "Box sécurisé (Chevreuse)"],
-            destinations: ["Col du Galibier", "Le Touquet - Côte d'Opale"],
+            garages: ["Garage principal - 12 Rue de Paris, Boulogne-Billancourt", "Box sécurisé - Dampierre-en-Yvelines"],
+            destinations: ["Col du Galibier, Valloire", "Le Touquet-Paris-Plage"],
             vehicles: [
-                { id: 'veh_1', brand: 'Alpine', model: 'A110 S', year: 2022, fuel: 'SP98', cc: '1798 cm³', hp: '300 ch', torque: '340 N.m', weight: '1114 kg', special: 'Pack Aéro & Échappement Sport', photo: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=400', archived: false },
-                { id: 'veh_2', brand: 'Porsche', model: '911 Carrera 3.2', year: 1984, fuel: 'SP98', cc: '3164 cm³', hp: '231 ch', torque: '284 N.m', weight: '1210 kg', special: 'Boîte G50, Jantes Fuchs', photo: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400', archived: false }
+                { id: 'veh_1', brand: 'Alpine', model: 'A110 S', year: 2022, fuel: 'SP98', cc: '1798', hp: '300', torque: '340', weight: '1114', special: 'Pack Aéro & Échappement Sport', photo: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?w=400', archived: false },
+                { id: 'veh_2', brand: 'Porsche', model: '911 Carrera 3.2', year: 1984, fuel: 'SP98', cc: '3164', hp: '231', torque: '284', weight: '1210', special: 'Boîte G50, Jantes Fuchs', photo: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=400', archived: false }
             ],
             routes: [
                 { id: 'route_1', title: 'La Route des Grandes Alpes', region: 'Alpes', dist: '684 km', dur: '14h30', elev: '11 400m D+', winding: 'SINUEUX', type: 'Col de montagne', loop: false, banner: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800', instructions: 'Attention aux freinages en descente de col, risque de vapor lock sur véhicules anciens.', pois: ['Col du Galibier', 'Col d\'Izoard', 'Col de la Bonette'], likes: 142, coords: [[45.1885, 5.7245], [45.0685, 6.4045], [44.556, 6.745]], comments: [{author: "Marc V.", text: "Fait le mois dernier en Porsche 911, magique !"}] },
@@ -477,14 +520,79 @@
                 { id: 'route_5', title: 'Côte d’Opale & Caps', region: 'Hauts-de-France', dist: '95 km', dur: '2h00', elev: '450m D+', winding: 'MIXTE', type: 'Littoral', loop: false, banner: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800', instructions: 'Vents marins forts, embruns sur le pare-brise près des falaises.', pois: ['Cap Gris-Nez', 'Cap Blanc-Nez', 'Wimereux'], likes: 74, coords: [[50.824, 1.613], [50.871, 1.587], [50.724, 1.611]], comments: [] }
             ],
             feed: [
-                { id: 'f_1', author: 'Marc V.', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150', time: 'Il y a 2h', text: 'Superbe sortie ce matin dans la Vallée de Chevreuse avec la berlinette ! Les routes sont impeccables.', image: 'https://images.unsplash.com/photo-1541348263662-e0526628da04?w=600', likes: 24, comments: 4 }
+                {
+                    id: 'f_1',
+                    author: 'Marc V.',
+                    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+                    vehicle: 'Porsche 911 SC (1981)',
+                    time: 'Il y a 2h',
+                    title: 'Itinéraire - Corniche des Cévennes',
+                    dist: '28 km',
+                    dur: '40 min',
+                    elev: '200m D+',
+                    coords: [[44.162, 3.742], [44.185, 3.710], [44.212, 3.685], [44.238, 3.642], [44.265, 3.605]],
+                    likes: 24,
+                    comments: 4,
+                    following: true
+                },
+                {
+                    id: 'f_2',
+                    author: 'Sophie L.',
+                    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
+                    vehicle: 'Mazda MX-5 NA (1992)',
+                    time: 'Il y a 5h',
+                    title: 'Itinéraire - Boucle des 17 Tournants',
+                    dist: '42 km',
+                    dur: '55 min',
+                    elev: '410m D+',
+                    coords: [[48.702, 2.054], [48.698, 2.012], [48.692, 1.984], [48.715, 1.995], [48.732, 2.014], [48.702, 2.054]],
+                    likes: 37,
+                    comments: 6,
+                    following: true
+                },
+                {
+                    id: 'f_3',
+                    author: 'Antoine D.',
+                    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+                    vehicle: 'Alfa Romeo Giulia GT 1600 Junior',
+                    time: 'Hier à 18:15',
+                    title: 'Itinéraire - Col de la Schlucht & Crêtes',
+                    dist: '64 km',
+                    dur: '1h 15min',
+                    elev: '1 120m D+',
+                    coords: [[48.063, 7.022], [48.041, 7.048], [48.015, 7.065], [47.982, 7.089], [47.945, 7.118]],
+                    likes: 51,
+                    comments: 9,
+                    following: true
+                },
+                {
+                    id: 'f_4',
+                    author: 'Lucas M.',
+                    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
+                    vehicle: 'Renault 5 Turbo 2',
+                    time: 'Hier à 14:30',
+                    title: 'Itinéraire - Gorges du Verdon Rive Gauche',
+                    dist: '85 km',
+                    dur: '1h 40min',
+                    elev: '1 350m D+',
+                    coords: [[43.765, 6.321], [43.742, 6.368], [43.728, 6.412], [43.751, 6.465], [43.792, 6.512]],
+                    likes: 83,
+                    comments: 12,
+                    following: false
+                }
             ]
         };
 
-        let appState = JSON.parse(localStorage.getItem('roadbook_state')) || defaultState;
+        let appState = JSON.parse(localStorage.getItem('roadbook_state_v2')) || defaultState;
 
         function saveStateToStorage() {
-            localStorage.setItem('roadbook_state', JSON.stringify(appState));
+            try {
+                localStorage.setItem('roadbook_state_v2', JSON.stringify(appState));
+                return true;
+            } catch (e) {
+                showToast("Espace de stockage saturé, réduisez la taille de la photo", "error");
+                return false;
+            }
         }
 
         let map = null;
@@ -492,6 +600,7 @@
         let routePolyline = null;
         let autoDriveInterval = null;
         let currentActiveRouteId = null;
+        let feedMiniMaps = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             initApp();
@@ -519,17 +628,13 @@
                     navEl.classList.toggle('text-white', t === tabId);
                     navEl.classList.toggle('text-zinc-400', t !== tabId);
                 }
-
-                const bnavEl = document.getElementById(`bnav-${t}`);
-                if (bnavEl) {
-                    bnavEl.classList.toggle('text-crimson', t === tabId);
-                    bnavEl.classList.toggle('font-bold', t === tabId);
-                    bnavEl.classList.toggle('text-zinc-500', t !== tabId);
-                }
             });
 
             if (tabId === 'map' && map) {
                 setTimeout(() => map.invalidateSize(), 200);
+            }
+            if (tabId === 'feed') {
+                setTimeout(() => feedMiniMaps.forEach(m => m.invalidateSize()), 200);
             }
         }
 
@@ -566,6 +671,7 @@
             document.getElementById('prof-category').value = p.category;
             document.getElementById('prof-bio').value = p.bio;
             document.getElementById('prof-avatar').value = '';
+            document.getElementById('prof-file').value = '';
             document.getElementById('profile-modal').classList.remove('hidden');
             document.getElementById('profile-modal').classList.add('flex');
         }
@@ -575,13 +681,36 @@
             document.getElementById('profile-modal').classList.add('hidden');
         }
 
+        // Utilitaire de compression d'image pour éviter le blocage localStorage
+        function compressImageFile(file, maxWidth, callback) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    callback(canvas.toDataURL('image/jpeg', 0.75));
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
         function handleProfileFile(input) {
             if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('prof-avatar').value = e.target.result;
-                };
-                reader.readAsDataURL(input.files[0]);
+                compressImageFile(input.files[0], 300, (compressedDataUrl) => {
+                    document.getElementById('prof-avatar').value = compressedDataUrl;
+                    showToast("Photo prête", "info");
+                });
             }
         }
 
@@ -603,12 +732,14 @@
                 appState.userProfile.avatar = customAvatar;
             }
 
-            saveStateToStorage();
-            renderUserProfile();
-            closeProfileModal();
-            showToast("Profil enregistré et conservé !", "success");
+            if (saveStateToStorage()) {
+                renderUserProfile();
+                closeProfileModal();
+                showToast("Profil enregistré !", "success");
+            }
         }
 
+        // FIL D'ACTUALITÉ (Style Strava sans photo)
         function setFeedFilter(filter) {
             appState.feedFilter = filter;
             document.getElementById('btn-feed-following').className = filter === 'following' ? 'px-3 py-1.5 rounded-lg bg-crimson text-white transition' : 'px-3 py-1.5 rounded-lg text-zinc-600 hover:text-asphalt transition';
@@ -619,25 +750,84 @@
         function renderFeed() {
             const container = document.getElementById('feed-activities-container');
             if (!container) return;
-            container.innerHTML = appState.feed.map(item => `
+
+            feedMiniMaps.forEach(m => m.remove());
+            feedMiniMaps = [];
+
+            const items = appState.feedFilter === 'following' 
+                ? appState.feed.filter(i => i.following) 
+                : appState.feed;
+
+            container.innerHTML = items.map((item, idx) => `
                 <div class="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm space-y-4">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <img src="${item.avatar}" class="w-10 h-10 rounded-xl object-cover border border-zinc-200">
                             <div>
-                                <h4 class="font-bold text-xs text-asphalt">${item.author}</h4>
-                                <span class="text-[10px] text-zinc-400 font-mono">${item.time}</span>
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-bold text-sm text-asphalt">${item.author}</h4>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-md bg-cream text-zinc-600 font-semibold border border-zinc-200">${item.vehicle}</span>
+                                </div>
+                                <span class="text-[11px] text-zinc-400 font-mono">${item.time}</span>
                             </div>
                         </div>
                     </div>
-                    <p class="text-xs text-zinc-700 leading-relaxed">${item.text}</p>
-                    ${item.image ? `<div class="rounded-xl overflow-hidden h-64 border border-zinc-100"><img src="${item.image}" class="w-full h-full object-cover"></div>` : ''}
+
+                    <div>
+                        <h3 class="font-serif text-lg font-bold text-asphalt">${item.title}</h3>
+                        <div class="flex items-center gap-5 mt-2 font-mono text-xs">
+                            <div>
+                                <span class="text-[10px] text-zinc-400 uppercase block">Distance</span>
+                                <strong class="text-asphalt text-sm">${item.dist}</strong>
+                            </div>
+                            <div class="pl-4 border-l border-zinc-200">
+                                <span class="text-[10px] text-zinc-400 uppercase block">Durée</span>
+                                <strong class="text-asphalt text-sm">${item.dur}</strong>
+                            </div>
+                            <div class="pl-4 border-l border-zinc-200">
+                                <span class="text-[10px] text-zinc-400 uppercase block">Dénivelé</span>
+                                <strong class="text-crimson text-sm">${item.elev}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Aperçu carte Strava-like -->
+                    <div class="rounded-xl overflow-hidden border border-zinc-200 relative">
+                        <div id="feed-map-${idx}" class="strava-mini-map"></div>
+                    </div>
+
                     <div class="flex items-center gap-4 pt-2 border-t border-zinc-100 text-xs font-semibold text-zinc-600">
-                        <button class="flex items-center gap-1.5 hover:text-crimson"><i class="fa-regular fa-heart"></i> ${item.likes}</button>
-                        <button class="flex items-center gap-1.5 hover:text-crimson"><i class="fa-regular fa-comment"></i> ${item.comments}</button>
+                        <button onclick="this.classList.toggle('text-crimson')" class="flex items-center gap-1.5 hover:text-crimson transition"><i class="fa-regular fa-heart"></i> ${item.likes}</button>
+                        <button class="flex items-center gap-1.5 hover:text-crimson transition"><i class="fa-regular fa-comment"></i> ${item.comments}</button>
                     </div>
                 </div>
             `).join('');
+
+            // Initialisation des mini-cartes épurées
+            items.forEach((item, idx) => {
+                const mapEl = document.getElementById(`feed-map-${idx}`);
+                if (mapEl && item.coords) {
+                    const miniMap = L.map(mapEl, {
+                        zoomControl: false,
+                        attributionControl: false,
+                        dragging: false,
+                        scrollWheelZoom: false,
+                        doubleClickZoom: false
+                    });
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+                        maxZoom: 18
+                    }).addTo(miniMap);
+
+                    const poly = L.polyline(item.coords, { color: '#8B1E24', weight: 4, opacity: 0.9 }).addTo(miniMap);
+                    
+                    // Points départ / arrivée
+                    L.circleMarker(item.coords[0], { radius: 4, color: '#10B981', fillOpacity: 1 }).addTo(miniMap);
+                    L.circleMarker(item.coords[item.coords.length - 1], { radius: 4, color: '#8B1E24', fillOpacity: 1 }).addTo(miniMap);
+
+                    miniMap.fitBounds(poly.getBounds(), { padding: [25, 25] });
+                    feedMiniMaps.push(miniMap);
+                }
+            });
         }
 
         function filterRoutes() {
@@ -754,7 +944,7 @@
             switchTab('map');
             if (map && r && r.coords) {
                 if (routePolyline) map.removeLayer(routePolyline);
-                routePolyline = L.polyline(r.coords, {color: '#8B1E24', weight: 5, opacity: 0.8}).addTo(map);
+                routePolyline = L.polyline(r.coords, {color: '#8B1E24', weight: 6, opacity: 0.9}).addTo(map);
                 map.fitBounds(routePolyline.getBounds(), {padding: [50, 50]});
             }
             showToast(`Tracé "${r ? r.title : ''}" chargé sur le GPS`, "success");
@@ -775,7 +965,7 @@
                         <div class="flex-1">
                             <span class="text-[10px] font-mono text-zinc-400 uppercase">${v.year} · ${v.fuel}</span>
                             <h4 class="font-bold text-sm text-asphalt">${v.brand} ${v.model}</h4>
-                            <p class="text-[11px] text-zinc-500">${v.hp || 'N/C'} · ${v.cc || ''}</p>
+                            <p class="text-[11px] text-zinc-500">${v.hp ? v.hp + ' ch' : 'N/C'} ${v.cc ? '· ' + v.cc + ' cm³' : ''}</p>
                         </div>
                     </div>
                     <div class="flex items-center justify-between pt-2 border-t border-zinc-100 text-xs">
@@ -805,11 +995,11 @@
                 document.getElementById('veh-model').value = v.model;
                 document.getElementById('veh-year').value = v.year;
                 document.getElementById('veh-fuel').value = v.fuel;
-                document.getElementById('veh-cc').value = v.cc;
-                document.getElementById('veh-hp').value = v.hp;
-                document.getElementById('veh-torque').value = v.torque;
-                document.getElementById('veh-weight').value = v.weight;
-                document.getElementById('veh-special').value = v.special;
+                document.getElementById('veh-cc').value = String(v.cc || '').replace(/\D/g, '');
+                document.getElementById('veh-hp').value = String(v.hp || '').replace(/\D/g, '');
+                document.getElementById('veh-torque').value = String(v.torque || '').replace(/\D/g, '');
+                document.getElementById('veh-weight').value = String(v.weight || '').replace(/\D/g, '');
+                document.getElementById('veh-special').value = v.special || '';
             } else {
                 ['veh-brand', 'veh-model', 'veh-year', 'veh-cc', 'veh-hp', 'veh-torque', 'veh-weight', 'veh-special'].forEach(el => document.getElementById(el).value = '');
             }
@@ -824,11 +1014,10 @@
 
         function handleVehicleFile(input) {
             if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('veh-photo').value = e.target.result;
-                };
-                reader.readAsDataURL(input.files[0]);
+                compressImageFile(input.files[0], 600, (compressedDataUrl) => {
+                    document.getElementById('veh-photo').value = compressedDataUrl;
+                    showToast("Photo chargée", "info");
+                });
             }
         }
 
@@ -858,11 +1047,11 @@
                 id: id || `veh_${Date.now()}`,
                 brand, model, year,
                 fuel: document.getElementById('veh-fuel').value,
-                cc: document.getElementById('veh-cc').value,
-                hp: document.getElementById('veh-hp').value,
-                torque: document.getElementById('veh-torque').value,
-                weight: document.getElementById('veh-weight').value,
-                special: document.getElementById('veh-special').value,
+                cc: document.getElementById('veh-cc').value.trim(),
+                hp: document.getElementById('veh-hp').value.trim(),
+                torque: document.getElementById('veh-torque').value.trim(),
+                weight: document.getElementById('veh-weight').value.trim(),
+                special: document.getElementById('veh-special').value.trim(),
                 photo: finalPhoto,
                 archived: false
             };
@@ -874,11 +1063,12 @@
                 appState.vehicles.push(vehicleData);
             }
 
-            saveStateToStorage();
-            renderGarage();
-            renderHeaderVehicleSelect();
-            closeVehicleModal();
-            showToast("Véhicule enregistré et conservé !", "success");
+            if (saveStateToStorage()) {
+                renderGarage();
+                renderHeaderVehicleSelect();
+                closeVehicleModal();
+                showToast("Véhicule enregistré !", "success");
+            }
         }
 
         function archiveVehicle(id) {
@@ -899,37 +1089,114 @@
             showToast("Véhicule restauré", "success");
         }
 
+        // MODALE ADRESSE AVEC SUGGESTIONS (API Adresse Gouv)
         function renderUserLocations() {
-            document.getElementById('user-garages-list').innerHTML = appState.garages.map(g => `
-                <div class="flex items-center justify-between text-xs bg-cream p-2 rounded-xl border border-zinc-200/70">
-                    <span><i class="fa-solid fa-warehouse text-crimson mr-1.5"></i>${g}</span>
+            document.getElementById('user-garages-list').innerHTML = appState.garages.map((g, idx) => `
+                <div class="flex items-center justify-between text-xs bg-cream p-2.5 rounded-xl border border-zinc-200/70">
+                    <span class="truncate pr-2"><i class="fa-solid fa-warehouse text-crimson mr-1.5"></i>${g}</span>
+                    <button onclick="removeLocation('garage', ${idx})" class="text-zinc-400 hover:text-crimson"><i class="fa-solid fa-trash-can"></i></button>
                 </div>
             `).join('');
 
-            document.getElementById('user-destinations-list').innerHTML = appState.destinations.map(d => `
-                <div class="flex items-center justify-between text-xs bg-cream p-2 rounded-xl border border-zinc-200/70">
-                    <span><i class="fa-solid fa-location-pin text-amber-500 mr-1.5"></i>${d}</span>
+            document.getElementById('user-destinations-list').innerHTML = appState.destinations.map((d, idx) => `
+                <div class="flex items-center justify-between text-xs bg-cream p-2.5 rounded-xl border border-zinc-200/70">
+                    <span class="truncate pr-2"><i class="fa-solid fa-location-pin text-amber-500 mr-1.5"></i>${d}</span>
+                    <button onclick="removeLocation('destination', ${idx})" class="text-zinc-400 hover:text-crimson"><i class="fa-solid fa-trash-can"></i></button>
                 </div>
             `).join('');
         }
 
-        function promptAddLocation(type) {
-            const name = prompt(type === 'garage' ? "Nom du nouveau garage :" : "Nom de la nouvelle destination :");
-            if (name) {
-                if (type === 'garage') appState.garages.push(name);
-                else appState.destinations.push(name);
-                saveStateToStorage();
-                renderUserLocations();
-                showToast("Lieu ajouté", "success");
+        function removeLocation(type, index) {
+            if (type === 'garage') appState.garages.splice(index, 1);
+            else appState.destinations.splice(index, 1);
+            saveStateToStorage();
+            renderUserLocations();
+            showToast("Lieu supprimé", "info");
+        }
+
+        function openLocationModal(type) {
+            document.getElementById('loc-type').value = type;
+            document.getElementById('loc-modal-title').textContent = type === 'garage' ? "Ajouter un garage" : "Ajouter une destination favorite";
+            document.getElementById('loc-custom-name').value = '';
+            document.getElementById('loc-search-input').value = '';
+            document.getElementById('loc-suggestions').classList.add('hidden');
+            document.getElementById('location-modal').classList.remove('hidden');
+            document.getElementById('location-modal').classList.add('flex');
+        }
+
+        function closeLocationModal() {
+            document.getElementById('location-modal').classList.remove('flex');
+            document.getElementById('location-modal').classList.add('hidden');
+        }
+
+        let searchTimeout = null;
+        function searchAddressSuggestions(query) {
+            clearTimeout(searchTimeout);
+            const sugBox = document.getElementById('loc-suggestions');
+            if (!query || query.trim().length < 3) {
+                sugBox.classList.add('hidden');
+                return;
             }
+
+            searchTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(query)}&limit=5`);
+                    const data = await res.json();
+                    if (data && data.features && data.features.length > 0) {
+                        sugBox.innerHTML = data.features.map(f => {
+                            const label = f.properties.label;
+                            return `
+                                <button type="button" onclick="selectAddressSuggestion('${label.replace(/'/g, "\\'")}')" class="w-full text-left px-3 py-2.5 hover:bg-cream text-xs flex items-center gap-2 transition">
+                                    <i class="fa-solid fa-location-dot text-crimson shrink-0"></i>
+                                    <span class="font-semibold text-asphalt truncate">${label}</span>
+                                </button>
+                            `;
+                        }).join('');
+                        sugBox.classList.remove('hidden');
+                    } else {
+                        sugBox.classList.add('hidden');
+                    }
+                } catch (e) {
+                    sugBox.classList.add('hidden');
+                }
+            }, 250);
         }
 
+        function selectAddressSuggestion(address) {
+            document.getElementById('loc-search-input').value = address;
+            document.getElementById('loc-suggestions').classList.add('hidden');
+        }
+
+        function saveLocationModal() {
+            const type = document.getElementById('loc-type').value;
+            const customName = document.getElementById('loc-custom-name').value.trim();
+            const address = document.getElementById('loc-search-input').value.trim();
+
+            if (!address) {
+                showToast("Veuillez saisir ou sélectionner une adresse", "error");
+                return;
+            }
+
+            const finalEntry = customName ? `${customName} - ${address}` : address;
+
+            if (type === 'garage') appState.garages.push(finalEntry);
+            else appState.destinations.push(finalEntry);
+
+            saveStateToStorage();
+            renderUserLocations();
+            closeLocationModal();
+            showToast("Adresse enregistrée !", "success");
+        }
+
+        // CARTE LEAFLET ÉPURÉE (Style Waze)
         function initLeafletMap() {
             if (map) return;
             map = L.map('leaflet-map').setView(appState.userLocation, 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            
+            // Tuiles CartoDB Voyager (épuré : routes, cours d'eau, parcs, sans surcharge de détails)
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                 maxZoom: 19,
-                attribution: '© OpenStreetMap'
+                attribution: '© OpenStreetMap, © CARTO'
             }).addTo(map);
 
             refreshMapMarkers();
