@@ -55,14 +55,28 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
             
             <div class="flex items-center gap-3 shrink-0">
-                <!-- Logo Volant 3 branches coupé à moitié -->
+                <!-- Logo Volant Momo Prototipo D350 gros, décentré et coupé sur le bord droit -->
                 <div class="w-10 h-10 rounded-xl bg-crimson flex items-center justify-center text-white shadow-lg shadow-crimson/30 overflow-hidden relative">
-                    <svg viewBox="0 0 40 40" class="w-9 h-9 translate-y-1.5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="20" cy="22" r="14" />
-                        <circle cx="20" cy="22" r="3.5" fill="currentColor" />
-                        <line x1="6" y1="22" x2="16.5" y2="22" />
-                        <line x1="23.5" y1="22" x2="34" y2="22" />
-                        <line x1="20" y1="25.5" x2="20" y2="36" />
+                    <svg viewBox="0 0 48 48" class="w-12 h-12 translate-x-2.5 translate-y-0.5 shrink-0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Jante extérieure épaisse -->
+                        <circle cx="24" cy="24" r="19" stroke-width="4" />
+                        <!-- Moyeu central et bouton klaxon -->
+                        <circle cx="24" cy="24" r="5" stroke-width="2.5" fill="#18181B" />
+                        <circle cx="24" cy="24" r="2" fill="currentColor" stroke="none" />
+                        <!-- Branche gauche ajourée style Prototipo -->
+                        <line x1="6" y1="22.5" x2="18.5" y2="22.5" stroke-width="2.2" />
+                        <line x1="6" y1="25.5" x2="18.5" y2="25.5" stroke-width="2.2" />
+                        <circle cx="11" cy="24" r="0.8" fill="currentColor" stroke="none" />
+                        <circle cx="15" cy="24" r="0.8" fill="currentColor" stroke="none" />
+                        <!-- Branche droite ajourée (coupée par le bord) -->
+                        <line x1="29.5" y1="22.5" x2="42" y2="22.5" stroke-width="2.2" />
+                        <line x1="29.5" y1="25.5" x2="42" y2="25.5" stroke-width="2.2" />
+                        <circle cx="33" cy="24" r="0.8" fill="currentColor" stroke="none" />
+                        <!-- Branche inférieure verticale ajourée -->
+                        <line x1="22.5" y1="29.5" x2="22.5" y2="42" stroke-width="2.2" />
+                        <line x1="25.5" y1="29.5" x2="25.5" y2="42" stroke-width="2.2" />
+                        <circle cx="24" cy="33.5" r="0.8" fill="currentColor" stroke="none" />
+                        <circle cx="24" cy="37.5" r="0.8" fill="currentColor" stroke="none" />
                     </svg>
                 </div>
                 <div>
@@ -183,7 +197,7 @@
         <div id="routes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </main>
 
-    <!-- VUE 3 : CARTE GPS (Style épuré Waze) -->
+    <!-- VUE 3 : CARTE GPS (Style épuré sans clé API) -->
     <main id="view-map" class="hidden flex-1 flex flex-col relative">
         <div class="absolute top-4 inset-x-4 z-30 flex flex-wrap items-center justify-between gap-3 pointer-events-none">
             <div class="bg-asphalt/95 backdrop-blur-md text-white px-4 py-3 rounded-2xl shadow-xl border border-zinc-800 flex items-center gap-4 pointer-events-auto">
@@ -303,7 +317,7 @@
         </div>
     </main>
 
-    <!-- MODALE VÉHICULE (Unités forcées & compression image) -->
+    <!-- MODALE VÉHICULE -->
     <div id="vehicle-modal" class="fixed inset-0 bg-asphalt/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-white w-full max-w-lg rounded-3xl shadow-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <h3 id="veh-modal-title" class="font-serif text-xl font-bold text-asphalt">Fiche Véhicule</h3>
@@ -366,12 +380,12 @@
             </div>
             <div class="flex justify-end gap-2 pt-2 border-t border-zinc-100">
                 <button type="button" onclick="closeVehicleModal()" class="px-4 py-2 rounded-xl bg-zinc-200 text-xs font-bold text-zinc-700">Annuler</button>
-                <button type="button" onclick="saveVehicleModal()" class="px-4 py-2 rounded-xl bg-crimson text-xs font-bold text-white shadow">Enregistrer</button>
+                <button type="button" id="btn-save-veh" onclick="saveVehicleModal()" class="px-4 py-2 rounded-xl bg-crimson text-xs font-bold text-white shadow">Enregistrer</button>
             </div>
         </div>
     </div>
 
-    <!-- MODALE ADRESSE AVEC AUTO-COMPLÉTION (Style Waze) -->
+    <!-- MODALE ADRESSE AVEC AUTO-COMPLÉTION -->
     <div id="location-modal" class="fixed inset-0 bg-asphalt/85 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
         <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl p-6 space-y-4">
             <div class="flex items-center justify-between">
@@ -390,7 +404,6 @@
                         <i class="fa-solid fa-magnifying-glass text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
                         <input type="text" id="loc-search-input" oninput="searchAddressSuggestions(this.value)" autocomplete="off" class="w-full bg-cream border border-zinc-300 rounded-xl pl-9 pr-3 py-2.5 font-semibold focus:outline-none focus:border-crimson" placeholder="Tapez une rue, un col, une ville...">
                     </div>
-                    <!-- Liste des suggestions -->
                     <div id="loc-suggestions" class="hidden mt-1 bg-white border border-zinc-200 rounded-xl shadow-lg max-h-48 overflow-y-auto divide-y divide-zinc-100"></div>
                 </div>
             </div>
@@ -428,7 +441,7 @@
             </div>
             <div class="flex justify-end gap-2 pt-2 border-t border-zinc-100">
                 <button type="button" onclick="closeProfileModal()" class="px-4 py-2 rounded-xl bg-zinc-200 text-xs font-bold text-zinc-700">Annuler</button>
-                <button type="button" onclick="saveProfileModal()" class="px-4 py-2 rounded-xl bg-crimson text-xs font-bold text-white shadow">Enregistrer</button>
+                <button type="button" id="btn-save-prof" onclick="saveProfileModal()" class="px-4 py-2 rounded-xl bg-crimson text-xs font-bold text-white shadow">Enregistrer</button>
             </div>
         </div>
     </div>
@@ -492,6 +505,9 @@
 
     <!-- SCRIPTS JAVASCRIPT -->
     <script>
+        // Clé API gratuite ImgBB pour hébergement externe des photos (remplaçable par ta propre clé sur api.imgbb.com)
+        const IMGBB_API_KEY = '6d207e02198a847aa98d0a2a901485a5';
+
         let defaultState = {
             activeTab: 'feed',
             activeVehicleId: 'veh_1',
@@ -504,7 +520,7 @@
                 age: 42,
                 category: "Sport",
                 bio: "Passionné d'Alpine et de vieilles mécaniques des années 70. En quête de cols alpins.",
-                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150"
+                avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200&fit=crop&crop=faces"
             },
             garages: ["Garage principal - 12 Rue de Paris, Boulogne-Billancourt", "Box sécurisé - Dampierre-en-Yvelines"],
             destinations: ["Col du Galibier, Valloire", "Le Touquet-Paris-Plage"],
@@ -523,7 +539,7 @@
                 {
                     id: 'f_1',
                     author: 'Marc V.',
-                    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+                    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&fit=crop&crop=faces',
                     vehicle: 'Porsche 911 SC (1981)',
                     time: 'Il y a 2h',
                     title: 'Itinéraire - Corniche des Cévennes',
@@ -538,7 +554,7 @@
                 {
                     id: 'f_2',
                     author: 'Sophie L.',
-                    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
+                    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&fit=crop&crop=faces',
                     vehicle: 'Mazda MX-5 NA (1992)',
                     time: 'Il y a 5h',
                     title: 'Itinéraire - Boucle des 17 Tournants',
@@ -553,7 +569,7 @@
                 {
                     id: 'f_3',
                     author: 'Antoine D.',
-                    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+                    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200&fit=crop&crop=faces',
                     vehicle: 'Alfa Romeo Giulia GT 1600 Junior',
                     time: 'Hier à 18:15',
                     title: 'Itinéraire - Col de la Schlucht & Crêtes',
@@ -568,7 +584,7 @@
                 {
                     id: 'f_4',
                     author: 'Lucas M.',
-                    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
+                    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&fit=crop&crop=faces',
                     vehicle: 'Renault 5 Turbo 2',
                     time: 'Hier à 14:30',
                     title: 'Itinéraire - Gorges du Verdon Rive Gauche',
@@ -583,15 +599,87 @@
             ]
         };
 
-        let appState = JSON.parse(localStorage.getItem('roadbook_state_v2')) || defaultState;
+        let appState = JSON.parse(localStorage.getItem('roadbook_state_v3')) || defaultState;
 
         function saveStateToStorage() {
             try {
-                localStorage.setItem('roadbook_state_v2', JSON.stringify(appState));
+                localStorage.setItem('roadbook_state_v3', JSON.stringify(appState));
                 return true;
             } catch (e) {
-                showToast("Espace de stockage saturé, réduisez la taille de la photo", "error");
-                return false;
+                // Purge automatique des anciennes clés si saturation
+                localStorage.removeItem('roadbook_state');
+                localStorage.removeItem('roadbook_state_v2');
+                try {
+                    localStorage.setItem('roadbook_state_v3', JSON.stringify(appState));
+                    return true;
+                } catch (err) {
+                    showToast("Stockage local plein", "error");
+                    return false;
+                }
+            }
+        }
+
+        // Fonction d'envoi vers API externe gratuite (ImgBB) + compression de secours
+        async function uploadImageToCloudAPI(file, targetInputId, saveBtnId) {
+            const btn = document.getElementById(saveBtnId);
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Envoi...';
+            }
+
+            // 1. Compression légère préalable via Canvas
+            const base64Compressed = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const maxWidth = 500;
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.65));
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // 2. Tentative d'envoi vers l'API externe ImgBB pour récupérer une URL légère
+            try {
+                const base64Data = base64Compressed.split(',')[1];
+                const formData = new FormData();
+                formData.append('image', base64Data);
+
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result && result.success && result.data && result.data.url) {
+                    document.getElementById(targetInputId).value = result.data.url;
+                    showToast("Photo hébergée sur le cloud !", "success");
+                } else {
+                    // Repli sur l'image compressée ultra-légère
+                    document.getElementById(targetInputId).value = base64Compressed;
+                    showToast("Photo optimisée prête", "info");
+                }
+            } catch (error) {
+                document.getElementById(targetInputId).value = base64Compressed;
+                showToast("Photo optimisée prête (mode local)", "info");
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = 'Enregistrer';
+                }
             }
         }
 
@@ -681,36 +769,9 @@
             document.getElementById('profile-modal').classList.add('hidden');
         }
 
-        // Utilitaire de compression d'image pour éviter le blocage localStorage
-        function compressImageFile(file, maxWidth, callback) {
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    if (width > maxWidth) {
-                        height = Math.round((height * maxWidth) / width);
-                        width = maxWidth;
-                    }
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    callback(canvas.toDataURL('image/jpeg', 0.75));
-                };
-                img.src = event.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
         function handleProfileFile(input) {
             if (input.files && input.files[0]) {
-                compressImageFile(input.files[0], 300, (compressedDataUrl) => {
-                    document.getElementById('prof-avatar').value = compressedDataUrl;
-                    showToast("Photo prête", "info");
-                });
+                uploadImageToCloudAPI(input.files[0], 'prof-avatar', 'btn-save-prof');
             }
         }
 
@@ -739,7 +800,7 @@
             }
         }
 
-        // FIL D'ACTUALITÉ (Style Strava sans photo)
+        // FIL D'ACTUALITÉ
         function setFeedFilter(filter) {
             appState.feedFilter = filter;
             document.getElementById('btn-feed-following').className = filter === 'following' ? 'px-3 py-1.5 rounded-lg bg-crimson text-white transition' : 'px-3 py-1.5 rounded-lg text-zinc-600 hover:text-asphalt transition';
@@ -791,7 +852,7 @@
                         </div>
                     </div>
 
-                    <!-- Aperçu carte Strava-like -->
+                    <!-- Aperçu carte sans clé API -->
                     <div class="rounded-xl overflow-hidden border border-zinc-200 relative">
                         <div id="feed-map-${idx}" class="strava-mini-map"></div>
                     </div>
@@ -803,7 +864,7 @@
                 </div>
             `).join('');
 
-            // Initialisation des mini-cartes épurées
+            // Tuiles ArcGIS World Street Map (gratuit, sans API KEY REQUIRED)
             items.forEach((item, idx) => {
                 const mapEl = document.getElementById(`feed-map-${idx}`);
                 if (mapEl && item.coords) {
@@ -814,13 +875,12 @@
                         scrollWheelZoom: false,
                         doubleClickZoom: false
                     });
-                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png', {
+                    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
                         maxZoom: 18
                     }).addTo(miniMap);
 
-                    const poly = L.polyline(item.coords, { color: '#8B1E24', weight: 4, opacity: 0.9 }).addTo(miniMap);
+                    const poly = L.polyline(item.coords, { color: '#8B1E24', weight: 4, opacity: 0.95 }).addTo(miniMap);
                     
-                    // Points départ / arrivée
                     L.circleMarker(item.coords[0], { radius: 4, color: '#10B981', fillOpacity: 1 }).addTo(miniMap);
                     L.circleMarker(item.coords[item.coords.length - 1], { radius: 4, color: '#8B1E24', fillOpacity: 1 }).addTo(miniMap);
 
@@ -1014,10 +1074,7 @@
 
         function handleVehicleFile(input) {
             if (input.files && input.files[0]) {
-                compressImageFile(input.files[0], 600, (compressedDataUrl) => {
-                    document.getElementById('veh-photo').value = compressedDataUrl;
-                    showToast("Photo chargée", "info");
-                });
+                uploadImageToCloudAPI(input.files[0], 'veh-photo', 'btn-save-veh');
             }
         }
 
@@ -1089,7 +1146,7 @@
             showToast("Véhicule restauré", "success");
         }
 
-        // MODALE ADRESSE AVEC SUGGESTIONS (API Adresse Gouv)
+        // MODALE ADRESSE AVEC SUGGESTIONS
         function renderUserLocations() {
             document.getElementById('user-garages-list').innerHTML = appState.garages.map((g, idx) => `
                 <div class="flex items-center justify-between text-xs bg-cream p-2.5 rounded-xl border border-zinc-200/70">
@@ -1188,15 +1245,14 @@
             showToast("Adresse enregistrée !", "success");
         }
 
-        // CARTE LEAFLET ÉPURÉE (Style Waze)
+        // CARTE LEAFLET SANS API KEY REQUIRED (ArcGIS World Street Map)
         function initLeafletMap() {
             if (map) return;
             map = L.map('leaflet-map').setView(appState.userLocation, 13);
             
-            // Tuiles CartoDB Voyager (épuré : routes, cours d'eau, parcs, sans surcharge de détails)
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+            L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
                 maxZoom: 19,
-                attribution: '© OpenStreetMap, © CARTO'
+                attribution: '© Esri, OpenStreetMap'
             }).addTo(map);
 
             refreshMapMarkers();
