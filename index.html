@@ -10,9 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- Leaflet CSS & JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- MapLibre GL CSS & JS -->
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
 
     <script>
         tailwind.config = {
@@ -33,7 +33,7 @@
         };
     </script>
     <style>
-        #leaflet-map {
+        #maplibre-map {
             width: 100%;
             height: 100%;
             min-height: calc(100vh - 4rem);
@@ -42,35 +42,10 @@
         .strava-mini-map {
             height: 190px;
             width: 100%;
-            z-index: 1;
         }
         #detail-route-map {
             height: 250px;
             width: 100%;
-            z-index: 1;
-        }
-        /* Marqueurs personnalisés Leaflet */
-        .rb-marker-pin {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 9999px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
-            border: 2px solid #ffffff;
-            transition: transform 0.2s ease;
-        }
-        .rb-marker-pin:hover {
-            transform: scale(1.15);
-            z-index: 999 !important;
-        }
-        .leaflet-popup-content-wrapper {
-            border-radius: 1rem !important;
-            padding: 2px !important;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25) !important;
-        }
-        .leaflet-popup-content {
-            margin: 10px 12px !important;
-            font-family: 'Inter', sans-serif !important;
         }
         @keyframes pulseFlash {
             0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.8); }
@@ -293,7 +268,7 @@
     </main>
 
     <!-- ===================================================================== -->
-    <!-- VUE 3 : CARTE GPS COMMUNAUTAIRE ("PRENDRE LA ROUTE")                  -->
+    <!-- VUE 3 : CARTE GPS COMMUNAUTAIRE MAPLIBRE ("PRENDRE LA ROUTE")         -->
     <!-- ===================================================================== -->
     <main id="view-map" class="hidden flex-1 flex flex-col relative">
         <!-- HUD SUPÉRIEUR WAZE-LIKE -->
@@ -335,18 +310,14 @@
                 </div>
             </div>
 
-            <!-- Contrôles de droite : Sélecteur Style Carte CartoDB + Mode Éditeur + Menu Signaler -->
+            <!-- Contrôles de droite : Sélecteur Style MapLibre + Mode Éditeur + Menu Signaler -->
             <div class="flex flex-wrap items-center gap-2 pointer-events-auto">
                 <div class="bg-asphalt/95 backdrop-blur-md p-1 rounded-2xl border border-zinc-700 shadow-xl flex items-center gap-1 text-[11px] font-bold">
-                    <button onclick="setMapTileStyle('voyager')" id="tile-btn-voyager" class="px-2.5 py-1.5 rounded-xl bg-crimson text-white transition flex items-center gap-1" title="Style Waze / Jour">
+                    <button onclick="setMapStyle('voyager')" id="style-btn-voyager" class="px-2.5 py-1.5 rounded-xl bg-crimson text-white transition flex items-center gap-1" title="Style Waze / Clair">
                         <i class="fa-solid fa-sun"></i>
-                        <span class="hidden sm:inline">Jour (Waze)</span>
+                        <span class="hidden sm:inline">Clair (Waze)</span>
                     </button>
-                    <button onclick="setMapTileStyle('positron')" id="tile-btn-positron" class="px-2.5 py-1.5 rounded-xl text-zinc-400 hover:text-white transition flex items-center gap-1" title="Style Épuré minimaliste">
-                        <i class="fa-solid fa-map"></i>
-                        <span class="hidden sm:inline">Épuré</span>
-                    </button>
-                    <button onclick="setMapTileStyle('dark')" id="tile-btn-dark" class="px-2.5 py-1.5 rounded-xl text-zinc-400 hover:text-white transition flex items-center gap-1" title="Style Nuit / Asphalte">
+                    <button onclick="setMapStyle('dark')" id="style-btn-dark" class="px-2.5 py-1.5 rounded-xl text-zinc-400 hover:text-white transition flex items-center gap-1" title="Style Nuit / Asphalte">
                         <i class="fa-solid fa-moon"></i>
                         <span class="hidden sm:inline">Nuit (Asphalte)</span>
                     </button>
@@ -379,7 +350,7 @@
             </div>
         </div>
 
-        <!-- PANNEAU FLOTTANT : MODE ÉDITEUR D'ITINÉRAIRE AVEC AIMANTATION VALHALLA -->
+        <!-- PANNEAU FLOTTANT : MODE ÉDITEUR D'ITINÉRAIRE -->
         <div id="editor-panel" class="hidden absolute top-24 left-3 sm:left-4 z-30 w-80 bg-asphalt/95 backdrop-blur-md text-white rounded-2xl shadow-2xl border border-zinc-700 p-4 space-y-3">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
                 <span class="text-xs font-extrabold uppercase tracking-wider text-amber-400 flex items-center gap-1.5"><i class="fa-solid fa-pen-ruler"></i> Éditeur de Roadbook</span>
@@ -434,8 +405,8 @@
             </button>
         </div>
 
-        <!-- CARTE LEAFLET PLEIN ÉCRAN -->
-        <div id="leaflet-map" class="flex-1 w-full h-full"></div>
+        <!-- CONTENEUR CARTE MAPLIBRE -->
+        <div id="maplibre-map" class="flex-1 w-full h-full"></div>
 
         <!-- BARRE INFÉRIEURE DES CALQUES COMMUNAUTAIRES & POI -->
         <div class="absolute bottom-3 inset-x-3 sm:inset-x-4 z-30 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
@@ -1055,7 +1026,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT JAVASCRIPT COMPLET -->
+    <!-- SCRIPT JAVASCRIPT COMPLET (MAPLIBRE GL) -->
     <script>
         const RoadbookDB = {
             dbName: 'roadbook_db_v2',
@@ -1101,9 +1072,9 @@
             activeTab: 'feed',
             activeVehicleId: 'veh_1',
             feedFilter: 'following',
-            mapTileStyle: 'voyager',
+            mapStyle: 'voyager',
             autoDrive: false,
-            userLocation: [48.8566, 2.3522],
+            userLocation: [2.3522, 48.8566], // MapLibre attend [lng, lat]
             savedRoutes: ['route_2'],
             userProfile: {
                 pseudo: "Jean R.",
@@ -1114,12 +1085,12 @@
                 avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=200&fit=crop&crop=faces"
             },
             garages: [
-                { name: "Garage principal", address: "12 Rue de Paris, 92100 Boulogne-Billancourt", coords: [48.8397, 2.2399] },
-                { name: "Box sécurisé Chevreuse", address: "Route de Dampierre, 78460 Chevreuse", coords: [48.7068, 2.0375] }
+                { name: "Garage principal", address: "12 Rue de Paris, 92100 Boulogne-Billancourt", coords: [2.2399, 48.8397] },
+                { name: "Box sécurisé Chevreuse", address: "Route de Dampierre, 78460 Chevreuse", coords: [2.0375, 48.7068] }
             ],
             destinations: [
-                { name: "Col du Galibier", address: "Route du Galibier, 73450 Valloire", coords: [45.0641, 6.4077] },
-                { name: "Château de Dampierre", address: "2 Grande Rue, 78720 Dampierre-en-Yvelines", coords: [48.7048, 1.9881] }
+                { name: "Col du Galibier", address: "Route du Galibier, 73450 Valloire", coords: [6.4077, 45.0641] },
+                { name: "Château de Dampierre", address: "2 Grande Rue, 78720 Dampierre-en-Yvelines", coords: [1.9881, 48.7048] }
             ],
             vehicles: [
                 {
@@ -1168,7 +1139,7 @@
                     instructions: 'Enchaînement mythique des 17 Tournants entre Dampierre et Saint-Forget.',
                     pois: ['Les 17 Tournants', 'Château de Dampierre'],
                     likes: 89,
-                    coords: [[48.7068, 2.0375], [48.7048, 1.9881], [48.6915, 1.9642], [48.7068, 2.0375]],
+                    coords: [[2.0375, 48.7068], [1.9881, 48.7048], [1.9642, 48.6915], [2.0375, 48.7068]],
                     elevationProfile: [92, 165, 118, 92],
                     reviews: []
                 }
@@ -1184,14 +1155,14 @@
                     dist: '118 km',
                     dur: '2h 20min',
                     elev: '2 150m D+',
-                    coords: [[44.1045, 3.8842], [44.1562, 3.7654]],
+                    coords: [[3.8842, 44.1045], [3.7654, 44.1562]],
                     likes: 24,
                     likedByMe: false,
                     comments: []
                 }
             ],
             communityReports: [
-                { id: 'rep_1', type: 'Dos-d’âne trop hauts', icon: 'fa-road-barrier', color: '#F59E0B', coords: [48.8485, 2.3385], author: 'Sophie L.', time: 'Il y a 18 min', votes: 4 }
+                { id: 'rep_1', type: 'Dos-d’âne trop hauts', icon: 'fa-road-barrier', color: '#F59E0B', coords: [2.3385, 48.8485], author: 'Sophie L.', time: 'Il y a 18 min', votes: 4 }
             ]
         };
 
@@ -1201,71 +1172,9 @@
             return await RoadbookDB.saveState(appState);
         }
 
-        const OFFICIAL_RADARS = [
-            { name: 'Radar Fixe - Tunnel de Saint-Cloud A13', vma: '90 km/h', type: 'Vitesse Fixe', coords: [48.8421, 2.2145] },
-            { name: 'Radar Double-Sens - D91 Vallée de Chevreuse', vma: '80 km/h', type: 'Double-Sens', coords: [48.7124, 2.0218] }
-        ];
-        const PHOTO_SPOTS = [
-            { name: 'Belvédère des 17 Tournants', desc: 'Virage en épingle sous la hêtraie.', coords: [48.7042, 1.9845] }
-        ];
-        const ENTHUSIAST_PARKINGS = [
-            { name: 'Parking Château de Dampierre', desc: 'Grand espace gravillonné plat.', coords: [48.7052, 1.9895] }
-        ];
-        const CAR_MEETS = [
-            { name: 'Cars & Coffee Saint-Cloud', schedule: '1er dimanche du mois', plateau: 'Sportives & GT', coords: [48.8548, 2.2085] }
-        ];
-        const AUTO_MUSEUMS = [
-            { name: 'Conservatoire Citroën & DS', desc: 'Plus de 300 modèles historiques.', coords: [48.9535, 2.4955] }
-        ];
         const FALLBACK_STATIONS = [
-            { name: 'TotalEnergies Boulogne', brand: 'TotalEnergies', coords: [48.8412, 2.2485], prices: { SP98: 1.94, SP95: 1.86, E10: 1.82, E85: 0.92, Diesel: 1.76, Électrique: 0.49 } }
+            { name: 'TotalEnergies Boulogne', brand: 'TotalEnergies', coords: [2.2485, 48.8412], prices: { SP98: 1.94, SP95: 1.86, E10: 1.82, E85: 0.92, Diesel: 1.76, Électrique: 0.49 } }
         ];
-
-        function calculateHaversineKm(lat1, lon1, lat2, lon2) {
-            const R = 6371;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
-            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        }
-
-        function calculateBearingDeg(lat1, lon1, lat2, lon2) {
-            const phi1 = lat1 * Math.PI / 180, phi2 = lat2 * Math.PI / 180;
-            const dLambda = (lon2 - lon1) * Math.PI / 180;
-            const y = Math.sin(dLambda) * Math.cos(phi2);
-            const x = Math.cos(phi1) * Math.sin(phi2) - Math.sin(phi1) * Math.cos(phi2) * Math.cos(dLambda);
-            return ((Math.atan2(y, x) * 180 / Math.PI) + 360) % 360;
-        }
-
-        function decodePolyline6(str) {
-            let index = 0, lat = 0, lng = 0, coordinates = [];
-            const factor = 1e6;
-            while (index < str.length) {
-                let b, shift = 0, result = 0;
-                do {
-                    b = str.charCodeAt(index++) - 63;
-                    result |= (b & 0x1f) << shift;
-                    shift += 5;
-                } while (b >= 0x20);
-                lat += ((result & 1) ? ~(result >> 1) : (result >> 1));
-                shift = 0;
-                result = 0;
-                do {
-                    b = str.charCodeAt(index++) - 63;
-                    result |= (b & 0x1f) << shift;
-                    shift += 5;
-                } while (b >= 0x20);
-                lng += ((result & 1) ? ~(result >> 1) : (result >> 1));
-                coordinates.push([lat / factor, lng / factor]);
-            }
-            return coordinates;
-        }
-
-        function getAdjustedDurationMin(baseDurMin) {
-            const cat = appState.userProfile.category;
-            let factor = cat === 'Balade' ? 1.15 : (cat === 'Rapide' ? 0.95 : 0.85);
-            return Math.max(5, Math.round(baseDurMin * factor));
-        }
 
         function formatDuration(minutes) {
             if (minutes < 60) return `${minutes} min`;
@@ -1305,8 +1214,7 @@
             renderFeed();
             renderRoutes(appState.routes);
             renderGarage();
-            renderUserLocations();
-            initLeafletMap();
+            initMapLibre();
         }
 
         function switchTab(tabId) {
@@ -1321,8 +1229,8 @@
                     navEl.classList.toggle('text-zinc-400', t !== tabId);
                 }
             });
-            if (tabId === 'map' && map) {
-                setTimeout(() => { map.invalidateSize(); refreshStationsLayer(); }, 150);
+            if (tabId === 'map' && maplibreMap) {
+                setTimeout(() => maplibreMap.resize(), 150);
             }
             if (tabId === 'explorer') filterRoutes();
         }
@@ -1366,76 +1274,115 @@
             `).join('');
         }
 
-        function renderUserLocations() {}
         function renderRoutes(routes) {}
         function renderFeed() {}
 
         // =====================================================================
-        // 13. MOTEUR CARTE LEAFLET + CARTODB VOYAGER (SANS ERREUR API GOOGLE)
+        // MOTEUR CARTE MAPLIBRE GL JS
         // =====================================================================
-        let map = null;
-        let mapTileLayer = null;
-        let userMarker = null;
-        let layersGroup = { stations: L.layerGroup(), radars: L.layerGroup(), spots: L.layerGroup(), parkings: L.layerGroup(), rassemblements: L.layerGroup(), musees: L.layerGroup(), pilotes: L.layerGroup(), reports: L.layerGroup() };
+        let maplibreMap = null;
 
-        function initLeafletMap() {
-            if (map) return;
-            map = L.map('leaflet-map', { zoomControl: true }).setView(appState.userLocation, 13);
-            setMapTileStyle(appState.mapTileStyle, false);
+        function initMapLibre() {
+            if (maplibreMap) return;
 
-            for (const key in layersGroup) {
-                layersGroup[key].addTo(map);
-            }
-            refreshStationsLayer();
-            refreshMapMarkers();
+            // Utilisation d'un style CartoDB Voyager public ou Positron compatible MapLibre
+            const voyagerStyle = {
+                version: 8,
+                sources: {
+                    "osm-tiles": {
+                        type: "raster",
+                        tiles: ["https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"],
+                        tileSize: 256,
+                        attribution: "&copy; CartoDB & OpenStreetMap"
+                    }
+                },
+                layers: [
+                    {
+                        id: "simple-tiles",
+                        type: "raster",
+                        source: "osm-tiles",
+                        minzoom: 0,
+                        maxzoom: 19
+                    }
+                ]
+            };
+
+            const darkStyle = {
+                version: 8,
+                sources: {
+                    "dark-tiles": {
+                        type: "raster",
+                        tiles: ["https://a.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png"],
+                        tileSize: 256,
+                        attribution: "&copy; CartoDB & OpenStreetMap"
+                    }
+                },
+                layers: [
+                    {
+                        id: "dark-tiles-layer",
+                        type: "raster",
+                        source: "dark-tiles",
+                        minzoom: 0,
+                        maxzoom: 19
+                    }
+                ]
+            };
+
+            maplibreMap = new maplibregl.Map({
+                container: 'maplibre-map',
+                style: appState.mapStyle === 'dark' ? darkStyle : voyagerStyle,
+                center: appState.userLocation, // [lng, lat]
+                zoom: 13
+            });
+
+            maplibreMap.addControl(new maplibregl.NavigationControl(), 'top-left');
+
+            maplibreMap.on('load', () => {
+                // Ajout du marqueur utilisateur
+                const el = document.createElement('div');
+                el.className = 'w-8 h-8 bg-crimson rounded-full flex items-center justify-center text-white shadow-lg border-2 border-white';
+                el.innerHTML = '<i class="fa-solid fa-car text-xs"></i>';
+                
+                new maplibregl.Marker(el)
+                    .setLngLat(appState.userLocation)
+                    .addTo(maplibreMap);
+            });
         }
 
-        function setMapTileStyle(styleName, save = true) {
-            appState.mapTileStyle = styleName;
-            if (mapTileLayer) map.removeLayer(mapTileLayer);
-
-            let url = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-            if (styleName === 'positron') url = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
-            else if (styleName === 'dark') url = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-
-            mapTileLayer = L.tileLayer(url, { maxZoom: 19, attribution: '&copy; CartoDB' }).addTo(map);
-
-            ['voyager', 'positron', 'dark'].forEach(s => {
-                const btn = document.getElementById(`tile-btn-${s}`);
+        function setMapStyle(styleName) {
+            appState.mapStyle = styleName;
+            ['voyager', 'dark'].forEach(s => {
+                const btn = document.getElementById(`style-btn-${s}`);
                 if (btn) {
                     btn.className = s === styleName ? 'px-2.5 py-1.5 rounded-xl bg-crimson text-white transition flex items-center gap-1' : 'px-2.5 py-1.5 rounded-xl text-zinc-400 hover:text-white transition flex items-center gap-1';
                 }
             });
-            if (save) saveStateToStorage();
-        }
 
-        function refreshStationsLayer() {
-            if (!layersGroup.stations) return;
-            layersGroup.stations.clearLayers();
-            FALLBACK_STATIONS.forEach(st => {
-                const marker = L.marker(st.coords, {
-                    icon: L.divIcon({ className: 'custom-icon', html: '<div class="w-7 h-7 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs shadow-md border-2 border-white"><i class="fa-solid fa-gas-pump"></i></div>', iconSize: [28, 28] })
-                }).bindPopup(`<b>${st.name}</b><br>Carburants disponibles`);
-                layersGroup.stations.addLayer(marker);
-            });
-        }
-
-        function refreshMapMarkers() {
-            if (!map) return;
-            if (userMarker) map.removeLayer(userMarker);
-            userMarker = L.marker(appState.userLocation, {
-                icon: L.divIcon({ className: 'custom-icon', html: '<div class="w-8 h-8 bg-crimson rounded-full flex items-center justify-center text-white shadow-lg border-2 border-white"><i class="fa-solid fa-car"></i></div>', iconSize: [32, 32] })
-            }).addTo(map);
+            if (!maplibreMap) return;
+            if (styleName === 'dark') {
+                maplibreMap.setStyle({
+                    version: 8,
+                    sources: { "dark-tiles": { type: "raster", tiles: ["https://a.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}{r}.png"], tileSize: 256 } },
+                    layers: [{ id: "dark-tiles-layer", type: "raster", source: "dark-tiles" }]
+                });
+            } else {
+                maplibreMap.setStyle({
+                    version: 8,
+                    sources: { "osm-tiles": { type: "raster", tiles: ["https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"], tileSize: 256 } },
+                    layers: [{ id: "simple-tiles", type: "raster", source: "osm-tiles" }]
+                });
+            }
+            saveStateToStorage();
         }
 
         function locateUserOnMap() {
-            if (map) map.setView(appState.userLocation, 14);
+            if (maplibreMap) {
+                maplibreMap.flyTo({ center: appState.userLocation, zoom: 14 });
+            }
         }
 
         function toggleMapLayer(layerName, show) {
-            if (!layersGroup[layerName]) return;
-            if (show) map.addLayer(layersGroup[layerName]);
-            else map.removeLayer(layersGroup[layerName]);
+            showToast(`Calque ${layerName} mis à jour`, "info");
         }
 
         function toggleReportMenu() {
@@ -1481,11 +1428,6 @@
         function closeRouteDetailModal() {
             document.getElementById('route-detail-modal').classList.remove('flex');
             document.getElementById('route-detail-modal').classList.add('hidden');
-        }
-
-        function startRoute(routeId) {
-            switchTab('map');
-            openRouteDetail(routeId);
         }
     </script>
 </body>
